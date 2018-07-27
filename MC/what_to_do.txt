@@ -1,0 +1,43 @@
+goal: expected MPV, MPV vs ds per particle kind. Surtout les muons, que l'on est capable de sélectionner efficacement
+-> avant reconstruction
+doit accéder aux traces
+pas forcément dans la zone active: on peut faire les cuts plus tard. Mais en fait si, les autrs n'ont pas de hits associés
+doit accéder aux hits de ces traces
+doit accéder à la charge totale déposée dans le hits
+doit accéder à la longueur (ds) du hit
+
+All primaries are not 
+
+-> relevant entries: 
+
+run, subrun, EventNumberInRun, IsData (must be 0) -- one entry per event
+nb particles: MCTruth_GEANT4_NumberOfParticles in this event    -- one entry per event
+
+  is in AV: MCTruth_GEANT4_IsInTPCAV -- one entry per particle (size: MCTruth_GEANT4_NumberOfParticles)
+  
+nb particles in TPC active volume in this event: MCTruth_GEANT4_InTPCAV_NumberOfParticles -- one entry per event
+  particle ID: MCTruth GEANT4 InTPCAV ParicleID -- one entry per particle in AV (size: MCTruth_GEANT4_InTPCAV_NumberOfParticles)
+  pdg code: MCTruth GEANT4 InTPCAV PDGCode -- one entry per particle in AV(size: MCTruth_GEANT4_InTPCAV_NumberOfParticles)
+  length in cm, start and exit points coord. in cm, start time in ns, start energy and mom(coord) in GeV(/c), sart and end directions (angles) -- one entry per particle in AV (size MCTruth_GEANT4_InTPCAV_NumberOfParticles)
+  
+total number of steps done by G4 in this event: MCTruth GEANT4 NumberOfTrajectoryStepsForAllParticles -- one entry per event
+
+  number of steps for one particle: MCTruth GEANT4 NumberOfTrajectoryStepsPerParticle -- one entry per particle (size MCTruth GEANT4 NumberOfParticles)
+  
+details of one step (particle it belongs to, energy, position, etc...): one entry per G4Step (size MCTruth GEANT4 NumberOfTrajectoryStepsForAllParticles)
+
+1-loop over events. size: event<NEvent
+  getevent
+  Iav=0
+  Istep=0
+  2-loop over tracks. size: i<MCTruth_GEANT4_NumberOfParticles
+    if in av:
+      Iav++
+      store pdgcode[Iav], particleID[Iav], length[Iav] and other stuff in track object, number of steps in this particle[i]
+      3-loop over G4Step in this particle
+        store info
+  step+=stepinthisparticle
+      
+      
+which "size" do I need? -> MCTruth_GEANT4_NumberOfParticles, MCTruth_GEANT4_InTPCAV_NumberOfParticles, MCTruth GEANT4 NumberOfTrajectoryStepsForAllParticles)
+-> Best way to store info? object already existing (track and hit objects)

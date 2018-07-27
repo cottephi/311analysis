@@ -1,0 +1,7 @@
+jobs/LSFJOB*
+*/*.png
+*/*.root
+*.root
+*.png
+obj/*
+WA105Soft

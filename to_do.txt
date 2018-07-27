@@ -1,0 +1,18 @@
+eff 2D???
+dQds sum vs integral at low extraction -> need to remove low dQ hits
+waveform at low extraction
+charging up: what's with the dates? why is run 840 absent?
+  Add error bars
+
+normalisation with temperature: fit 3L to have Arho and Brho, set rho=1 at a given P and T (take those of 3L paper), compute transparency from that, correct for new rho
+
+redo MPV plots for feb, june and MC
+
+
+4-check MPV MC
+
+
+correct hits of secondary tracks for dx?
+
+
+5-correlation vue0/vue1
