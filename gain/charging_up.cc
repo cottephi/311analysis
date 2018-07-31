@@ -27,7 +27,7 @@ void charging_up(int run = 840, string cut_type = "Ds", string version = "June",
   gErrorIgnoreLevel = kError;
   
   string corrected_or_not = "";
-  if(cut_type.find("throughgoing") != string::npos){corrected_or_not = "_Dx_Corrected";}
+  if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
   gStyle->SetOptFit(0);
   gStyle->SetStatY(0.35);                
   // Set y-position (fraction of pad size)

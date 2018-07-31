@@ -45,6 +45,8 @@ void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version 
 
   for(auto run : run_list){
   
+    if(highway){if(!load_highway(run)){return;}}
+  
     double drift = runs_and_fields[run]["Drift"];
     double amplification = runs_and_fields[run]["Extraction"];
     double extraction = runs_and_fields[run]["Amplification"];
@@ -127,10 +129,10 @@ void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version 
     cout << "Reading input file..." << endl;
     #endif
     if(path_311data.find("Feb") != string::npos){
-      read_tree_Feb(&chain, tracks_before_cuts, to_read, tstart, tend);
+      read_tree_Feb(&chain, tracks_before_cuts, tstart, tend, to_read);
     }
     else if(path_311data.find("June") != string::npos){
-      read_tree_June(&chain, tracks_before_cuts, to_read, tstart, tend);
+      read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
     }
     else{
       cout << "ERROR: unknown reconstruction version" << endl;

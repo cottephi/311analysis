@@ -15,10 +15,9 @@ string to_string_with_precision(const T a_value, const int n = 3){
   return out.str();
 }
 
-vector<string> params = {"date","TE0037","TE0038","TE0039","TE0040","TE0041","TE0042","TE0043","TE0044","TE0045","TE0046","TE0047","TE0048","TE1001","TE1002","TE1003","TE1004","TE0049","TE0050","TE0051","TE0052","TE0053","TE0054","TE0055","TE0056","TE0057","TE0058","TE0059","TE0060","PE0006"};
 //vector<string> params = {"date","TE0037","TE0041","TE0045","TE1001","PE0006"};
 
-void pressure(string srun = "801"){
+void Pressure(string srun = "1005"){
   
   gErrorIgnoreLevel = kError;
 
@@ -114,12 +113,17 @@ void pressure(string srun = "801"){
   }
   ifile.close();
   
-  if(map_par_values["data"].size() == 0){
+  if(map_par_values["date"].size() == 0){
     cout << "Error in pressure.cc: empty run" << endl;
     map_par_values.clear();
     return;
   }
-  
+  for(auto par : map_par_values){
+    if(par.second.size() == 0){
+      cout << "ERROR: no data for parameter " << par.first << endl;
+      return;
+    }
+  }
   cout << "...done" << endl;
   TFile ofile_pressure(string(directory + "pressure.root").data(),"RECREATE");
   TFile ofile_temperature_CRP(string(directory + "temperature_CRP.root").data(),"RECREATE");
@@ -127,67 +131,34 @@ void pressure(string srun = "801"){
   
   
   for(auto par : map_par_values){
-    int i=0;
 ////////////////////////////////////////////////
     //param vs time
 ////////////////////////////////////////////////
     cout << "Plotting " << par.first << "..." << endl;
 
     if(par.first == "date"){continue;}
-    i++;
-    cout << i << endl;
     TGraph gr(par.second.size(), &map_par_values["date"][0], &par.second[0]);
-    i++;
-    cout << i << endl;
     gr.SetTitle(string(par.first).data());
-    i++;
-    cout << i << endl;
     gr.SetName(string("graph_"+par.first).data());
-    i++;
-    cout << i << endl;
     gr.Draw("AC");
-    i++;
-    cout << i << endl;
     gr.GetXaxis()->SetTimeDisplay(1);
-    i++;
-    cout << i << endl;
     gr.GetXaxis()->LabelsOption("v");
-    i++;
-    cout << i << endl;
     if(map_par_values["date"].back()-map_par_values["date"][0] > 24*3600){
-    i++;
-    cout << " " << i << endl;
       gr.GetXaxis()->SetTimeFormat("%d/%m %Hh%M");
       gr.GetXaxis()->SetNdivisions(5);
     }
     else{
-    i++;
-    cout << "  " << i << endl;
       gr.GetXaxis()->SetTimeFormat("%Hh%M");
       gr.GetXaxis()->SetNdivisions(8);
     }
-    i++;
-    cout << i << endl;
     gr.Draw("AC");
-    i++;
-    cout << i << endl;
     gPad->Update();
-    i++;
-    cout << i << endl;
     gPad->Modified();
-    i++;
-    cout << i << endl;
     if(par.first == "PE0006"){ofile_pressure.cd();}
     else if(find(temp_crp.begin(), temp_crp.end(), par.first) != temp_crp.end()){ofile_temperature_CRP.cd();}
     else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
-    i++;
-    cout << i << endl;
     gr.Write();
-    i++;
-    cout << i << endl;
     gPad->SetName(string(string(gr.GetName()) + "_pad").data());
-    i++;
-    cout << i << endl;
 //    gPad->SaveAs(string(directory + "graph_"+par.first + ".png").data());
     if(par.first == "PE0006"){ofile_pressure.cd();}
     else if(find(temp_crp.begin(), temp_crp.end(), par.first) != temp_crp.end()){ofile_temperature_CRP.cd();}
@@ -272,8 +243,6 @@ void pressure(string srun = "801"){
       gPad->Write();
       delete gPad;
     }
-    
-    cout << "chien" << endl;
   }
   ofile_pressure.Close();
   ofile_temperature_CRP.Close();

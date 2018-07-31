@@ -136,7 +136,7 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
   vector<double> f1 = {-1,-1};
   string name_to_get = "";
   string corrected_or_not = "";
-  if(cut_type.find("throughgoing") != string::npos){corrected_or_not = "Dx_Corrected_";}
+  if(cut_type.find("tg") != string::npos){corrected_or_not = "Dx_Corrected_";}
 
   #if verbose 
   cout << "  Reading histograms..." << endl;

@@ -52,6 +52,9 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
   gStyle->SetPalette(kColorPrintableOnGrey);
   bool recreate_fit_file = false;
   
+  string corrected_or_not = "";
+  if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
+  
   //****************************************************************************
   //variables definition here
   map<string, vector<int> > scans;
@@ -148,38 +151,17 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
         mpv_field_ByLEMs_total_summedviews[lem]->SetName(string("mpv_field_LEM_"+to_string(lem)+"_summedviews").data());
     }
     
-    TMultiGraph* mpv_field_Dx_Corrected_total = new TMultiGraph();
-    mpv_field_Dx_Corrected_total->SetTitle(string(";"+field_type+" field ("+unit+");gain").data());
-    mpv_field_Dx_Corrected_total->SetName("mpv_field_Dx_Corrected_total");
-    map<int, TMultiGraph*> mpv_field_ByLEMs_Dx_Corrected_total;
-    TMultiGraph* mpv_field_Dx_Corrected_total_summedviews = new TMultiGraph();
-    mpv_field_Dx_Corrected_total_summedviews->SetTitle(string(";"+field_type+" field ("+unit+");gain").data());
-    mpv_field_Dx_Corrected_total_summedviews->SetName("mpv_field_Dx_Corrected_total_summedviews");
-    map<int, TMultiGraph*> mpv_field_ByLEMs_Dx_Corrected_total_summedviews;
-    vector<int> scan_nums_for_total;
-    for( auto lem : lems ){
-        mpv_field_ByLEMs_Dx_Corrected_total[lem] = new TMultiGraph();
-        mpv_field_ByLEMs_Dx_Corrected_total[lem]->SetTitle(string(";"+field_type+" field ("+unit+");gain").data());
-        mpv_field_ByLEMs_Dx_Corrected_total[lem]->SetName(string("mpv_field_LEM_Dx_Corrected_"+to_string(lem)).data());
-        mpv_field_ByLEMs_Dx_Corrected_total_summedviews[lem] = new TMultiGraph();
-        mpv_field_ByLEMs_Dx_Corrected_total_summedviews[lem]->SetTitle(string(";"+field_type+" field ("+unit+");gain").data());
-        mpv_field_ByLEMs_Dx_Corrected_total_summedviews[lem]->SetName(string("mpv_field_LEM_"+to_string(lem)+"_summedviews_Dx_Corrected").data());
-    }
-      
     int empty_scan_num = 0;
     for( auto scan_num : scan_it.second ){
       
       vector<TGraphErrors*> mpv_field;
       map<int, vector<TGraphErrors*> > mpv_field_ByLEMs;
       vector<TMultiGraph*> mpv_field_AllLEMs;
-      vector<TMultiGraph*> mpv_field_AllLEMs_Dx_Corrected;
-      vector<TGraphErrors*> mpv_field_Dx_Corrected;
-      map<int, vector<TGraphErrors*> > mpv_field_ByLEMs_Dx_Corrected;
       vector<int> scan_nums_for_AllLEMs;
       #if verbose 
       cout << "  Initialising graphs..." << endl;
       #endif
-      bool are_graph_ok = init_graph_gain(mpv_field, mpv_field_ByLEMs, mpv_field_Dx_Corrected, mpv_field_ByLEMs_Dx_Corrected, mpv_field_AllLEMs, mpv_field_AllLEMs_Dx_Corrected, scan_nums_for_AllLEMs, scan_type, scan_num);
+      bool are_graph_ok = init_graph_gain(mpv_field, mpv_field_ByLEMs, mpv_field_AllLEMs, scan_nums_for_AllLEMs, scan_type, scan_num);
       if( !are_graph_ok){
         cout << "  Error while initialising graph" << endl;
         return;
@@ -278,7 +260,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
           #if verbose 
           cout << "  Reading histograms..." << endl;
           #endif
-          runfile.GetObject("dQds_view0", hdQds);
+          runfile.GetObject(string("dQds_view0" + corrected_or_not).data(), hdQds);
           nhits_tot += hdQds->GetEntries();
           if(read_fit){
             f = ReadFit(hdQds, mpv_field[0], scan_type, field_it.first);
@@ -289,7 +271,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
             runfile_fitted->cd();
             hdQds->Write();
           }
-          runfile.GetObject("dQds_view1", hdQds);
+          runfile.GetObject(string("dQds_view1" + corrected_or_not).data(), hdQds);
           nhits_tot += hdQds->GetEntries();
           if(read_fit){
             f = ReadFit(hdQds,mpv_field[1], scan_type, field_it.first);
@@ -317,63 +299,25 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
             #endif
           }
           
-          runfile.GetObject("dQds_view0_Dx_Corrected", hdQds);
-          if(read_fit){
-            f = ReadFit(hdQds, mpv_field_Dx_Corrected[0], scan_type, field_it.first);
-          }
-          else{
-            f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_Dx_Corrected[0], scan_type, field_it.first);
-            runfile_fitted->cd();
-            hdQds->Write();
-          }
-          runfile.GetObject("dQds_view1_Dx_Corrected", hdQds);
-          if(read_fit){
-            f = ReadFit(hdQds,mpv_field_Dx_Corrected[1], scan_type, field_it.first);
-          }
-          else{
-            f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_Dx_Corrected[1], scan_type, field_it.first);
-            runfile_fitted->cd();
-            hdQds->Write();
-          }
-          
           for( auto lem : lems ){
-              runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view0").data(), hdQds);
-              if(read_fit){
-                f = ReadFit(hdQds,mpv_field_Bylem[0], scan_type, field_it.first);
-              }
-              else{
-                f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_Bylem[0], scan_type, field_it.first);
-                runfile_fitted->cd();
-                hdQds->Write();
-              }
-              runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view1").data(), hdQds);
-              if(read_fit){
-                f = ReadFit(hdQds,mpv_field_Bylem[1], scan_type, field_it.first);
-              }
-              else{
-                f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_Bylem[1], scan_type, field_it.first);
-                runfile_fitted->cd();
-                hdQds->Write();
-              }
-              
-              runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view0_Dx_Corrected").data(), hdQds);
-              if(read_fit){
-                f = ReadFit(hdQds,mpv_field_ByLEMs_Dx_Corrected[lem][0], scan_type, field_it.first);
-              }
-              else{
-                f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_ByLEMs_Dx_Corrected[lem][0], scan_type, field_it.first);
-                runfile_fitted->cd();
-                hdQds->Write();
-              }
-              runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view1_Dx_Corrected").data(), hdQds);
-              if(read_fit){
-                f = ReadFit(hdQds,mpv_field_ByLEMs_Dx_Corrected[lem][1], scan_type, field_it.first);
-              }
-              else{
-                f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_ByLEMs_Dx_Corrected[lem][1], scan_type, field_it.first);
-                runfile_fitted->cd();
-                hdQds->Write();
-              }
+            runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view0" + corrected_or_not).data(), hdQds);
+            if(read_fit){
+              f = ReadFit(hdQds,mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
+            }
+            else{
+              f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
+              runfile_fitted->cd();
+              hdQds->Write();
+            }
+            runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view1" + corrected_or_not).data(), hdQds);
+            if(read_fit){
+              f = ReadFit(hdQds,mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
+            }
+            else{
+              f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
+              runfile_fitted->cd();
+              hdQds->Write();
+            }
           }//for lem
           if(runfile_fitted->IsOpen()){
             runfile_fitted->Close();
@@ -408,9 +352,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
         continue;
       }
       sum_views(mpv_field, mpv_field_ByLEMs);
-      sum_views(mpv_field_Dx_Corrected, mpv_field_ByLEMs_Dx_Corrected);
       fill_multigraph(mpv_field_ByLEMs, mpv_field_AllLEMs);
-      fill_multigraph(mpv_field_ByLEMs_Dx_Corrected, mpv_field_AllLEMs_Dx_Corrected);
       
       if(scan_type != "All"){
         #if verbose
@@ -430,7 +372,6 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
         cout << "    Writing MPV/Gain graph for scan " << scan_type << " " << scan_num << "." << endl;
         #endif
       }
-      scan_nums_for_total.push_back(scan_num);
       mpv_field[0]->SetTitle(to_string(scan_num).data());
       mpv_field[1]->SetTitle(to_string(scan_num).data());
       mpv_field[2]->SetTitle(to_string(scan_num).data());
@@ -440,17 +381,6 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
       mpv_field[0]->SetMarkerColor(kRed);
       mpv_field[1]->SetMarkerColor(kBlue);
       mpv_field[2]->SetMarkerColor(kGreen+1);
-      
-      
-      mpv_field_Dx_Corrected[0]->SetTitle(to_string(scan_num).data());
-      mpv_field_Dx_Corrected[1]->SetTitle(to_string(scan_num).data());
-      mpv_field_Dx_Corrected[2]->SetTitle(to_string(scan_num).data());
-      mpv_field_Dx_Corrected_total->Add(new TGraphErrors(*mpv_field_Dx_Corrected[0]),"*");
-      mpv_field_Dx_Corrected_total->Add(new TGraphErrors(*mpv_field_Dx_Corrected[1]),"*");
-      mpv_field_Dx_Corrected_total_summedviews->Add(new TGraphErrors(*mpv_field_Dx_Corrected[2]),"*");
-      mpv_field_Dx_Corrected[0]->SetMarkerColor(kRed);
-      mpv_field_Dx_Corrected[1]->SetMarkerColor(kBlue);
-      mpv_field_Dx_Corrected[2]->SetMarkerColor(kGreen+1);
       
       if(scan_type != "All"){
         ofile->cd();
@@ -467,83 +397,40 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
         if(mpv_field[2]){
           draw_gain_graph(mpv_field[2], scan_type, scan_num, ofile, outpath);
         }
-        
-        ofile->cd();
-        if(scan_type == "Amplification"){
-          //Arho~4000  Brho~200
-          fit_gain(mpv_field_Dx_Corrected[0],{1,4000,200});
-          fit_gain(mpv_field_Dx_Corrected[1],{1,4000,200});
-          if(mpv_field_Dx_Corrected[2]){
-            fit_gain(mpv_field_Dx_Corrected[2],{1,4000,200});
-          }
-        }
-        draw_gain_graph(mpv_field_Dx_Corrected[0], scan_type, scan_num, ofile, outpath);
-        draw_gain_graph(mpv_field_Dx_Corrected[1], scan_type, scan_num, ofile, outpath);
-        if(mpv_field_Dx_Corrected[2]){
-          draw_gain_graph(mpv_field_Dx_Corrected[2], scan_type, scan_num, ofile, outpath);
-        }
       }
 //      draw_gain_graph_superposed_lems(mpv_field_AllLEMs[0], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
-//      draw_gain_graph_superposed_lems(mpv_field_AllLEMs_Dx_Corrected[0], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
 //      draw_gain_graph_superposed_lems(mpv_field_AllLEMs[1], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
-//      draw_gain_graph_superposed_lems(mpv_field_AllLEMs_Dx_Corrected[1], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
 //      draw_gain_graph_superposed_lems(mpv_field_AllLEMs[2], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
-//      draw_gain_graph_superposed_lems(mpv_field_AllLEMs_Dx_Corrected[2], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
       for( auto lem : lems ){
         if(scan_type != "All"){
           #if verbose
           cout << "    Writing MPV/Gain graph for LEM " << lem << endl;
           #endif
         }
-        mpv_field_Bylem[0]->SetTitle(to_string(scan_num).data());
-        mpv_field_Bylem[1]->SetTitle(to_string(scan_num).data());
-        mpv_field_Bylem[2]->SetTitle(to_string(scan_num).data());
-        mpv_field_ByLEMs_total[lem]->Add(new TGraphErrors(*mpv_field_Bylem[0]),"*");
-        mpv_field_ByLEMs_total[lem]->Add(new TGraphErrors(*mpv_field_Bylem[1]),"*");
-        mpv_field_ByLEMs_total_summedviews[lem]->Add(new TGraphErrors(*mpv_field_Bylem[2]),"*");
-        mpv_field_Bylem[0]->SetMarkerColor(kRed);
-        mpv_field_Bylem[1]->SetMarkerColor(kBlue);
-        mpv_field_Bylem[2]->SetMarkerColor(kGreen+1);
-        
-        mpv_field_ByLEMs_Dx_Corrected[lem][0]->SetTitle(to_string(scan_num).data());
-        mpv_field_ByLEMs_Dx_Corrected[lem][1]->SetTitle(to_string(scan_num).data());
-        mpv_field_ByLEMs_Dx_Corrected[lem][2]->SetTitle(to_string(scan_num).data());
-        mpv_field_ByLEMs_Dx_Corrected_total[lem]->Add(new TGraphErrors(*mpv_field_ByLEMs_Dx_Corrected[lem][0]),"*");
-        mpv_field_ByLEMs_Dx_Corrected_total[lem]->Add(new TGraphErrors(*mpv_field_ByLEMs_Dx_Corrected[lem][1]),"*");
-        mpv_field_ByLEMs_Dx_Corrected_total_summedviews[lem]->Add(new TGraphErrors(*mpv_field_ByLEMs_Dx_Corrected[lem][2]),"*");
-        mpv_field_ByLEMs_Dx_Corrected[lem][0]->SetMarkerColor(kRed);
-        mpv_field_ByLEMs_Dx_Corrected[lem][1]->SetMarkerColor(kBlue);
-        mpv_field_ByLEMs_Dx_Corrected[lem][2]->SetMarkerColor(kGreen+1);
+        mpv_field_ByLEMs[lem][0]->SetTitle(to_string(scan_num).data());
+        mpv_field_ByLEMs[lem][1]->SetTitle(to_string(scan_num).data());
+        mpv_field_ByLEMs[lem][2]->SetTitle(to_string(scan_num).data());
+        mpv_field_ByLEMs_total[lem]->Add(new TGraphErrors(*mpv_field_ByLEMs[lem][0]),"*");
+        mpv_field_ByLEMs_total[lem]->Add(new TGraphErrors(*mpv_field_ByLEMs[lem][1]),"*");
+        mpv_field_ByLEMs_total_summedviews[lem]->Add(new TGraphErrors(*mpv_field_ByLEMs[lem][2]),"*");
+        mpv_field_ByLEMs[lem][0]->SetMarkerColor(kRed);
+        mpv_field_ByLEMs[lem][1]->SetMarkerColor(kBlue);
+        mpv_field_ByLEMs[lem][2]->SetMarkerColor(kGreen+1);
         
         if(scan_type != "All"){
           ofile->cd();
           if(scan_type == "Amplification"){
             //Arho~4000  Brho~200
-            fit_gain(mpv_field_Bylem[0],{1,4000,200});
-            fit_gain(mpv_field_Bylem[1],{1,4000,200});
-            if(mpv_field_Bylem[2]){
-              fit_gain(mpv_field_Bylem[2],{1,4000,200});
+            fit_gain(mpv_field_ByLEMs[lem][0],{1,4000,200});
+            fit_gain(mpv_field_ByLEMs[lem][1],{1,4000,200});
+            if(mpv_field_ByLEMs[lem][2]){
+              fit_gain(mpv_field_ByLEMs[lem][2],{1,4000,200});
             }
           }
-          draw_gain_graph(mpv_field_Bylem[0], scan_type, scan_num, ofile, outpath);
-          draw_gain_graph(mpv_field_Bylem[1], scan_type, scan_num, ofile, outpath);
-          if(mpv_field_Bylem[2]){
-            draw_gain_graph(mpv_field_Bylem[2], scan_type, scan_num, ofile, outpath);
-          }
-          
-          ofile->cd();
-          if(scan_type == "Amplification"){
-            //Arho~4000  Brho~200
-            fit_gain(mpv_field_ByLEMs_Dx_Corrected[lem][0],{1,4000,200});
-            fit_gain(mpv_field_ByLEMs_Dx_Corrected[lem][1],{1,4000,200});
-            if(mpv_field_ByLEMs_Dx_Corrected[lem][2]){
-              fit_gain(mpv_field_ByLEMs_Dx_Corrected[lem][2],{1,4000,200});
-            }
-          }
-          draw_gain_graph(mpv_field_ByLEMs_Dx_Corrected[lem][0], scan_type, scan_num, ofile, outpath);
-          draw_gain_graph(mpv_field_ByLEMs_Dx_Corrected[lem][1], scan_type, scan_num, ofile, outpath);
-          if(mpv_field_ByLEMs_Dx_Corrected[lem][2]){
-            draw_gain_graph(mpv_field_ByLEMs_Dx_Corrected[lem][2], scan_type, scan_num, ofile, outpath);
+          draw_gain_graph(mpv_field_ByLEMs[lem][0], scan_type, scan_num, ofile, outpath);
+          draw_gain_graph(mpv_field_ByLEMs[lem][1], scan_type, scan_num, ofile, outpath);
+          if(mpv_field_ByLEMs[lem][2]){
+            draw_gain_graph(mpv_field_ByLEMs[lem][2], scan_type, scan_num, ofile, outpath);
           }
         }
       }//for lem
@@ -571,20 +458,12 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
 //    draw_gain_multigraph(mpv_field_total_summedviews, scan_type, ofile_total, true, outpath_total);
 //    
 //    ofile_total->cd();
-//    draw_gain_multigraph(mpv_field_Dx_Corrected_total, scan_type, ofile_total);
-//    draw_gain_multigraph(mpv_field_Dx_Corrected_total_summedviews, scan_type, ofile_total, true, outpath_total);
-//    
-//    ofile_total->cd();
 //    for( auto lem : lems ){
 //      if(mpv_field_ByLEMs_total[lem]->GetListOfGraphs()){
 //        draw_gain_multigraph(mpv_field_ByLEMs_total[lem], scan_type, ofile_total);
-//        
-//        draw_gain_multigraph(mpv_field_ByLEMs_Dx_Corrected_total[lem], scan_type, ofile_total);
 //      }
 //      if(mpv_field_ByLEMs_total_summedviews[lem]->GetListOfGraphs()){
 //        draw_gain_multigraph(mpv_field_ByLEMs_total_summedviews[lem], scan_type, ofile_total, true, outpath_total);
-//        
-//        draw_gain_multigraph(mpv_field_ByLEMs_Dx_Corrected_total_summedviews[lem], scan_type, ofile_total, true, outpath_total);
 //      }
 //    }// for lem
 //    ofile_total->Close();

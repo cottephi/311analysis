@@ -107,6 +107,15 @@ bool select_tracks_YZ(string cut_type, vector<track> tracks, vector<track> & mip
     }
     
     if( mag > length_cut ) {
+    
+      if(highway){
+        if(tracks_selected_by_highway.size() == 0){
+          cout << "ERROR in select_track : please load highway output" << endl;
+          return false;
+        }
+        int track_ID = 1000*(1+t.event) + t.id;
+        if( find(tracks_selected_by_highway.begin(), tracks_selected_by_highway.end(), track_ID) == tracks_selected_by_highway.end() ){continue;}
+      }
       //cut on the track angle. Avoid track parallel to a view, or parallel to drift direction. Also ignore bended tracks 
       if( theta_cut > 0 and (t.theta < theta_cut or t.theta > TMath::Pi()-theta_cut) ){continue;}
       if( phi_cut > 0 and (fabs(t.phi) - ((int)(fabs(t.phi)/(TMath::Pi()/2.)))*TMath::Pi()/2. < phi_cut or fabs(t.phi) - ((int)(fabs(t.phi)/(TMath::Pi()/2.)))*TMath::Pi()/2. > TMath::Pi()/2.-phi_cut) ){continue;}
@@ -180,6 +189,8 @@ void YZ_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string ve
   std::string filename = "";
 
   for(auto run : run_list){
+  
+    if(highway){if(!load_highway(run)){return;}}
   
     double drift = runs_and_fields[run]["Drift"];
     double amplification = runs_and_fields[run]["Extraction"];

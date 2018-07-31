@@ -214,6 +214,14 @@ void cuts_analysis(int run = 840, string cut_type = "Ds", string version = "June
   }
   inputfile_before_cuts = inputfile_before_cuts+"/tracks_"+to_string(run)+".root";
   inputfile_selected_tracks = inputfile_selected_tracks+"/tracks_"+to_string(run)+".root";
+  if(!ExistTest(inputfile_before_cuts)){
+    cout << "ERROR: file " << inputfile_before_cuts << " not found" << endl;
+    return;
+  }
+  if(!ExistTest(inputfile_selected_tracks)){
+    cout << "ERROR: file " << inputfile_selected_tracks << " not found" << endl;
+    return;
+  }
   
   cout << "Loading tracks from " << inputfile_before_cuts << endl;
   TFile ifile_before_cuts(inputfile_before_cuts.data(), "READ");

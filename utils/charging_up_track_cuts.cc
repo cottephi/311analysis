@@ -420,6 +420,8 @@ void charging_up_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", 
   std::string filename = "";
   
   for(auto run : run_list){
+  
+    if(highway){if(!load_highway(run)){return;}}
     
     double drift = runs_and_fields[run]["Drift"];
     double amplification = runs_and_fields[run]["Extraction"];
@@ -486,7 +488,7 @@ void charging_up_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", 
       cout << "ERROR: unknown reconstruction version" << endl;
       return;
     }
-    if(tracks_before_cuts.size() == 0){
+    if(tracks_before_cuts_charging_up.size() == 0){
       #if verbose
       cout << "Empty run " << run << endl;
       #endif

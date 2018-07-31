@@ -81,6 +81,17 @@ bool Load_Version(string version){
     lem_size = 48;
     dQdx_cut_min = 0.;
   }
+  else if(version == "Junec"){
+    path_311data = "/eos/user/p/pcotte/311data/2018_June_24c/";
+    path_wa105_311data = "/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24c/ROOT/recofast/";
+    tpc_boundaries = {-50, 50, -48, 48, 0, 288};
+    pitch = 0.3;
+    dx=10;
+    dy=4.8;
+    dz=4.8;
+    lem_size = 48;
+    dQdx_cut_min = 0.;
+  }
   else{
     cout << "Unknown reco version " << version << endl;
     return false;
@@ -919,6 +930,57 @@ void load_gain_eff_corrections(){
   gain_corrections[1198] = get_eff(1.1)*.6;
   gain_corrections[1199] = get_eff(1.1)*.6;
   return;
+}
+
+bool load_highway(int run){
+
+  #if verbose
+  cout << "Loading highway tracks selection output for run " << run << "..." << endl;
+  #endif
+  string path = highway_output + "Run" + to_string(run) + "/";
+  if(!ExistTest(path)){
+    tracks_selected_by_highway.push_back(-1.);
+    return true;
+  }
+  string wildcard_path = path+"*";
+  vector<string> ifiles;
+  for( auto file : glob(wildcard_path) ){
+    ifiles.push_back(path+file);
+  }
+  if(ifiles.size() == 0){
+    tracks_selected_by_highway.push_back(-1.);
+    return true;
+  }
+  
+  
+  for (auto file : ifiles){
+    fstream ifile;
+    ifile.open(file.data(), fstream::in);
+    if(!ifile.is_open()){
+      cout << "ERROR : can not open file " << file.data() << endl;
+      return false;
+    }
+    int i = 0;
+    
+    while(!ifile.eof()){
+      char buffer[1000];
+      ifile.getline(buffer, 1000);
+      if(i == 0){i++; continue;}
+      char* tokBuffer;
+      if( string(buffer).find(";") == string::npos ){break;}
+      tokBuffer = strtok(buffer, ";"); tokBuffer = strtok(NULL, ";"); tokBuffer = strtok(NULL, ";");
+      long track_ID = 1000*(1+atoi(tokBuffer));
+      tokBuffer = strtok(NULL, ";");
+      track_ID += atoi(tokBuffer);
+      tracks_selected_by_highway.push_back(track_ID);
+    }
+    ifile.close();
+  }
+  
+  #if verbose
+  cout << "...Done. Found " << tracks_selected_by_highway.size() << " tracks." << endl;
+  #endif
+  return true;
 }
 
 int find_lem(double y, double z){
@@ -2286,18 +2348,13 @@ vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph, string scan_type, float
 }
 
 
-bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs, vector<TGraphErrors*> &mpv_field_Dx_Corrected, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs_Dx_Corrected, vector<TMultiGraph*> &mpv_field_AllLEMs, vector<TMultiGraph*> &mpv_field_AllLEMs_Dx_Corrected, vector<int> &scan_nums_for_AllLEMs, string scan_type, int scan_num){
+bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs, vector<TMultiGraph*> &mpv_field_AllLEMs, vector<int> &scan_nums_for_AllLEMs, string scan_type, int scan_num){
 
   mpv_field_AllLEMs.push_back(new TMultiGraph());mpv_field_AllLEMs.push_back(new TMultiGraph());mpv_field_AllLEMs.push_back(new TMultiGraph());
   mpv_field_AllLEMs[0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_AllLEMs_view0").data());
   mpv_field_AllLEMs[1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_AllLEMs_view1").data());
   mpv_field_AllLEMs[2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_AllLEMs_summedviews").data());
       
-  mpv_field_AllLEMs_Dx_Corrected.push_back(new TMultiGraph());mpv_field_AllLEMs_Dx_Corrected.push_back(new TMultiGraph());mpv_field_AllLEMs_Dx_Corrected.push_back(new TMultiGraph());
-  mpv_field_AllLEMs_Dx_Corrected[0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_AllLEMs_view0_Dx_Corrected").data());
-  mpv_field_AllLEMs_Dx_Corrected[1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_AllLEMs_view1_Dx_Corrected").data());
-  mpv_field_AllLEMs_Dx_Corrected[2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_AllLEMs_summedviews_Dx_Corrected").data());
-  
   mpv_field.push_back(new TGraphErrors()); mpv_field.push_back(new TGraphErrors()); mpv_field.push_back(new TGraphErrors());
   mpv_field[0]->SetMarkerStyle(31);
   mpv_field[1]->SetMarkerStyle(31);
@@ -2308,17 +2365,6 @@ bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErr
   mpv_field[0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view0").data());
   mpv_field[1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view1").data());
   mpv_field[2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_summed_views").data());
-  
-    mpv_field_Dx_Corrected.push_back(new TGraphErrors()); mpv_field_Dx_Corrected.push_back(new TGraphErrors()); mpv_field_Dx_Corrected.push_back(new TGraphErrors());
-  mpv_field_Dx_Corrected[0]->SetMarkerStyle(31);
-  mpv_field_Dx_Corrected[1]->SetMarkerStyle(31);
-  mpv_field_Dx_Corrected[2]->SetMarkerStyle(31);
-  mpv_field_Dx_Corrected[0]->SetMarkerStyle(2);
-  mpv_field_Dx_Corrected[1]->SetMarkerStyle(2);
-  mpv_field_Dx_Corrected[2]->SetMarkerStyle(2);
-  mpv_field_Dx_Corrected[0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view0_Dx_Corrected").data());
-  mpv_field_Dx_Corrected[1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view1_Dx_Corrected").data());
-  mpv_field_Dx_Corrected[2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_summed_views_Dx_Corrected").data());
       
   for( int lem = 0; lem < NUM_OF_GOOD_LEMS; lem++ ){
     scan_nums_for_AllLEMs.push_back(scan_num);
@@ -2333,18 +2379,6 @@ bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErr
     mpv_field_ByLEMs[lems[lem]][0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view0").data());
     mpv_field_ByLEMs[lems[lem]][1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view1").data());
     mpv_field_ByLEMs[lems[lem]][2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_summed_views").data());
-    
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]] = {};
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]].push_back(new TGraphErrors()); mpv_field_ByLEMs_Dx_Corrected[lems[lem]].push_back(new TGraphErrors()); mpv_field_ByLEMs_Dx_Corrected[lems[lem]].push_back(new TGraphErrors());
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][0]->SetMarkerStyle(31);
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][1]->SetMarkerStyle(31);
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][2]->SetMarkerStyle(31);
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][0]->SetMarkerStyle(2);
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][1]->SetMarkerStyle(2);
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][2]->SetMarkerStyle(2);
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view0_Dx_Corrected").data());
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view1_Dx_Corrected").data());
-    mpv_field_ByLEMs_Dx_Corrected[lems[lem]][2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_summed_views_Dx_Corrected").data());
   }
   return true;
 }
@@ -2427,6 +2461,16 @@ void sum_views(vector<TGraphErrors> &graph, map<int, vector<TGraphErrors> > &gra
   return;
 }
 
+void sum_views(vector<TGraphErrors*> &graph, map<int, vector<TGraphErrors*> > &graph_ByLEMs){
+
+  sum_views_singlegraph(graph);
+  
+  for( auto lem : lems ){
+    if( graph_ByLEMs[lem][0]->GetN() > 2 and graph_ByLEMs[lem][1]->GetN() > 2 ){sum_views_singlegraph(graph_ByLEMs[lem]);}
+  }//for lem
+  return;
+}
+
 void sum_views_singlegraph(vector<TGraphErrors> &graph){
   int biggest_graph = 0;
   int smallest_graph = 1;
@@ -2456,6 +2500,39 @@ void sum_views_singlegraph(vector<TGraphErrors> &graph){
     if( y3 != y1 and y3 != 0 ){
       graph[2].SetPoint(graph[2].GetN(),x1,y3);
       graph[2].SetPointError(graph[2].GetN()-1,0,ey3);
+    }
+  }
+}
+
+void sum_views_singlegraph(vector<TGraphErrors*> &graph){
+  int biggest_graph = 0;
+  int smallest_graph = 1;
+  if( graph[0]->GetN() < graph[1]->GetN() ){
+    biggest_graph = 1;
+    smallest_graph = 0;
+  }
+  for( int i = 0; i < graph[biggest_graph]->GetN(); i++ ){
+    double x1 = 0;
+    double y1 = 0;
+    double ex1 = 0;
+    double y3 = 0;
+    double ey3 = 0;
+    double x2 = 0;
+    double y2 = 0;
+    graph[biggest_graph]->GetPoint(i,x1,y1);
+    double ey1 = graph[biggest_graph]->GetErrorY(i);
+    for( int j = 0; j < graph[biggest_graph]->GetN(); j++ ){
+      graph[smallest_graph]->GetPoint(j,x2,y2);
+      double ey2 = graph[smallest_graph]->GetErrorY(j);
+      if( x2 == x1 ){
+        y3 = y1+y2;
+        ey3 = TMath::Sqrt(ey1*ey1 + ey2*ey2);
+        break;
+      }
+    }
+    if( y3 != y1 and y3 != 0 ){
+      graph[2]->SetPoint(graph[2]->GetN(),x1,y3);
+      graph[2]->SetPointError(graph[2]->GetN()-1,0,ey3);
     }
   }
 }
@@ -3505,6 +3582,16 @@ bool select_tracks(string cut_type, vector<track> tracks, vector<track> & mips, 
     }
     
     if( mag > length_cut ) {
+    
+      if(highway){
+        if(tracks_selected_by_highway.size() == 0){
+          cout << "ERROR in select_track : please load highway output" << endl;
+          return false;
+        }
+        int track_ID = 1000*(1+t.event) + t.id;
+        if( find(tracks_selected_by_highway.begin(), tracks_selected_by_highway.end(), track_ID) == tracks_selected_by_highway.end() ){continue;}
+      }
+      
       //cut on the track angle. Avoid track parallel to a view, or parallel to drift direction. Also ignore bended tracks 
       if( theta_cut > 0 and (t.theta < theta_cut or t.theta > TMath::Pi()-theta_cut) ){continue;}
       if( phi_cut > 0 and (fabs(t.phi) - ((int)(fabs(t.phi)/(TMath::Pi()/2.)))*TMath::Pi()/2. < phi_cut or fabs(t.phi) - ((int)(fabs(t.phi)/(TMath::Pi()/2.)))*TMath::Pi()/2. > TMath::Pi()/2.-phi_cut) ){continue;}
@@ -3589,15 +3676,16 @@ bool get_histo_in_inputfile(TH1D &hdQds, TFile *runfile, string name_to_get, boo
 
 string set_cuts(string cut_type){
   string to_return = "";
-  if(cut_type.find("theta") != string::npos) {theta_cut = 0.1745; to_return+="theta_";}
-  if(cut_type.find("phi") != string::npos) {phi_cut = 0.1745; to_return+="phi_";}
+  if(cut_type == "common"){length_cut = 50.;method_dQ = "sum";method_ds = "local"; to_return+="common_"; highway = true;}
+//  if(cut_type.find("theta") != string::npos) {theta_cut = 0.1745; to_return+="theta_";}
+//  if(cut_type.find("phi") != string::npos) {phi_cut = 0.1745; to_return+="phi_";}
   if(cut_type.find("length") != string::npos) {length_cut = 40.; to_return+="length_";}
   if(cut_type.find("Ds") != string::npos) {ds_cut = 1.; to_return+="Ds_";}
-  if(cut_type.find("GoF") != string::npos) {GoF_cut = 0.2; to_return+="GoF_";}
-  if(cut_type.find("tgx") != string::npos) {only_throughgoing_x = true; to_return+="tgx_";}
-  else if(cut_type.find("tgy") != string::npos) {only_throughgoing_y = true; to_return+="tgy_";}
-  else if(cut_type.find("tgz") != string::npos) {only_throughgoing_z = true; to_return+="tgz_";}
-  else if(cut_type.find("tg") != string::npos) {only_throughgoing = true; to_return+="tg_";}
+//  if(cut_type.find("GoF") != string::npos) {GoF_cut = 0.2; to_return+="GoF_";}
+  if(cut_type.find("purity") != string::npos) {only_throughgoing_x = true; to_return+="tgx_";}
+//  else if(cut_type.find("tgy") != string::npos) {only_throughgoing_y = true; to_return+="tgy_";}
+//  else if(cut_type.find("tgz") != string::npos) {only_throughgoing_z = true; to_return+="tgz_";}
+//  else if(cut_type.find("tg") != string::npos) {only_throughgoing = true; to_return+="tg_";}
   if(to_return == ""){to_return = "before_cuts";}
   else{to_return = to_return.substr(0, to_return.size()-1);}
   return to_return;

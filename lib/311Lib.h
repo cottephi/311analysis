@@ -76,6 +76,7 @@ vector<double> simulated_extr;
 vector<double> simulated_amp;
 vector<double> simulated_ind;
 map<int,double> gain_corrections;
+vector<int> tracks_selected_by_highway;
 map<int, map<string,float> > runs_and_fields;
 pair<double,double> Arho_from_3L = make_pair(-1,-1); //pressure 980mbar, temperature 87K
 pair<double,double> Brho_from_3L = make_pair(-1,-1);
@@ -87,6 +88,7 @@ const string dqds_cosmics = path_311analysis + "dqds_cosmics.dat";
 const string runs_file = path_311analysis + "all_runs.csv";
 const string runs_headers = "/eos/user/p/pcotte/311data/runs_headers/";
 const string slow_control = "/eos/user/p/pcotte/311data/slow_control/";
+const string highway_output = "/eos/user/p/pcotte/from_github_311analysis/Analysis/Event-track-selection/HighwayAlgorithm/HighwayOutput/text_files/";
 
 string SelectTrack_Input;
 string SelectTrack_Output;
@@ -130,6 +132,7 @@ bool load_rho_run(int run);
 void load_fit_3L();
 void load_Gushin_Eff();
 void load_gain_eff_corrections();
+bool load_highway(int run);
 
 const int NUM_OF_VIEWS = 2;
 const int NUM_OF_LEMS = 12;
@@ -138,7 +141,7 @@ double N_Ch_0 = 320;
 double N_Ch_1 = 960;
 int tdc = 1667;
 /*double ADC2CHARGE = 45.31875; //ADC*ticks (from qScan)*/
-double ADC2CHARGE[2] = {54.779, 67.085};
+double ADC2CHARGE[2] = {55, 67};
 vector<int> bad_channels = {576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607};
 vector<int> lems = {2, 4, 5, 6, 7, 8, 9, 11}; //active lems
 vector<int> vol_cut = {0, 0, 0, 0, 0, 0}; //in cm
@@ -148,9 +151,10 @@ const double drift_velocity = 150. ; //cm/ms
 double T0 = 87;
 double P0=980;
 double corr = 1.;
-double e_lifetime_const = 6.;//ms //Caspar talk 29 June
+double e_lifetime_const = 7.;//ms //Caspar talk 29 June
 string method_ds = "3D";
 string method_dQ = "sum";
+bool highway = false;
 
 double golden_ratio = 1.618;
 
@@ -274,15 +278,17 @@ void fill_2d_hist(TH2D* h, double x, double y, double z);
 
 vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph = 0, string scan_type = "", float x = 0, float xer = 0);
 
-bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs, vector<TGraphErrors*> &mpv_field_Dx_Corrected, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs_Dx_Corrected, vector<TMultiGraph*> &mpv_field_AllLEMs, vector<int> &scan_nums_for_AllLEMs, string scan_type = "", int scan_num = 0);
+bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs, vector<TMultiGraph*> &mpv_field_AllLEMs, vector<int> &scan_nums_for_AllLEMs, string scan_type = "", int scan_num = 0);
 
 bool init_graph_purity_and_charging_up(vector<TGraphErrors> &graph, map<int, vector<TGraphErrors>> &graph_ByLEMs, string name = "");
 
 void sum_views(vector<TGraphErrors> &graph, map<int, vector<TGraphErrors> > &graph_ByLEMs);
+void sum_views(vector<TGraphErrors> &graph, map<int, vector<TGraphErrors*> > &graph_ByLEMs);
 
 void sum_views_multigraph(vector<TMultiGraph*> &graph);
 
 void sum_views_singlegraph(vector<TGraphErrors> &graph);
+void sum_views_singlegraph(vector<TGraphErrors*> &graph);
 
 double e_lifetime(TGraphErrors *graph);
 

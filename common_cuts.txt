@@ -1,0 +1,6 @@
+highway algo
+cut length 50cm
+only central LEMs
+ds: local track direction
+dQ: summed ADC
+for purity: throughgoingX
