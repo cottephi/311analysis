@@ -1,4 +1,5 @@
 jobs/LSFJOB*
+jobs_output/LSFJOB*
 */*.png
 */*.root
 *.root
