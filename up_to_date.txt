@@ -1,5 +1,5 @@
 Feb
-  none
+  all running
 June 
   sum 3D : dQds : Ds, length, Ds_length and before cuts
            YZ dQds : 840 before_cuts. 840 Ds, length and DS_length

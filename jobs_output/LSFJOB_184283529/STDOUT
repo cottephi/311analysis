@@ -1,0 +1,100 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184283529> on <b645081776.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({1198,1199,633,634,691},"before_cuts","Feb","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+  Initialising histos...
+  ...done
+Processing 13 subruns in run 1198
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-1-Parser.root
+File /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-2-Parser.root not found.
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-3-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-4-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-5-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-6-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-7-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-8-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-9-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-10-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-11-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1198/1198-12-Parser.root
+Files added. 
+Run 1198 has 4020 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1198/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using before_cuts cuts...
+ Selected 65521 tracks over 65521 tracks 
+Doing cut before_cuts
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/before_cuts/1198.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/before_cuts/tracks_1198.root has been created 
+end with run 1198
+  Initialising histos...
+  ...done
+Processing 11 subruns in run 1199
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-2-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-3-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-4-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-5-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-6-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-7-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-8-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-9-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1199/1199-10-Parser.root
+Files added. 
+Run 1199 has 3403 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1199/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using before_cuts cuts...
+ Selected 50762 tracks over 50762 tracks 
+Doing cut before_cuts
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/before_cuts/1199.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/before_cuts/tracks_1199.root has been created 
+end with run 1199
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 633
+File /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/633/633-0-Parser.root not found.
+Files added. 
+Run 633 has 0 events 
+Reading input file...
+Empty run 633
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 634
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/634/634-0-Parser.root
+Files added. 
+Run 634 has 38 events 
+Reading input file...
+ERROR: can not get pressure and temperature for run 634
+Empty run 634
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 691
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/691/691-0-Parser.root
+Files added. 
+Run 691 has 125 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/691/pressure_and_temp/temperature_cryostat.root...
+Empty run 691
+All done..
+
+Job finished at mar. juil. 31 16:29:40 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:01:39 KSI2K hours (99 KSI2K seconds)
+                 This process corresponds to     : 0:06:28 HS06  hours (388 HS06  seconds)

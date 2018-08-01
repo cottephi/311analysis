@@ -1,0 +1,13 @@
+#! /bin/sh
+
+$LSB_TRAPSIGS
+$LSB_RCP1
+$LSB_RCP2
+$LSB_RCP3
+# LSBATCH: User input
+/usr/local/lsf/etc/job_starter '/eos/user/p/pcotte/311analysis/jobs/job.sh "track_cuts_run.sh {1010,1011,1012,1013,1014} common_purity Feb sum local true 'true'"'
+ExitStat=$?
+wait
+# LSBATCH: End user input
+true
+exit `expr $? "|" $ExitStat`

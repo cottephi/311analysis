@@ -1,0 +1,122 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184284974> on <b6fa33d5cc.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/charging_up_track_cuts.cc({1037},"common_purity","June","sum","local",true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+Loading highway tracks selection output for run 1037...
+Processing 37 subruns in run 1037
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-2-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-3-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-4-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-5-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-6-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-7-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-8-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-9-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-10-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-11-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-12-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-13-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-14-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-15-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-16-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-17-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-18-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-19-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-20-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-21-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-22-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-23-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-24-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-25-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-26-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-27-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-28-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-29-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-30-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-31-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-32-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-33-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-34-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-35-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1037/1037-36-RecoFast-Parser.root
+Files added. 
+Warning in <TClass::Init>: no dictionary for class ROOT::TIOFeatures is available
+Run 1037 has 12395 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1037/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 30713 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 25874 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 32948 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 25072 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 27097 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 32052 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 24958 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 35860 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 35485 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 52688 tracks 
+Doing cut common_tgx
+skipping subrun 0
+  Initialising histos...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 58897 tracks 
+Doing cut common_tgx
+skipping subrun 0
+end with run 1037
+All done..
+
+Job finished at mar. juil. 31 16:38:42 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:06:17 KSI2K hours (377 KSI2K seconds)
+                 This process corresponds to     : 0:24:30 HS06  hours (1470 HS06  seconds)

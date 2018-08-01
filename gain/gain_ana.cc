@@ -54,6 +54,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
   
   string corrected_or_not = "";
   if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
+  string name_to_get = "";
   
   //****************************************************************************
   //variables definition here
@@ -95,11 +96,6 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
   //system(string("rm "+GainAna_Output+"*.root").data());
   load_cosmics();
   
-  string outpath = GainAna_Output;
-  check_and_mkdir(outpath);
-  outpath = outpath + cut_type;
-  check_and_mkdir(outpath);
-  
   for( auto scan_it : scans ){
     if( scan_it.first  == "All"){
       for( int i = 0; i < 63; i++ ){
@@ -111,7 +107,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
   for( auto scan_it : scans ){
   
     string scan_type = scan_it.first;
-    outpath = GainAna_Output + cut_type+"/"+scan_type;
+    string outpath = GainAna_Output + cut_type + "/" + scan_type;
     check_and_mkdir(outpath);
 //    string outpath_total = outpath;
 //    outpath = outpath + "gain.root"
@@ -169,8 +165,8 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
       TFile *ofile = new TFile();
       outpath = GainAna_Output+cut_type+"/"+scan_type+"/"+to_string(scan_num)+"/";
       if(scan_type != "All"){
-        check_and_mkdir(outpath);
         string outfile = outpath+"gain.root";
+        check_and_mkdir(outfile);
         ofile = TFile::Open(outfile.data(), "RECREATE");
       }
 
@@ -240,7 +236,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
           int i_read_fit = read_or_do_fit(filename_fitted, filename_nonfitted, recreate_fit_file, ifilename, files_not_found);
           if(i_read_fit == 3){continue;}
           if(i_read_fit == 1){read_fit = true;}
-          TFile runfile(ifilename.data(),"READ");
+          TFile *runfile = TFile::Open(ifilename.data(),"READ");
           if( !read_fit ){
             #if verbose
             cout << "    Recording fitted histograms in " << filename_fitted << endl;
@@ -252,7 +248,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
             }
           }
 
-          TH1D* hdQds = 0;
+          TH1D hdQds;
           TString FunName = "";
           int nhits_tot = 0;
           vector<double> f = {-1,-1};
@@ -260,26 +256,44 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
           #if verbose 
           cout << "  Reading histograms..." << endl;
           #endif
-          runfile.GetObject(string("dQds_view0" + corrected_or_not).data(), hdQds);
-          nhits_tot += hdQds->GetEntries();
+          
+          name_to_get = "dQds_view0" + corrected_or_not;
+          if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+          if(!read_fit && !runfile_fitted->IsOpen()){
+            runfile->Close(); delete runfile; runfile = 0;
+            runfile = TFile::Open(filename_nonfitted.data(), "READ");
+            runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+          }
+          
+          nhits_tot += hdQds.GetEntries();
           if(read_fit){
-            f = ReadFit(hdQds, mpv_field[0], scan_type, field_it.first);
+            f = ReadFit(&hdQds, mpv_field[0], scan_type, field_it.first);
 //            if(runs_and_fields[run]["Extraction"] < 1800){}
           }
           else{
-            f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field[0], scan_type, field_it.first);
+            f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field[0], scan_type, field_it.first);
             runfile_fitted->cd();
-            hdQds->Write();
+            hdQds.Write();
           }
-          runfile.GetObject(string("dQds_view1" + corrected_or_not).data(), hdQds);
-          nhits_tot += hdQds->GetEntries();
+          
+          name_to_get = "dQds_view1" + corrected_or_not;
+          if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+          if(!read_fit && !runfile_fitted->IsOpen()){
+            runfile->Close(); delete runfile; runfile = 0;
+            runfile = TFile::Open(filename_nonfitted.data(), "READ");
+            runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+          }
+          
+          nhits_tot += hdQds.GetEntries();
           if(read_fit){
-            f = ReadFit(hdQds,mpv_field[1], scan_type, field_it.first);
+            f = ReadFit(&hdQds,mpv_field[1], scan_type, field_it.first);
           }
           else{
-            f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field[1], scan_type, field_it.first);
+            f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field[1], scan_type, field_it.first);
             runfile_fitted->cd();
-            hdQds->Write();
+            hdQds.Write();
           }
           
           if( nhits_tot < min_number_of_hits ){
@@ -290,7 +304,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
               runfile_fitted->Close();
             }
             delete runfile_fitted;
-            runfile.Close();
+            runfile->Close();
             continue;
           }
           else{
@@ -300,23 +314,41 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
           }
           
           for( auto lem : lems ){
-            runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view0" + corrected_or_not).data(), hdQds);
+          
+            name_to_get = "dQds_LEM_"+to_string(lem)+"_view0" + corrected_or_not;
+            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+            if(!read_fit && !runfile_fitted->IsOpen()){
+              runfile->Close(); delete runfile; runfile = 0;
+              runfile = TFile::Open(filename_nonfitted.data(), "READ");
+              runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+              if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+            }
+            
             if(read_fit){
-              f = ReadFit(hdQds,mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
+              f = ReadFit(&hdQds,mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
             }
             else{
-              f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
+              f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
               runfile_fitted->cd();
-              hdQds->Write();
+              hdQds.Write();
             }
-            runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view1" + corrected_or_not).data(), hdQds);
+          
+            name_to_get = "dQds_LEM_"+to_string(lem)+"_view1" + corrected_or_not;
+            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+            if(!read_fit && !runfile_fitted->IsOpen()){
+              runfile->Close(); delete runfile; runfile = 0;
+              runfile = TFile::Open(filename_nonfitted.data(), "READ");
+              runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+              if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+            }
+            
             if(read_fit){
-              f = ReadFit(hdQds,mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
+              f = ReadFit(&hdQds,mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
             }
             else{
-              f = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5, mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
+              f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
               runfile_fitted->cd();
-              hdQds->Write();
+              hdQds.Write();
             }
           }//for lem
           if(runfile_fitted->IsOpen()){
@@ -326,8 +358,8 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
           #if verbose
           cout << "    done reading histograms and filling graphs" << endl;
           #endif
-          delete hdQds;
-          runfile.Close();
+          runfile->Close();
+          delete runfile;
           
           #if verbose
           cout << "    next run" << endl;

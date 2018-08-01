@@ -1,0 +1,88 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184287168> on <b6faf0059c.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({809,832,833,834,835},"common_nolen","June","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+Loading highway tracks selection output for run 809...
+  Initialising histos...
+  ...done
+/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/809/ not found or empty
+Loading highway tracks selection output for run 832...
+  Initialising histos...
+  ...done
+/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/832/ not found or empty
+Loading highway tracks selection output for run 833...
+...Done. Found 2554 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 833
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/833/833-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/833/833-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/833/833-2-RecoFast-Parser.root
+Files added. 
+Warning in <TClass::Init>: no dictionary for class ROOT::TIOFeatures is available
+Run 833 has 847 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/833/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using common_nolen cuts...
+ Selected 1297 tracks over 6849 tracks 
+Doing cut common_nolen
+ TFile /eos/user/p/pcotte/311data/2018_June_24/dQds_local_sum/common_nolen/833.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_June_24/selected_tracks_local_sum/common_nolen/tracks_833.root has been created 
+end with run 833
+Loading highway tracks selection output for run 834...
+...Done. Found 5293 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 834
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/834/834-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/834/834-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/834/834-2-RecoFast-Parser.root
+Files added. 
+Run 834 has 848 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/834/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common_nolen cuts...
+ Selected 1808 tracks over 7621 tracks 
+Doing cut common_nolen
+ TFile /eos/user/p/pcotte/311data/2018_June_24/dQds_local_sum/common_nolen/834.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_June_24/selected_tracks_local_sum/common_nolen/tracks_834.root has been created 
+end with run 834
+Loading highway tracks selection output for run 835...
+...Done. Found 7911 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 835
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/835/835-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/835/835-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/835/835-2-RecoFast-Parser.root
+Files added. 
+Run 835 has 838 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/835/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common_nolen cuts...
+ Selected 1959 tracks over 7398 tracks 
+Doing cut common_nolen
+ TFile /eos/user/p/pcotte/311data/2018_June_24/dQds_local_sum/common_nolen/835.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_June_24/selected_tracks_local_sum/common_nolen/tracks_835.root has been created 
+end with run 835
+All done..
+
+Job finished at mar. juil. 31 16:36:48 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:00:29 KSI2K hours (29 KSI2K seconds)
+                 This process corresponds to     : 0:01:55 HS06  hours (115 HS06  seconds)

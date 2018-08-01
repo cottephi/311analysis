@@ -1,0 +1,274 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184286615> on <b630126e84.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({1000,1001,1002,1003,1004},"common","June","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+Loading highway tracks selection output for run 1000...
+  Initialising histos...
+  ...done
+Processing 39 subruns in run 1000
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-2-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-3-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-4-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-5-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-6-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-7-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-8-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-9-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-10-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-11-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-12-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-13-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-14-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-15-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-16-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-17-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-18-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-19-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-20-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-21-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-22-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-23-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-24-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-25-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-26-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-27-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-28-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-29-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-30-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-31-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-32-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-33-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-34-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-35-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-36-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-37-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1000/1000-38-RecoFast-Parser.root
+Files added. 
+Warning in <TClass::Init>: no dictionary for class ROOT::TIOFeatures is available
+Run 1000 has 12948 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1000/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using common cuts...
+ Selected 0 tracks over 226540 tracks 
+Doing cut common
+skipping run 1000
+Loading highway tracks selection output for run 1001...
+  Initialising histos...
+  ...done
+/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1001/ not found or empty
+Loading highway tracks selection output for run 1002...
+  Initialising histos...
+  ...done
+Processing 41 subruns in run 1002
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-2-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-3-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-4-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-5-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-6-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-7-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-8-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-9-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-10-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-11-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-12-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-13-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-14-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-15-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-16-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-17-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-18-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-19-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-20-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-21-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-22-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-23-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-24-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-25-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-26-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-27-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-28-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-29-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-30-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-31-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-32-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-33-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-34-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-35-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-36-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-37-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-38-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-39-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1002/1002-40-RecoFast-Parser.root
+Files added. 
+Run 1002 has 13735 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1002/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 0 tracks over 334088 tracks 
+Doing cut common
+skipping run 1002
+Loading highway tracks selection output for run 1003...
+  Initialising histos...
+  ...done
+Processing 114 subruns in run 1003
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-2-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-3-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-4-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-5-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-6-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-7-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-8-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-9-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-10-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-11-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-12-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-13-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-14-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-15-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-16-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-17-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-18-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-19-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-20-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-21-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-22-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-23-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-24-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-25-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-26-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-27-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-28-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-29-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-30-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-31-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-32-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-33-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-34-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-35-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-36-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-37-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-38-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-39-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-40-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-41-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-42-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-43-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-44-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-45-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-46-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-47-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-48-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-49-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-50-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-51-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-52-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-53-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-54-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-55-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-56-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-57-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-58-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-59-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-60-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-61-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-62-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-63-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-64-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-65-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-66-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-67-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-68-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-69-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-70-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-71-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-72-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-73-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-74-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-75-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-76-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-77-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-78-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-79-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-80-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-81-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-82-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-83-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-84-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-85-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-86-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-87-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-88-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-89-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-90-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-91-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-92-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-93-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-94-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-95-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-96-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-97-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-98-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-99-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-100-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-101-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-102-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-103-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-104-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-105-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-106-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-107-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-108-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-109-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-110-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-111-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-112-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1003/1003-113-RecoFast-Parser.root
+Files added. 
+Run 1003 has 38190 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1003/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 0 tracks over 823175 tracks 
+Doing cut common
+skipping run 1003
+Loading highway tracks selection output for run 1004...
+  Initialising histos...
+  ...done
+Processing 5 subruns in run 1004
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1004/1004-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1004/1004-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1004/1004-2-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1004/1004-3-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/1004/1004-4-RecoFast-Parser.root
+Files added. 
+Run 1004 has 1593 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1004/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 0 tracks over 34551 tracks 
+Doing cut common
+skipping run 1004
+All done..
+
+Job finished at mar. juil. 31 17:24:24 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:37:02 KSI2K hours (2222 KSI2K seconds)
+                 This process corresponds to     : 2:24:29 HS06  hours (8669 HS06  seconds)

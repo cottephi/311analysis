@@ -15,6 +15,7 @@
 #include <string>
 #include <time.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <cmath>
 
 #include <TROOT.h>
@@ -68,7 +69,7 @@ bool Load_Version(string version){
     dy=5;
     dz=5;
     lem_size = 50;
-    dQdx_cut_min = 0.;
+    dQdx_cut_min = 0.001;
   }
   else if(version == "June"){
     path_311data = "/eos/user/p/pcotte/311data/2018_June_24/";
@@ -79,7 +80,7 @@ bool Load_Version(string version){
     dy=4.8;
     dz=4.8;
     lem_size = 48;
-    dQdx_cut_min = 0.;
+    dQdx_cut_min = 0.001;
   }
   else if(version == "Junec"){
     path_311data = "/eos/user/p/pcotte/311data/2018_June_24c/";
@@ -90,13 +91,24 @@ bool Load_Version(string version){
     dy=4.8;
     dz=4.8;
     lem_size = 48;
-    dQdx_cut_min = 0.;
+    dQdx_cut_min = 0.001;
+  }
+  else if(version == "July"){
+    path_311data = "/eos/user/p/pcotte/311data/2018_July_30/";
+    path_wa105_311data = "/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/";
+    tpc_boundaries = {-50, 50, -50, 50, 0, 300};
+    pitch = 0.3125;
+    dx=10;
+    dy=5;
+    dz=5;
+    lem_size = 50;
+    dQdx_cut_min = 0.001;
   }
   else{
     cout << "Unknown reco version " << version << endl;
     return false;
   }
-
+  check_and_mkdir(path_311data);
   SelectTrack_Input = path_311data + "reconstructed_files/";
   SelectTrack_Output = path_311data + "selected_tracks_" + method_ds + "_" + method_dQ + "/";
   SelectTrack_MC_Output = path_MC_output + "selected_tracks_" + method_ds + "_" + method_dQ + "/";
@@ -1431,20 +1443,20 @@ int drays_mitigation(track & t){
 
   //mitigate the effects of delta rays recontructed with the track removing
   //consecutive high dqds hits
-  //take track as input, return smae track, but with delta rays contribution summed in their initial hit, all following n_consecutive hits padded to 0
+  //take track as input, return same track, but with delta rays contribution summed in their initial hit, all following n_consecutive hits deleted
 
   map<size_t, vector<double>> hits2view;
 
   unsigned int n_consecutive =15;
   double dq_cut = 6;
-  int initial_cut = 5;
+//  int initial_cut = 5;
   int drays = 0;
   bool Continue = false;
 
   unsigned int c=0;
   double sum=0;
   int view = 0;
-  int ii=0;
+//  int ii=0;
 
   vector<double> hit_list;
   double dq;
@@ -1459,11 +1471,10 @@ int drays_mitigation(track & t){
     if(method_dQ == "sum"){dq = h.dq_sum;}
     else{dq = h.dq_integral;}
 
-    //assuming ordering first all hits view 0 then all hist view 1
+    //assuming ordering first all hits view 0 then all hits view 1
 
-    if(ii<initial_cut and h.view == view){ h.dq_sum=0; h.dq_integral=0; ++ii; }
-    else if( ii==initial_cut ){ view++; ii=0; }
-
+//    if(ii<initial_cut and h.view == view){ h.dq_sum=0; h.dq_integral=0; ++ii; }
+//    else if( ii==initial_cut ){ view++; ii=0; }
     hit_list.push_back( dq );
 
   }
@@ -1505,12 +1516,18 @@ int drays_mitigation(track & t){
     c++;
   }
 
-  for( unsigned int hh=0; hh<t.hits_trk.size(); hh++ ){
-  
-    auto h = t.hits_trk.at(hh);
-    if(method_dQ == "sum"){t.hits_trk.at(hh).dq_sum = hit_list.at( hh );}
-    else{t.hits_trk.at(hh).dq_integral = hit_list.at( hh );}
+  vector<hit> new_hits;
+  for(unsigned int hh=0; hh<hit_list.size(); hh++){
+    if( hit_list.at( hh ) > 0){
+      new_hits.push_back(t.hits_trk.at(hh));
+    }
   }
+  t.hits_trk = new_hits;
+//  for( unsigned int hh=0; hh<t.hits_trk.size(); hh++ ){
+//    auto h = t.hits_trk.at(hh);
+//    if(method_dQ == "sum"){t.hits_trk.at(hh).dq_sum = hit_list.at( hh );}
+//    else{t.hits_trk.at(hh).dq_integral = hit_list.at( hh );}
+//  }
 
   return drays;
 }//end function
@@ -2220,14 +2237,6 @@ vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double 
   sv.push_back(hdQds->Integral());
   sv.push_back(hdQds->GetStdDev());
   function = langaufit(hdQds,fr,sv,pllo,plhi,fp,fpe,pvalue,pvaluelim,ndf, false, gauss);
-  double MPV = function->GetMaximumX();
-  double xmax, xmin;
-  function->GetRange(xmin,xmax);
-  while (MPV == xmin or MPV == xmax){
-    function->SetRange(xmin-5,xmax+5);
-    function->GetRange(xmin,xmax);
-    MPV = function->GetMaximumX();
-  }
   if( pvalue < pvaluelim or pvalue != pvalue ){
     #if verbose
     cout << "    Bad fit for " << hdQds->GetName() << "(pvalue=" << pvalue << ")" << endl;
@@ -2243,6 +2252,22 @@ vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double 
   else if(fpe[1]/mpv_cosmics > sigmalim and mpv_cosmics > 0 ){
     #if verbose
     cout << "    Bad fit for " << hdQds->GetName() << "(sigma=" << fpe[1]/mpv_cosmics << ")" << endl;
+    #endif
+    return {-1,-1};
+  }
+  double MPV = function->GetMaximumX();
+  double xmax, xmin;
+  function->GetRange(xmin,xmax);
+  int nstep = 0;
+  while ( (MPV == xmin or MPV == xmax) and nstep < 5 ){
+    function->SetRange(xmin-5,xmax+5);
+    function->GetRange(xmin,xmax);
+    MPV = function->GetMaximumX();
+    nstep++;
+  }
+  if(nstep == 5){
+    #if verbose
+    cout << "    Bad fit for " << hdQds->GetName() << " (MPV is equal to one of fit function ranges)" << endl;
     #endif
     return {-1,-1};
   }
@@ -3637,14 +3662,36 @@ bool select_tracks(string cut_type, vector<track> tracks, vector<track> & mips, 
   return true;
 }
 
-void check_and_mkdir(string path){
-  if(!ExistTest(path)){
-    #if verbose
-    cout << "Creating directory " << path << endl;
-    #endif
-    mkdir(path.data(),0777);
+//check if all the directoryies in a file address exist, creates them if possible. Can take either a file with complete address or a directory
+bool check_and_mkdir(string path){
+  istringstream dummy(path);
+  vector<string> subpaths((istream_iterator<WordDelimitedBySlash>(dummy)),istream_iterator<WordDelimitedBySlash>());
+  string partpath = "";
+  unsigned int i = 0;
+  for(auto sp : subpaths){
+    string previous = partpath;
+    ++i;
+    if(partpath == "" and sp == ""){
+      partpath += "/";
+      continue;
+    }
+    else if(partpath == ""){return true;}
+    else{partpath += sp;}
+    if(partpath.find(".") != string::npos and i == subpaths.size()){return true;}
+  
+    if(!ExistTest(partpath)){
+      if(access(previous.data(),W_OK) != 0){
+        cout << "ERROR in check_and_mkdir: do not have permission to create " << partpath << " directory." << endl;
+        return false;
+      }
+      #if verbose
+      cout << "Creating directory " << partpath << endl;
+      #endif
+      mkdir(partpath.data(),0777);
+    }
+    partpath += "/";
   }
-  return;
+  return true;
 }
 
 bool get_histo_in_inputfile(TH1D &hdQds, TFile *runfile, string name_to_get, bool &read_fit){
@@ -3676,10 +3723,12 @@ bool get_histo_in_inputfile(TH1D &hdQds, TFile *runfile, string name_to_get, boo
 
 string set_cuts(string cut_type){
   string to_return = "";
-  if(cut_type == "common"){length_cut = 50.;method_dQ = "sum";method_ds = "local"; to_return+="common_"; highway = true;}
+  if(cut_type.find("dray") != string::npos){dray_miti = true; to_return+="dray_";}
+  if(cut_type.find("common") != string::npos){length_cut = 50.;method_dQ = "sum";method_ds = "local"; to_return+="common_"; highway = true;}
 //  if(cut_type.find("theta") != string::npos) {theta_cut = 0.1745; to_return+="theta_";}
 //  if(cut_type.find("phi") != string::npos) {phi_cut = 0.1745; to_return+="phi_";}
   if(cut_type.find("length") != string::npos) {length_cut = 40.; to_return+="length_";}
+  if(cut_type.find("nolen") != string::npos) {length_cut = 0.; to_return+="nolen_";}
   if(cut_type.find("Ds") != string::npos) {ds_cut = 1.; to_return+="Ds_";}
 //  if(cut_type.find("GoF") != string::npos) {GoF_cut = 0.2; to_return+="GoF_";}
   if(cut_type.find("purity") != string::npos) {only_throughgoing_x = true; to_return+="tgx_";}

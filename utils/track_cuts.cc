@@ -122,7 +122,6 @@ void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version 
     //start cuts *************************************************************
     
     vector<track> tracks_before_cuts,  tracks;
-//    vector<track> * ptracks = &tracks;
     track single_track;
     #if verbose
     cout << "Run " << run << " has " << chain.GetEntries() << " events " << endl;
@@ -231,6 +230,7 @@ void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version 
     t_tracks.Branch("track", "track", &single_track);
     for(auto tr : tracks){
       single_track = tr;
+      if(dray_miti){drays_mitigation(single_track);}
       t_tracks.Fill();
     }
     ofile.Write();

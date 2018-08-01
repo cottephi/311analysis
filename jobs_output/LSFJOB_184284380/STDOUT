@@ -1,0 +1,116 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184284380> on <b6fa33d5cc.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({789,790,791,792,793},"common","Feb","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+Loading highway tracks selection output for run 789...
+...Done. Found 2302 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 789
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/789/789-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/789/789-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/789/789-2-Parser.root
+Files added. 
+Run 789 has 844 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/789/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using common cuts...
+ Selected 382 tracks over 6768 tracks 
+Doing cut common
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/common/789.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/common/tracks_789.root has been created 
+end with run 789
+Loading highway tracks selection output for run 790...
+...Done. Found 3284 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 790
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/790/790-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/790/790-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/790/790-2-Parser.root
+Files added. 
+Run 790 has 780 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/790/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 373 tracks over 6106 tracks 
+Doing cut common
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/common/790.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/common/tracks_790.root has been created 
+end with run 790
+Loading highway tracks selection output for run 791...
+...Done. Found 5204 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 791
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/791/791-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/791/791-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/791/791-2-Parser.root
+Files added. 
+Run 791 has 798 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/791/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 352 tracks over 7430 tracks 
+Doing cut common
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/common/791.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/common/tracks_791.root has been created 
+end with run 791
+Loading highway tracks selection output for run 792...
+...Done. Found 7285 tracks.
+  Initialising histos...
+  ...done
+Processing 2 subruns in run 792
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/792/792-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/792/792-1-Parser.root
+Files added. 
+Run 792 has 670 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/792/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 388 tracks over 6263 tracks 
+Doing cut common
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/common/792.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/common/tracks_792.root has been created 
+end with run 792
+Loading highway tracks selection output for run 793...
+...Done. Found 9756 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 793
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/793/793-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/793/793-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/793/793-2-Parser.root
+Files added. 
+Run 793 has 904 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/793/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 416 tracks over 8880 tracks 
+Doing cut common
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/common/793.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/common/tracks_793.root has been created 
+end with run 793
+All done..
+
+Job finished at mar. juil. 31 16:32:36 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:00:32 KSI2K hours (32 KSI2K seconds)
+                 This process corresponds to     : 0:02:07 HS06  hours (127 HS06  seconds)

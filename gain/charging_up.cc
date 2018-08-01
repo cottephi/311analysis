@@ -28,6 +28,8 @@ void charging_up(int run = 840, string cut_type = "Ds", string version = "June",
   
   string corrected_or_not = "";
   if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
+  string name_to_get = "";
+  
   gStyle->SetOptFit(0);
   gStyle->SetStatY(0.35);                
   // Set y-position (fraction of pad size)
@@ -103,7 +105,7 @@ void charging_up(int run = 840, string cut_type = "Ds", string version = "June",
     int i_read_fit = read_or_do_fit(filename_fitted, filename_nonfitted, recreate_fit_file, ifilename, files_not_found);
     if(i_read_fit == 3){return;}
     if(i_read_fit == 1){read_fit = true;}
-    TFile runfile(ifilename.data(),"READ");
+    TFile *runfile = TFile::Open(ifilename.data(),"READ");
     if( !read_fit ){
       #if verbose
       cout << "    Recording fitted histograms in " << filename_fitted << endl;
@@ -115,31 +117,49 @@ void charging_up(int run = 840, string cut_type = "Ds", string version = "June",
       }
     }
   
-    TH1D* hdQds = 0;
+    TH1D hdQds;
     vector<double> f0 = {-1,-1};
     vector<double> f1 = {-1,-1};
     
     #if verbose 
     cout << "  Reading dQds histograms of run " << run << "..." << endl;
     #endif
-    runfile.GetObject(string("dQds_view0" + corrected_or_not).data(), hdQds);
-    time = atoi(hdQds->GetTitle());
+    
+    name_to_get = "dQds_view0" + corrected_or_not;
+    if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+    if(!read_fit && !runfile_fitted->IsOpen()){
+      runfile->Close(); delete runfile; runfile = 0;
+      runfile = TFile::Open(filename_nonfitted.data(), "READ");
+      runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+      if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+    }
+      
+    time = atoi(hdQds.GetTitle());
     if(read_fit){
-      f0 = ReadFit(hdQds);
+      f0 = ReadFit(&hdQds);
     }
     else{
-      f0 = fit_dQds(hdQds, false, min_number_of_hits, 10000, 0.25);
+      f0 = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5);
       runfile_fitted->cd();
-      hdQds->Write();
+      hdQds.Write();
     }
-    runfile.GetObject(string("dQds_view1" + corrected_or_not).data(), hdQds);
+    
+    name_to_get = "dQds_view1" + corrected_or_not;
+    if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+    if(!read_fit && !runfile_fitted->IsOpen()){
+      runfile->Close(); delete runfile; runfile = 0;
+      runfile = TFile::Open(filename_nonfitted.data(), "READ");
+      runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+      if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+    }
+    
     if(read_fit){
-      f1 = ReadFit(hdQds);
+      f1 = ReadFit(&hdQds);
     }
     else{
-      f1 = fit_dQds(hdQds, false, min_number_of_hits, 10000, 0.25);
+      f1 = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5);
       runfile_fitted->cd();
-      hdQds->Write();
+      hdQds.Write();
     }
     if(mpv_cosmics > 0){
       f0[0] = f0[0]/mpv_cosmics;
@@ -172,23 +192,39 @@ void charging_up(int run = 840, string cut_type = "Ds", string version = "June",
       }
     }
     for( auto lem : lems ){
-      runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view0" + corrected_or_not).data(), hdQds);
+    
+      name_to_get = "dQds_LEM_"+to_string(lem)+"_view0" + corrected_or_not;
+      if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+      if(!read_fit && !runfile_fitted->IsOpen()){
+        runfile->Close(); delete runfile; runfile = 0;
+        runfile = TFile::Open(filename_nonfitted.data(), "READ");
+        runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+        if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+      }
       if(read_fit){
-        f0 = ReadFit(hdQds);
+        f0 = ReadFit(&hdQds);
       }
       else{
-        f0 = fit_dQds(hdQds, false, min_number_of_hits, 10000, 1);
+        f0 = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 1);
         runfile_fitted->cd();
-        hdQds->Write();
+        hdQds.Write();
       }
-      runfile.GetObject(string("dQds_LEM_"+to_string(lem)+"_view1" + corrected_or_not).data(), hdQds);
+      name_to_get = "dQds_LEM_"+to_string(lem)+"_view1" + corrected_or_not;
+      if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+      if(!read_fit && !runfile_fitted->IsOpen()){
+        runfile->Close(); delete runfile; runfile = 0;
+        runfile = TFile::Open(filename_nonfitted.data(), "READ");
+        runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
+        if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
+      }
+      
       if(read_fit){
-        f1 = ReadFit(hdQds);
+        f1 = ReadFit(&hdQds);
       }
       else{
-        f1 = fit_dQds(hdQds, false, min_number_of_hits, 10000, 1);
+        f1 = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 1);
         runfile_fitted->cd();
-        hdQds->Write();
+        hdQds.Write();
       }
       if(mpv_cosmics > 0){
         f0[0] = f0[0]/mpv_cosmics;
@@ -221,29 +257,25 @@ void charging_up(int run = 840, string cut_type = "Ds", string version = "June",
         }
       }
     }
-    #if verbose
-    cout << "    done reading histograms and filling graphs" << endl;
-    #endif
-    delete hdQds;
     if(runfile_fitted->IsOpen()){
       runfile_fitted->Close();
     }
     delete runfile_fitted;
-    runfile.Close();
+    runfile->Close();
+    delete runfile;
   }//subruns
+  #if verbose
+  cout << "    done reading histograms and filling graphs" << endl;
+  #endif
   
   
 //attempt to fit if histos are not emtpy
       
   sum_views(mg_charging_up, mg_charging_up_ByLEMs);
 
-  string outpath = charging_up_Output;
-  check_and_mkdir(outpath);
-  outpath = outpath + cut_type + "/";
-  check_and_mkdir(outpath);
-  outpath = outpath + "/"+to_string(run) + "/";
-  check_and_mkdir(outpath);
+  string outpath = charging_up_Output + cut_type + "/" + "/"+to_string(run) + "/";
   string outfile = outpath+"charging_up.root";
+  check_and_mkdir(outfile);
   TFile ofile(outfile.data(), "RECREATE");
   #if verbose
   cout << "Writing file: " << string(ofile.GetName()).data() << endl;

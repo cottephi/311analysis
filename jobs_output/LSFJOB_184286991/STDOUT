@@ -1,0 +1,91 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184286991> on <b6fb518812.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({794,795,796,797,798},"common_purity","June","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+Loading highway tracks selection output for run 794...
+...Done. Found 1979 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 794
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/794/794-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/794/794-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/794/794-2-RecoFast-Parser.root
+Files added. 
+Warning in <TClass::Init>: no dictionary for class ROOT::TIOFeatures is available
+Run 794 has 770 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/794/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 7050 tracks 
+Doing cut common_tgx
+skipping run 794
+Loading highway tracks selection output for run 795...
+...Done. Found 4267 tracks.
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 795
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/795/795-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/795/795-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/795/795-2-RecoFast-Parser.root
+Files added. 
+Run 795 has 752 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/795/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common_tgx cuts...
+ Selected 1 tracks over 7471 tracks 
+Doing cut common_tgx
+ TFile /eos/user/p/pcotte/311data/2018_June_24/dQds_local_sum/common_tgx/795.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_June_24/selected_tracks_local_sum/common_tgx/tracks_795.root has been created 
+end with run 795
+Loading highway tracks selection output for run 796...
+...Done. Found 4765 tracks.
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 796
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/796/796-0-RecoFast-Parser.root
+Files added. 
+Run 796 has 194 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/796/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 1540 tracks 
+Doing cut common_tgx
+skipping run 796
+Loading highway tracks selection output for run 797...
+  Initialising histos...
+  ...done
+/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/797/ not found or empty
+Loading highway tracks selection output for run 798...
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 798
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/798/798-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/798/798-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/798/798-2-RecoFast-Parser.root
+Files added. 
+Run 798 has 837 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/798/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common_tgx cuts...
+ Selected 0 tracks over 7121 tracks 
+Doing cut common_tgx
+skipping run 798
+All done..
+
+Job finished at mar. juil. 31 16:36:26 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:00:23 KSI2K hours (23 KSI2K seconds)
+                 This process corresponds to     : 0:01:30 HS06  hours (90 HS06  seconds)

@@ -1,0 +1,105 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184284243> on <b6789c29c8.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({794,795,796,797,798},"length","Feb","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 794
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/794/794-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/794/794-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/794/794-2-Parser.root
+Files added. 
+Run 794 has 770 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/794/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using length cuts...
+ Selected 1482 tracks over 7409 tracks 
+Doing cut length
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length/794.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length/tracks_794.root has been created 
+end with run 794
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 795
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/795/795-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/795/795-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/795/795-2-Parser.root
+Files added. 
+Run 795 has 752 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/795/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length cuts...
+ Selected 1686 tracks over 7922 tracks 
+Doing cut length
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length/795.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length/tracks_795.root has been created 
+end with run 795
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 796
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/796/796-0-Parser.root
+Files added. 
+Run 796 has 194 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/796/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length cuts...
+ Selected 389 tracks over 1853 tracks 
+Doing cut length
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length/796.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length/tracks_796.root has been created 
+end with run 796
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 797
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/797/797-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/797/797-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/797/797-2-Parser.root
+Files added. 
+Run 797 has 870 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/797/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length cuts...
+ Selected 1642 tracks over 7329 tracks 
+Doing cut length
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length/797.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length/tracks_797.root has been created 
+end with run 797
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 798
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/798/798-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/798/798-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/798/798-2-Parser.root
+Files added. 
+Run 798 has 837 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/798/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length cuts...
+ Selected 1638 tracks over 7236 tracks 
+Doing cut length
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length/798.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length/tracks_798.root has been created 
+end with run 798
+All done..
+
+Job finished at mar. juil. 31 16:33:16 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:00:39 KSI2K hours (39 KSI2K seconds)
+                 This process corresponds to     : 0:02:35 HS06  hours (155 HS06  seconds)

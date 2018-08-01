@@ -2,7 +2,7 @@
 outdir=/eos/user/p/pcotte/311analysis/jobs
 runs='{}'
 cut_type='Ds'
-version='June'
+version='Feb'
 method_dQ='sum'
 method_ds='3D'
 save_tracks='true'

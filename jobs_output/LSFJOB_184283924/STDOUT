@@ -1,0 +1,91 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184283924> on <b66b67e136f8.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({1058,1059,1060,1064,1065},"Ds_length","Feb","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+  Initialising histos...
+  ...done
+Processing 2 subruns in run 1058
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1058/1058-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1058/1058-1-Parser.root
+Files added. 
+Run 1058 has 350 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1058/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using length_Ds cuts...
+ Selected 206 tracks over 1824 tracks 
+Doing cut length_Ds
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length_Ds/1058.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length_Ds/tracks_1058.root has been created 
+end with run 1058
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 1059
+File /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1059/1059-0-Parser.root not found.
+Files added. 
+Run 1059 has 0 events 
+Reading input file...
+Empty run 1059
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 1060
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1060/1060-0-Parser.root
+Files added. 
+Run 1060 has 283 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1060/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length_Ds cuts...
+ Selected 762 tracks over 5554 tracks 
+Doing cut length_Ds
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length_Ds/1060.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length_Ds/tracks_1060.root has been created 
+end with run 1060
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 1064
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1064/1064-0-Parser.root
+Files added. 
+Run 1064 has 242 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1064/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length_Ds cuts...
+ Selected 266 tracks over 1821 tracks 
+Doing cut length_Ds
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length_Ds/1064.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length_Ds/tracks_1064.root has been created 
+end with run 1064
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 1065
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1065/1065-0-Parser.root
+Files added. 
+Run 1065 has 280 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1065/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using length_Ds cuts...
+ Selected 500 tracks over 3249 tracks 
+Doing cut length_Ds
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/dQds_local_sum/length_Ds/1065.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_Feb_05/selected_tracks_local_sum/length_Ds/tracks_1065.root has been created 
+end with run 1065
+All done..
+
+Job finished at mar. juil. 31 16:28:22 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:00:21 KSI2K hours (21 KSI2K seconds)
+                 This process corresponds to     : 0:01:23 HS06  hours (83 HS06  seconds)

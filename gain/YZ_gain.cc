@@ -116,7 +116,6 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
   if(i_read_fit == 3){return;}
   if(i_read_fit == 1){read_fit = true;}
   TFile *runfile = TFile::Open(ifilename.data(),"READ");
-  cout << "chien" << endl;
   if( !read_fit ){
     #if verbose
     cout << "    Recording fitted histograms in " << filename_fitted << endl;
@@ -131,7 +130,6 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
   
   TH1D hdQds;
   TString FunName = "";
-  int nhits_tot = 0;
   vector<double> f0 = {-1,-1};
   vector<double> f1 = {-1,-1};
   string name_to_get = "";
@@ -139,7 +137,7 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
   if(cut_type.find("tg") != string::npos){corrected_or_not = "Dx_Corrected_";}
 
   #if verbose 
-  cout << "  Reading histograms..." << endl;
+  cout << "  Reading dQds histograms of run " << run << "..." << endl;
   #endif
   for( int Y = begins[0]; Y < ends[0]; Y++ ){
     double y = (Y+0.5)*dy;
@@ -156,7 +154,6 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
         if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
       }
       
-      nhits_tot += hdQds.GetEntries();
       if(read_fit){
         f0 = ReadFit(&hdQds);
       }
@@ -189,7 +186,6 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
         if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
       }
       
-      nhits_tot += hdQds.GetEntries();
       if(read_fit){
         f1 = ReadFit(&hdQds);
       }

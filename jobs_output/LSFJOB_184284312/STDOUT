@@ -1,0 +1,110 @@
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/pcotte/184284312> on <b6432ca5a9.cern.ch>
+
+
+Processing /eos/user/p/pcotte/311analysis/loadHeader.cc...
+Processing /eos/user/p/pcotte/311analysis/loadLib.cc...
+Processing /eos/user/p/pcotte/311analysis/utils/track_cuts.cc({1038,1039,1040,1045,1052},"common","Feb","sum","local",true,true)...
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+Loading highway tracks selection output for run 1038...
+  Initialising histos...
+  ...done
+Processing 22 subruns in run 1038
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-2-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-3-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-4-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-5-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-6-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-7-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-8-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-9-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-10-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-11-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-12-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-13-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-14-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-15-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-16-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-17-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-18-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-19-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-20-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1038/1038-21-Parser.root
+Files added. 
+Run 1038 has 7314 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1038/pressure_and_temp/temperature_cryostat.root...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using common cuts...
+ Selected 0 tracks over 142974 tracks 
+Doing cut common
+skipping run 1038
+Loading highway tracks selection output for run 1039...
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 1039
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1039/1039-0-Parser.root
+Files added. 
+Run 1039 has 151 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1039/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 0 tracks over 3205 tracks 
+Doing cut common
+skipping run 1039
+Loading highway tracks selection output for run 1040...
+  Initialising histos...
+  ...done
+Processing 4 subruns in run 1040
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1040/1040-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1040/1040-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1040/1040-2-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1040/1040-3-Parser.root
+Files added. 
+Run 1040 has 1340 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1040/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 0 tracks over 22254 tracks 
+Doing cut common
+skipping run 1040
+Loading highway tracks selection output for run 1045...
+  Initialising histos...
+  ...done
+Processing 1 subruns in run 1045
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1045/1045-0-Parser.root
+Files added. 
+Run 1045 has 300 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1045/pressure_and_temp/temperature_cryostat.root...
+Empty run 1045
+Loading highway tracks selection output for run 1052...
+  Initialising histos...
+  ...done
+Processing 3 subruns in run 1052
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1052/1052-0-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1052/1052-1-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/1052/1052-2-Parser.root
+Files added. 
+Run 1052 has 905 events 
+Reading input file...
+Reading slow control file /eos/user/p/pcotte/311data/slow_control/1052/pressure_and_temp/temperature_cryostat.root...
+Selecting tracks using common cuts...
+ Selected 0 tracks over 2528 tracks 
+Doing cut common
+skipping run 1052
+All done..
+
+Job finished at mar. juil. 31 16:37:37 CEST 2018 on node 
+ under linux version Scientific Linux CERN SLC release 6.10 (Carbon)
+
+CERN statistics: This process used approximately : 0:01:51 KSI2K hours (111 KSI2K seconds)
+                 This process corresponds to     : 0:07:14 HS06  hours (434 HS06  seconds)

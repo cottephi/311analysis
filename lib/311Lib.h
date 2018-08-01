@@ -155,6 +155,7 @@ double e_lifetime_const = 7.;//ms //Caspar talk 29 June
 string method_ds = "3D";
 string method_dQ = "sum";
 bool highway = false;
+bool dray_miti = false;
 
 double golden_ratio = 1.618;
 
@@ -219,6 +220,13 @@ class track{
 #pragma link C++ class vector<track>+; 
 //#endif
 
+class WordDelimitedBySlash : public std::string
+{};
+std::istream& operator>>(std::istream& is, WordDelimitedBySlash& output)
+{
+   std::getline(is, output, '/');
+   return is;
+}
 //Functions declaration*********************************************************
 
 int find_lem(double y, double z);
@@ -336,7 +344,7 @@ void rec_track_dQds(track t, vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds
 
 bool select_tracks(string cut_type, vector<track> tracks, vector<track> & mips, vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds_ByLEMs, map<int, vector<TH1D> > &hdQds_ByDx, map<int, map<int, vector<TH1D> > > &hdQds_ByDx_ByLEMs, vector<TH1D> &hdQds_Dx_Corrected,  map<int, vector<TH1D> > &hdQds_ByLEMs_Dx_Corrected);
 
-void check_and_mkdir(string path);
+bool check_and_mkdir(string path);
 
 bool get_histo_in_inputfile(TH1D &hdQds, TFile *runfile, string name_to_get, bool &read_fit);
 
