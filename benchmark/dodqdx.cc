@@ -31,7 +31,7 @@ string to_string_with_precision(const T a_value, const int n = 3){
 }
 
 
-void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local", bool save_plots = true){
+void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string version = "July", string m_dQ = "sum", string m_ds = "local", bool save_plots = true){
   method_ds = m_ds;
   method_dQ = m_dQ;
   if(!Load_Version(version)){return;}
