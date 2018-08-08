@@ -128,7 +128,7 @@ bool Load_Version(string version){
   dQds_charging_up_Output = path_311data + "dQds_charging_up_" + method_ds + "_" + method_dQ + "/";
   dQds_YZ_Output = path_311data + "dQds_YZ_" + method_ds + "_" + method_dQ + "/"; 
 
- return true;
+  return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ bool load_runs_2D(string scan_type, int scan_num, vector<int> &run_list, vector<
   }
   else if( scan_type == "Amplification_Extraction" and scan_num == 5 ){
     // Drift: 300  //induction: 2.5
-    run_list = {1165, 1166, 1178, 1180, 1181, 1182, 1183, 1187, 1188};
+    run_list = {1165, /*1166,*/ 1178, 1180, 1181, 1182, 1183, 1187, 1188};
   }
   else if( scan_type == "Amplification_Extraction" and scan_num == 6 ){
     // Drift: 500  //induction: 2.5
@@ -245,12 +245,12 @@ bool load_runs_2D(string scan_type, int scan_num, vector<int> &run_list, vector<
   string field1 = scan_type.substr(0,scan_type.find_first_of("_"));
   string field2 = scan_type.substr(scan_type.find_first_of("_")+1);
   for(auto r : run_list){
-    field.push_back(make_pair(runs_and_fields[r][field1]/1000., runs_and_fields[r][field2]/1000.));
+    field.push_back(make_pair(runs_and_fields[r][field1], runs_and_fields[r][field2]));
   }
   for(auto f : runs_and_fields[run_list[0]]){
     if(f.first == field1 or f.first == field2){continue;}
     const_fields_names.push_back(f.first);
-    const_fields_values.push_back(f.second/1000.);
+    const_fields_values.push_back(f.second);
   }
   return true;
 }
@@ -337,10 +337,10 @@ bool load_runs(string scan_type, int scan_num, vector<int> &run_list, vector<flo
    // Drift : 0.509     // Amplification : 27.0     // Induction : 1.0  
     run_list = {1000, 1002, 1003, 1004};
   }
-  else if( scan_type == "Extraction" and scan_num == 6 ){
-   // Drift : 0.207     // Amplification : 30.0     // Induction : 2.5  
-    run_list = {1165, 1166};
-  }
+//  else if( scan_type == "Extraction" and scan_num == 6 ){
+//   // Drift : 0.207     // Amplification : 30.0     // Induction : 2.5  
+//    run_list = {1165, 1166};
+//  }
   else if( scan_type == "Extraction" and scan_num == 7 ){
    // Drift : 0.257     // Amplification : 23.0     // Induction : 5.0  
     run_list = {1172, 1173};
@@ -381,7 +381,7 @@ bool load_runs(string scan_type, int scan_num, vector<int> &run_list, vector<flo
   }
   //from Elog
   else if(scan_type == "Amplification" and scan_num == 100){
-    run_list = {/*1165, 1166, 1167, 1172, 1173, 1174, 1175, 1176, 1177, */1178, 1180, 1181, 1182, 1183, 1187, 1188, 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197, 1197, 1199};
+    run_list = {/*1165, 1166, 1167, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1180, 1181, */1182, 1183, 1187, 1188, 1189, 1190, 1191, /*1192, 1193,*/ 1194, 1195, 1196, 1197, /*1198, 1199,*/ 840};
   }
 
   // Induction :
@@ -521,9 +521,9 @@ bool load_runs(string scan_type, int scan_num, vector<int> &run_list, vector<flo
   else if( scan_type == "All" and scan_num == 38 ){
     run_list = {1165};
   }
-  else if( scan_type == "All" and scan_num == 39 ){
-    run_list = {1166};
-  }
+//  else if( scan_type == "All" and scan_num == 39 ){
+//    run_list = {1166};
+//  }
   else if( scan_type == "All" and scan_num == 40 ){
     run_list = {1167};
   }
@@ -713,12 +713,12 @@ bool load_runs(string scan_type, int scan_num, vector<int> &run_list, vector<flo
     return true;
   }
   for(auto r : run_list){
-    field.push_back(runs_and_fields[r][field_to_read]/1000.);
+    field.push_back(runs_and_fields[r][field_to_read]);
   }
   for(auto f : runs_and_fields[run_list[0]]){
     if(f.first == field_to_read){continue;}
     const_fields_names.push_back(f.first);
-    const_fields_values.push_back(f.second/1000.);
+    const_fields_values.push_back(f.second);
   }
   return true;
 }
@@ -753,53 +753,68 @@ bool load_run_lists(){
       field_names.push_back(string(tokBuffer));
       tokBuffer = strtok(NULL, ";");
       field_names.push_back(string(tokBuffer));
+      tokBuffer = strtok(NULL, ";");
+      field_names.push_back(string(tokBuffer));
       i++; 
       continue;
     }
     run_tmp = atoi(tokBuffer);
     tokBuffer = strtok(NULL, ";");
-    runs_and_fields[run_tmp][field_names[0]] = atof(tokBuffer);
+    runs_and_fields[run_tmp][field_names[0]] = atof(tokBuffer)/1000.;
     tokBuffer = strtok(NULL, ";");
-    runs_and_fields[run_tmp][field_names[1]] = atof(tokBuffer);
+    runs_and_fields[run_tmp][field_names[1]] = atof(tokBuffer)/1000.;
     tokBuffer = strtok(NULL, ";");
-    runs_and_fields[run_tmp][field_names[2]] = atof(tokBuffer);
+    runs_and_fields[run_tmp][field_names[2]] = atof(tokBuffer)/1000.;
     tokBuffer = strtok(NULL, ";");
-    runs_and_fields[run_tmp][field_names[3]] = atof(tokBuffer);
+    runs_and_fields[run_tmp][field_names[3]] = atof(tokBuffer)/1000.;
+    tokBuffer = strtok(NULL, ";");
+    runs_triggers[run_tmp] = tokBuffer;
   }
   all_runs.close();
   if(runs_and_fields.size() == 0){
     cout << "ERROR loading runs : empty run list" << endl;
     return false;
   }
+  cout << "done" << endl;
   return true;
 }
 
-bool load_eff_simu_graphs(){
+bool load_extr_eff_simu_graphs(){
   string path_ExtrEff_vs_LemExtr = path_311analysis + "ExtrEff_vs_LemExtr.root";
-  string path_IndEff_vs_LemInd = path_311analysis + "IndEff_vs_LemInd.root";
   if(!ExistTest(path_ExtrEff_vs_LemExtr)){
     cout << "ERROR: could not find " << path_ExtrEff_vs_LemExtr << endl;
     return false;
   }
-  if(!ExistTest(path_IndEff_vs_LemInd)){
-    cout << "ERROR: could not find " << path_IndEff_vs_LemInd << endl;
-    return false;
-  }
-  
   TFile ifile_ExtrEff_vs_LemExtr(path_ExtrEff_vs_LemExtr.data(), "READ");
-  TFile ifile_IndEff_vs_LemInd(path_IndEff_vs_LemInd.data(), "READ");
   
-  TCanvas *dummycan;
-  ifile_ExtrEff_vs_LemExtr.GetObject("can_eff_vs_LemExtr", dummycan);
-  h_ExtrEff_vs_LemExtr = *((TGraph2D*)dummycan->GetListOfPrimitives()->At(0))->GetHistogram();
-  ifile_IndEff_vs_LemInd.GetObject("can_eff_vs_LemInd", dummycan);
-  h_IndEff_vs_LemInd = *((TGraph2D*)dummycan->GetListOfPrimitives()->At(0))->GetHistogram();
-  delete dummycan;
+  TCanvas *dummycan0;
+  ifile_ExtrEff_vs_LemExtr.GetObject("can_eff_vs_LemExtr", dummycan0);
+  TList *primitives0 = dummycan0->GetListOfPrimitives();
+  TGraph2D *graph0 = (TGraph2D*)primitives0->At(0);
+  h_ExtrEff_vs_LemExtr = *graph0->GetHistogram();
   
   if(h_ExtrEff_vs_LemExtr.GetEntries() == 0){
     cout << "Error while loading graph ExtrEff_vs_LemExtr" << endl;
     return false;
   }
+  
+  return true;
+}
+  
+bool load_ind_eff_simu_graphs(){
+  string path_IndEff_vs_LemInd = path_311analysis + "IndEff_vs_LemInd.root";
+  if(!ExistTest(path_IndEff_vs_LemInd)){
+    cout << "ERROR: could not find " << path_IndEff_vs_LemInd << endl;
+    return false;
+  }
+  TFile ifile_IndEff_vs_LemInd(path_IndEff_vs_LemInd.data(), "READ");
+  
+  TCanvas *dummycan1;
+  ifile_IndEff_vs_LemInd.GetObject("can_eff_vs_LemInd", dummycan1);
+  TList *primitives1 = dummycan1->GetListOfPrimitives();
+  TGraph2D *graph1 = (TGraph2D*)primitives1->At(0);
+  h_IndEff_vs_LemInd = *graph1->GetHistogram();
+
   if(h_IndEff_vs_LemInd.GetEntries() == 0){
     cout << "Error while loading graph IndEff_vs_LemInd" << endl;
     return false;
@@ -807,74 +822,17 @@ bool load_eff_simu_graphs(){
   return true;
 }
 
-bool load_rho_run(int run){
-  
-  string file = slow_control + to_string(run) + "/pressure_and_temp/temperature_cryostat.root";
-  if(!ExistTest(runs_headers+to_string(run)+".root")){
-    if(IsBatch){
-      cout << "ERROR: can not create header file for run " << run << endl;
-      return false;
-    }
-    #if verbose
-    cout << "Saving run header..." << endl;
-    #endif
-    gROOT->ProcessLine(string(".x " + path_311analysis + "utils/save_runs_headers.cc({" + to_string(run) + "})").data());
-    if(!ExistTest(runs_headers+to_string(run)+".root")){
-      cout << "ERROR: can not create header file for run " << run << endl;
-      return false;
-    }
+TMyFileHeader load_run_header(int run, bool update){
+  string filepath = runs_headers + to_string(run) + ".root";
+  TMyFileHeader header = TMyFileHeader();
+  if(update or !ExistTest(filepath)){if(!save_runs_headers({run})){return header;}}
+  TFile fileheader(filepath.data(),"READ");
+  if(!fileheader.IsOpen()){
+    cout << "ERROR: can not find header file for run " << run << endl;
+    return header;
   }
-  if(!ExistTest(slow_control + "/" + to_string(run) + "/" + to_string(run) + ".txt")){
-    if(IsBatch){
-      cout << "ERROR: can not get slow control data for run " << run << endl;
-      return false;
-    }
-    #if verbose
-    cout << "Getting slow control data from wa105db..." << endl;
-    #endif
-    gROOT->ProcessLine(string(".x " + path_311analysis + "slow_control/GetDataFromRun.cc({" + to_string(run) + "})").data());
-    if(!ExistTest(slow_control + "/" + to_string(run) + "/" + to_string(run) + ".txt")){
-      cout << "ERROR: can not get slow control data for run " << run << endl;
-      return false;
-    }
-  }
-  if(!ExistTest(file)){
-    if(IsBatch){
-      cout << "ERROR: can not get pressure and temperature for run " << run << endl;
-      return false;
-    }
-    #if verbose
-    cout << "Plotting pressure and temperature from slow control data..." << endl;
-    #endif
-    if(!pressure(to_string(run))){
-      cout << "ERROR: can not get pressure and temperature for run " << run << endl;
-      return false;
-    }
-  }
-  #if verbose
-  cout << "Reading slow control file " << file << "..." << endl;
-  #endif
-  TFile ifile(file.data(),"READ");
-  if(!ifile.IsOpen()){
-    cout << "ERROR in load_pressure_and_temperature: can't open " << file << endl;
-    return false;
-  }
-  TGraph *gr;
-  TH1D *h;
-  ifile.GetObject("graph_PE0006OverTE0056", gr);
-  gr_rho = TGraph(*gr);
-  ifile.GetObject("histo_PE0006OverTE0056", h);
-  h_rho = TH1D(*h);
-  delete gr; delete h; gr = 0; h = 0;
-  ifile.Close();
-  
-  TFile ifile_header(string(runs_headers+to_string(run)+".root").data(),"READ");
-  TMyFileHeader *header = (TMyFileHeader*)((TKey*)ifile_header.GetListOfKeys()->At(0))->ReadObj();
-  rho_run = header->GetRho();
-  rho_var_run = header->GetRhoVar();
-  ifile_header.Close();
-  
-  return true;
+  header = *(TMyFileHeader*)((TKey*)fileheader.GetListOfKeys()->At(0))->ReadObj();
+  return header;
 }
 
 void load_fit_3L(){
@@ -919,8 +877,11 @@ void load_gain_eff_corrections(){
   #if verbose
   cout << "Initialising hard-coded efficiency corrections..." << endl;
   #endif
-  if(h_ExtrEff_vs_LemExtr.GetEntries() == 0 or h_IndEff_vs_LemInd.GetEntries() == 0){
-    if(!load_eff_simu_graphs()){return;}
+  if(h_ExtrEff_vs_LemExtr.GetEntries() == 0){
+    if(!load_extr_eff_simu_graphs()){return;}
+  }
+  if(h_IndEff_vs_LemInd.GetEntries() == 0){
+    if(!load_ind_eff_simu_graphs()){return;}
   }
   if(h_GushinEff.GetEntries() == 0){load_Gushin_Eff();}
   gain_corrections[1178] = get_eff(1.2)*.5;
@@ -992,6 +953,48 @@ bool load_highway(int run){
   #if verbose
   cout << "...Done. Found " << tracks_selected_by_highway.size() << " tracks." << endl;
   #endif
+  return true;
+}
+
+
+void load_force_mpv(){
+  force_mpv[1182] = make_pair(2.220945, 2.053639);
+  force_mpv[1183] = make_pair(2.184064, 2.062411);
+  force_mpv[1187] = make_pair(1.921035, 2.049250);
+  force_mpv[1188] = make_pair(2.033270, 2.055467);
+  force_mpv[1189] = make_pair(2.876688, 2.564887);
+  force_mpv[1190] = make_pair(2.997272, 2.662352);
+  force_mpv[1191] = make_pair(3.007459, 2.811454);
+  force_mpv[1194] = make_pair(3.574564, 3.406592);
+  force_mpv[1195] = make_pair(2.421819, 2.656836);
+  force_mpv[1196] = make_pair(3.564599, 2.998725);
+  force_mpv[1197] = make_pair(3.641836, 3.092138);
+  return;
+}
+
+bool load_gr_and_h_rho(int run){
+  string ifilepath = slow_control + to_string(run) + "/pressure_and_temp/temperature_cryostat.root";
+  if(!ExistTest(ifilepath)){
+    #if verbose
+    cout << "Plotting pressure, temp and density graphs for run " << run <<"..." << endl;
+    #endif
+    if(!pressure(to_string(run))){return false;}
+  }
+  TFile ifile(ifilepath.data(), "READ");
+  if(!ifile.IsOpen()){
+    cout << "ERROR in load_gr_and_h_rho: can not open file " << string(slow_control + to_string(run) + "/pressure_and_temp/temperature_cryostat.root").data() << endl;
+    return false;
+  }
+  TGraph *dummygraph = 0;
+  TH1D *dummyhisto = 0;
+  ifile.GetObject("graph_PE0006OverTE0056",dummygraph);
+  ifile.GetObject("histo_PE0006OverTE0056",dummyhisto);
+  if(dummygraph == 0){
+    cout << "ERROR: can not get graph_PE0006OverTE0056 in file " << ifile.GetName() << endl;
+    return false;
+  }
+  Gr_Rho = TGraph(*dummygraph);
+  H_Rho = TH1D(*dummyhisto);
   return true;
 }
 
@@ -1075,6 +1078,26 @@ bool isGood_lem( int lem ){
      return true;
    else
       return false;
+}
+
+bool IsGood_run(string cut_type_and_methods, int run){
+  if( bad_runs.find(cut_type_and_methods) != bad_runs.end() ){
+    if( find(bad_runs[cut_type_and_methods].begin(), bad_runs[cut_type_and_methods].end(), run) != bad_runs[cut_type_and_methods].end() ){
+      return false;
+    }
+  }
+  return true;
+}
+bool IsGood_lem_gain(string cut_type_and_methods, int run, int lem){
+  if(!IsGood_run(cut_type_and_methods, run)){return false;}
+  if( bad_runs_lems.find(cut_type_and_methods) != bad_runs_lems.end() ){
+    if( bad_runs_lems[cut_type_and_methods].find(run) != bad_runs_lems[cut_type_and_methods].end() ){
+      if( find(bad_runs_lems[cut_type_and_methods][run].begin(), bad_runs_lems[cut_type_and_methods][run].end(), lem) != bad_runs_lems[cut_type_and_methods][run].end() ){
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 double find_projection(hit h){
@@ -1345,9 +1368,9 @@ void read_tree_Feb(TChain *rTree, vector<track> & tracks, int &tstart, int &tend
     rTree->GetEntry(i);
     if(i==0){
       tstart = tEventTimeSeconds;
-      if(runs_and_fields.size() == 0){load_run_lists();}
-      if(!load_rho_run(tRun)){return;}
-      Efield = runs_and_fields[tRun]["Amplification"];
+      TMyFileHeader header = load_run_header(tRun);
+      if(header.GetRun() == -1){return;}
+      Efield = header.GetAmplification();
     }
     if(i==to_read-1){
       tend = tEventTimeSeconds;
@@ -1738,9 +1761,9 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
     rTree->GetEntry(i);
     if(i==0){
       tstart = tEventTimeSeconds;
-      if(runs_and_fields.size() == 0){load_run_lists();}
-      if(!load_rho_run(tRun)){return;}
-      Efield = runs_and_fields[tRun]["Amplification"];
+      TMyFileHeader header = load_run_header(tRun);
+      if(header.GetRun() == -1){return;}
+      Efield = header.GetAmplification();
     }
     if(i==to_read-1){
       tend = tEventTimeSeconds;
@@ -2016,7 +2039,7 @@ double langaufun(double *x, double *par){
 }
 
 TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
- vector<double> parlimitslo, vector<double> parlimitshi, vector<double> &fitparams, vector<double> &fiterrors, double &pvalue, double pvaluelim, int &NDF, bool find_best, bool gauss){
+ vector<double> parlimitslo, vector<double> parlimitshi, vector<double> &fitparams, vector<double> &fiterrors, double &pvalue, double pvaluelim, bool find_best, bool gauss){
    // Once again, here are the Landau * Gaussian parameters:
    //   par[0]=Width (scale) parameter of Landau density
    //   par[1]=Most Probable (MP, location) parameter of Landau density
@@ -2203,7 +2226,7 @@ inline bool ExistTest (const std::string& name) {
   return (stat (name.c_str(), &buffer) == 0);
 }
 
-vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double pvaluelim, double sigmalim, TGraphErrors* graph, string scan_type, float x, float xer){
+vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double pvaluelim, double sigmalim, TGraphErrors* graph, float x, float xer){
   TF1 *function;
   if(hdQds->GetEntries() < min_number_of_hits){
     #if verbose
@@ -2220,7 +2243,6 @@ vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double 
   double fr[2];
   vector<double> sv, pllo, plhi, fp, fpe;
   double chisqr, pvalue;
-  int ndf;
 
   //initialize fit quantities
   FWHM(fr[0], fr[1], hdQds);
@@ -2236,20 +2258,14 @@ vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double 
   sv.push_back(hdQds->GetMean());
   sv.push_back(hdQds->Integral());
   sv.push_back(hdQds->GetStdDev());
-  function = langaufit(hdQds,fr,sv,pllo,plhi,fp,fpe,pvalue,pvaluelim,ndf, false, gauss);
+  function = langaufit(hdQds,fr,sv,pllo,plhi,fp,fpe,pvalue,pvaluelim, false, gauss);
   if( pvalue < pvaluelim or pvalue != pvalue ){
     #if verbose
     cout << "    Bad fit for " << hdQds->GetName() << "(pvalue=" << pvalue << ")" << endl;
     #endif
     return {-1,-1};
   }
-  else if(fpe[1] > sigmalim and mpv_cosmics < 0 ){
-    #if verbose
-    cout << "    Bad fit for " << hdQds->GetName() << "(sigma=" << fpe[1] << ")" << endl;
-    #endif
-    return {-1,-1};
-  }
-  else if(fpe[1]/mpv_cosmics > sigmalim and mpv_cosmics > 0 ){
+  else if(fpe[1]/mpv_cosmics > sigmalim){
     #if verbose
     cout << "    Bad fit for " << hdQds->GetName() << "(sigma=" << fpe[1]/mpv_cosmics << ")" << endl;
     #endif
@@ -2274,48 +2290,20 @@ vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double 
   ((TF1*)hdQds->GetListOfFunctions()->At(0))->SetLineColor(600);
   if( graph != 0 ){
     //insert points in graph
-    if(scan_type == "Drift"){
-      if(mpv_cosmics < 0){
-        graph->SetPoint(graph->GetN(), x*1000, MPV/corr);
-        graph->SetPointError(graph->GetN()-1, xer, fpe[1]/corr);
-      }
-      else{
-        graph->SetPoint(graph->GetN(), x*1000, MPV/(corr*mpv_cosmics));
-        graph->SetPointError(graph->GetN()-1, xer, fpe[1]/(corr*mpv_cosmics));
-      }
-    }
-    else{
-      if(mpv_cosmics < 0){
-        graph->SetPoint(graph->GetN(), x, MPV/corr);
-        graph->SetPointError(graph->GetN()-1, xer, fpe[1]/corr);
-      }
-      else{
-        graph->SetPoint(graph->GetN(), x, MPV/(corr*mpv_cosmics));
-        graph->SetPointError(graph->GetN()-1, xer, fpe[1]/(corr*mpv_cosmics));
-      }
-    }//if not drift
+    graph->SetPoint(graph->GetN(), x, MPV/(corr*mpv_cosmics));
+    graph->SetPointError(graph->GetN()-1, xer, fpe[1]/(corr*mpv_cosmics));
   }//if graph
   return {MPV,fpe[1]};
 }
 ////////////////////////////////////////////////////////////////////////////////
 
 void fill_2d_graph(TGraph2D* graph, double x, double y, double z){
-  if(mpv_cosmics < 0){
-    graph->SetPoint(graph->GetN(), x, y, z);
-  }
-  else{
-    graph->SetPoint(graph->GetN(), x, y, z/mpv_cosmics);
-  }
+  graph->SetPoint(graph->GetN(), x, y, z/mpv_cosmics);
 }
 
 void fill_2d_hist(TH2D* h, double x, double y, double z){
   float Z = -1.;
-  if(mpv_cosmics < 0){
-    Z = z;
-  }
-  else{
-    Z = z/mpv_cosmics;
-  }
+  Z = z/mpv_cosmics;
   int bin = h->FindBin(x,y);
   float content = h->GetBinContent(bin);
   if( Z > content){
@@ -2324,7 +2312,7 @@ void fill_2d_hist(TH2D* h, double x, double y, double z){
   return;
 }
 
-vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph, string scan_type, float x, float xer){
+vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph, float x, float xer){
   TF1 *function;
   TList* funcs = hdQds->GetListOfFunctions();
   if(funcs->GetSize() == 0){
@@ -2344,32 +2332,16 @@ vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph, string scan_type, float
   #if verbose
   cout << "Read fit: " << hdQds->GetName() << endl;
   #endif
-  double fp = function->GetParameter(1);
+  double MPV = function->GetMaximumX();
+//  double MPV = function->GetParameter(1);
   double fpe = function->GetParError(1);
   if( graph != 0 ){
     //insert points in graph
-    if(scan_type == "Drift"){
-      if(mpv_cosmics < 0){
-        graph->SetPoint(graph->GetN(), x*1000, fp/corr);
-        graph->SetPointError(graph->GetN()-1, xer, fpe/corr);
-      }
-      else{
-        graph->SetPoint(graph->GetN(), x*1000, fp/(corr*mpv_cosmics));
-        graph->SetPointError(graph->GetN()-1, xer, fpe/(corr*mpv_cosmics));
-      }
-    }
-    else{
-      if(mpv_cosmics < 0){
-        graph->SetPoint(graph->GetN(), x, fp/corr);
-        graph->SetPointError(graph->GetN()-1, xer, fpe/corr);
-      }
-      else{
-        graph->SetPoint(graph->GetN(), x, fp/(corr*mpv_cosmics));
-        graph->SetPointError(graph->GetN()-1, xer, fpe/(corr*mpv_cosmics));
-      }
-    }//if not drift
+    //insert points in graph
+    graph->SetPoint(graph->GetN(), x, MPV/(corr*mpv_cosmics));
+    graph->SetPointError(graph->GetN()-1, xer, fpe/(corr*mpv_cosmics));
   }//if graph
-  return {fp,fpe};
+  return {MPV,fpe};
 }
 
 
@@ -2384,9 +2356,9 @@ bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErr
   mpv_field[0]->SetMarkerStyle(31);
   mpv_field[1]->SetMarkerStyle(31);
   mpv_field[2]->SetMarkerStyle(31);
-  mpv_field[0]->SetMarkerStyle(2);
-  mpv_field[1]->SetMarkerStyle(2);
-  mpv_field[2]->SetMarkerStyle(2);
+  mpv_field[0]->SetMarkerSize(2);
+  mpv_field[1]->SetMarkerSize(2);
+  mpv_field[2]->SetMarkerSize(2);
   mpv_field[0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view0").data());
   mpv_field[1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view1").data());
   mpv_field[2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_summed_views").data());
@@ -2398,9 +2370,9 @@ bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErr
     mpv_field_ByLEMs[lems[lem]][0]->SetMarkerStyle(31);
     mpv_field_ByLEMs[lems[lem]][1]->SetMarkerStyle(31);
     mpv_field_ByLEMs[lems[lem]][2]->SetMarkerStyle(31);
-    mpv_field_ByLEMs[lems[lem]][0]->SetMarkerStyle(2);
-    mpv_field_ByLEMs[lems[lem]][1]->SetMarkerStyle(2);
-    mpv_field_ByLEMs[lems[lem]][2]->SetMarkerStyle(2);
+    mpv_field_ByLEMs[lems[lem]][0]->SetMarkerSize(2);
+    mpv_field_ByLEMs[lems[lem]][1]->SetMarkerSize(2);
+    mpv_field_ByLEMs[lems[lem]][2]->SetMarkerSize(2);
     mpv_field_ByLEMs[lems[lem]][0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view0").data());
     mpv_field_ByLEMs[lems[lem]][1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view1").data());
     mpv_field_ByLEMs[lems[lem]][2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_summed_views").data());
@@ -2562,11 +2534,14 @@ void sum_views_singlegraph(vector<TGraphErrors*> &graph){
   }
 }
 
-double RFromBirk(double drift, double MPV){
+double RFromBirk(double drift, double MPV, bool convert){
   double A = 0.8;
   double k = 0.0486; //kV/cm
   double rho = 1.3954; //g/cm3
   if(MPV > 0){
+    if(convert){
+      MPV = 1./(1.6*A/(0.236*mpv_cosmics) - k/0.5);
+    }
     return A/(1+MPV*k/(rho*drift));
   }
   else if(mpv_cosmics < 0){
@@ -2640,26 +2615,30 @@ double e_lifetime(TGraphErrors *graph){
 }
 
 double get_eff(double extraction, double amplification, double induction){
-  if (induction == 5){
-    induction = 4.999;
-  }
   double eff = -1.;
+  
   if(amplification < 0 and induction < 0){
-    if(h_GushinEff.GetEntries() == 0){
-      load_Gushin_Eff();
-    }
+    if(extraction > 100){extraction = extraction/1000.;}
+    if(h_GushinEff.GetEntries() == 0){load_Gushin_Eff();}
     int bin = h_GushinEff.FindBin(extraction);
     eff = h_GushinEff.GetBinContent(bin);
     return eff;
   }
+  
   //convert V/cm or kV/cm to V
-  if(amplification < 1000){amplification = amplification*100.;}
-  else{amplification = amplification*0.1;}
-  if(extraction < 100){extraction = extraction*1000.;}
-  if(induction < 100){induction = induction*200.;}
-  else{induction = induction*0.2;}
-  if(h_ExtrEff_vs_LemExtr.GetEntries() == 0 or h_IndEff_vs_LemInd.GetEntries() == 0){
-    if(!load_eff_simu_graphs()){return -1;}
+  amplification = amplification*100.;
+  extraction = extraction*1000.;
+  induction = induction*200.;
+  if (induction == 5){
+    induction = 4.999;
+  }
+  
+  
+  if(h_ExtrEff_vs_LemExtr.GetEntries() == 0){
+    if(!load_extr_eff_simu_graphs()){return -1;}
+  }
+  if(h_IndEff_vs_LemInd.GetEntries() == 0){
+    if(!load_ind_eff_simu_graphs()){return -1;}
   }
   if(extraction > 0){
     int bin = h_ExtrEff_vs_LemExtr.FindBin(amplification,extraction);
@@ -2821,7 +2800,7 @@ void get_eff_multigraphs(TMultiGraph *mg, string scan_type, vector<int> scan_num
     double max_gain = 0;
     for(int j = 0; j < mg_eff[i]->GetN(); j++){
       mg_eff[i]->GetPoint(j,field,gain);
-      if(scan_type == "Drift"){eff = RFromBirk(field/1000.);}
+      if(scan_type == "Drift"){eff = RFromBirk(field, gain*mpv_cosmics, true);}
       if(scan_type == "Induction"){eff = get_eff(-1,amplifield,field);}
       if(scan_type == "Extraction"){
         if(eff_to_use == "simu"){
@@ -2968,7 +2947,7 @@ void get_eff_graphs(TGraphErrors *gr, string scan_type, int scan_num, TFile *ofi
   double max_gain = 0;
   for(int j = 0; j < gr_eff->GetN(); j++){
     gr_eff->GetPoint(j,field,gain);
-    if(scan_type == "Drift"){eff = RFromBirk(field/1000.);}
+    if(scan_type == "Drift"){eff = RFromBirk(field, gain*mpv_cosmics, true);}
     if(scan_type == "Induction"){eff = get_eff(-1,amplifield,field);}
     if(scan_type == "Extraction"){
       if(eff_to_use == "simu"){
@@ -3106,7 +3085,7 @@ TMultiGraph* normalise_gain_graph(TMultiGraph *mg, string scan_type, vector<stri
         if(eff_to_use == "Gushin"){eff = eff*get_eff(extracfield);}
         else if(eff_to_use == "Extr"){eff = eff*get_eff(extracfield,amplifield,-1.);}
         else if(eff_to_use == "Ind"){eff = eff*get_eff(-1.,amplifield,inducfield);}
-        else if(eff_to_use == "Drift"){eff = eff*RFromBirk(driftfield/1000.);}
+        else if(eff_to_use == "Drift"){eff = eff*RFromBirk(driftfield, gain*mpv_cosmics, true);}
         else{cout << "WARNING in normalise_gain_graph: unknown eff " << eff_to_use << endl;}
         gr_normalized->SetName(string(string(gr_normalized->GetName())+"_"+eff_to_use).data());
       }
@@ -3286,23 +3265,23 @@ void draw_gain_dQds(map<double,map<int,TH1D> > mpv_field, string scan_type, int 
 //}
 
 void draw_gain_graph(TGraphErrors *gr, string scan_type, int scan_num, TFile *ofile, string draw){
-  if(scan_type == "Amplification" and scan_num == 100){
-    if(Gain_graph_3L.GetN() == 0){load_fit_3L();}
-    Gain_graph_3L.Draw("AP*");
-    Gain_graph_3L.SetMinimum(0);
-    Gain_graph_3L.Draw("AP*");
-    gPad->Update();
-    gPad->Modified();
-    ((TF1*)Gain_graph_3L.GetListOfFunctions()->At(0))->Draw("SAME");
-    gr->Draw("SAME P*");
-  }
-  else{
+//  if(scan_type == "Amplification" and scan_num == 100){
+//    if(Gain_graph_3L.GetN() == 0){load_fit_3L();}
+//    Gain_graph_3L.Draw("AP*");
+//    Gain_graph_3L.SetMinimum(0);
+//    Gain_graph_3L.Draw("AP*");
+//    gPad->Update();
+//    gPad->Modified();
+//    ((TF1*)Gain_graph_3L.GetListOfFunctions()->At(0))->Draw("SAME");
+//    gr->Draw("SAME P*");
+//  }
+//  else{
     gr->Draw("AP*");
     gr->SetMinimum(0);
     gr->Draw("AP*");
     gPad->Update();
     gPad->Modified();
-  }
+//  }
   ofile->cd();
   gr->Write();
   gPad->SetName(string(string(gr->GetName())+"_pad").data());
@@ -3417,10 +3396,6 @@ void fit_gain(TGraphErrors* gr, vector<double> par){
   return;
 }
 
-double correct_dx_for_lifetime(double dx, double e_lifetime){
-  return TMath::Exp(dx/(e_lifetime*drift_velocity));
-}
-
 void fit_charging_up(TGraphErrors &gr){
   double begintime = 0;
   double endtime = 0;
@@ -3445,7 +3420,9 @@ void fit_charging_up(TGraphErrors &gr){
 }
 
 double theoretical_gain(double T, double rho, double E){
-  if(E > 1000){E = E/1000.;}
+  if(rho_ref == 0){
+    cout << "gain_correction_for_rho: Please specify a reference density" << endl; return 0;
+  }
   if(Arho_from_3L.first < 0){
     load_fit_3L();
   }
@@ -3455,19 +3432,24 @@ double theoretical_gain(double T, double rho, double E){
 }
 
 double gain_correction_for_rho(double rho, double E){
-  if(rho_ref == 0){
-    cout << "gain_correction_for_rho: Please a reference density" << endl; return 0;
-  }
   double G0 = theoretical_gain(1,rho,E);
   double G0_corr = theoretical_gain(1,rho_ref,E);
   return G0_corr/G0;
 }
 
+double correct_dx_for_lifetime(double dx, double e_lifetime){
+  return TMath::Exp(dx/(e_lifetime*drift_velocity));
+}
+
+double correct_for_drift(double E){
+  return RFromBirk(E)/RFromBirk(0.5);
+}
+
 double get_density_for_hit(int hit_time, int run){
-  if(gr_rho.GetN() == 0){
-    if(!load_rho_run(run)){return -1;}
+  if(Gr_Rho.GetN() == 0){
+    if(!load_gr_and_h_rho(run)){return -1;}
   }
-  return gr_rho.Eval(hit_time);
+  return Gr_Rho.Eval(hit_time);
 }
 
 int read_or_do_fit(string filename_fitted, string filename_nonfitted, bool recreate_fit_file, string &ifilename, int &files_not_found){
@@ -3563,7 +3545,8 @@ void rec_track_dQds(track t, vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds
     else{ds = h.dx_local;}
     if(method_dQ == "sum"){dq = h.dq_sum;}
     else{dq = h.dq_integral;}
-    double dqds = h.gain_density_correction_factor * dq/ds;
+//    double dqds = h.gain_density_correction_factor * dq/ds;
+    double dqds = dq/ds;
     
     //cut on dqdx
     if( dqds <= dQdx_cut_min or dqds > 50 or h.sp_x < tpc_boundaries[0] or h.sp_x >= tpc_boundaries[1] or h.sp_y < tpc_boundaries[2] or h.sp_y > tpc_boundaries[3] or h.sp_z < tpc_boundaries[4] or h.sp_z > tpc_boundaries[5] ){ continue; }
@@ -3740,6 +3723,29 @@ string set_cuts(string cut_type){
   return to_return;
 }
 
+void set_bad_runs(){
+  bad_runs["Ds_local_sum"] = {771,992,1005,1165,1166,1167,1172,1173,1184,1185,1195};
+  bad_runs_lems["Ds_local_sum"][1002] = {2};
+  bad_runs_lems["Ds_local_sum"][1037] = {6};
+  bad_runs_lems["Ds_local_sum"][1039] = {2,4};
+  bad_runs_lems["Ds_local_sum"][1174] = {9,11};
+  bad_runs_lems["Ds_local_sum"][1175] = {9,11};
+  bad_runs_lems["Ds_local_sum"][1177] = {9,11};
+  bad_runs_lems["Ds_local_sum"][1183] = {2,9};
+  bad_runs_lems["Ds_local_sum"][1187] = {9,11};
+  bad_runs_lems["Ds_local_sum"][1188] = {2,9,11};
+
+  bad_runs_lems["common_local_sum"][783] = {7,8};
+  bad_runs_lems["common_local_sum"][786] = {8};
+  bad_runs_lems["common_local_sum"][785] = {4};
+  bad_runs_lems["common_local_sum"][784] = {4,5,8};
+  bad_runs_lems["common_local_sum"][840] = {5,7,8};
+  bad_runs_lems["common_local_sum"][835] = {8};
+  bad_runs_lems["common_local_sum"][833] = {8};
+
+  return;
+}
+
 bool pressure(string srun){
   
   gErrorIgnoreLevel = kError;
@@ -3783,12 +3789,13 @@ bool pressure(string srun){
     return false;
   }
   int i = 0;
+  int npar = 0;
   vector<int> columns_to_rec = {};
   map<string,vector<double> > map_par_values;
   vector<double> mean_cryo_temps = {};
   vector<double> cryo_pos_for_plot = {};
   double rho_var = 0;
-  double p_mean = 0;
+  double rho_mean = 0;
   
   while(!ifile.eof()){
     char buffer[1000];
@@ -3820,6 +3827,7 @@ bool pressure(string srun){
         tokBuffer = strtok(NULL, ";");
       }
       i++;
+      npar = col;
       continue;
     }
     if(std::find(columns_to_rec.begin(), columns_to_rec.end(), col) != columns_to_rec.end()){
@@ -3832,6 +3840,10 @@ bool pressure(string srun){
         map_par_values[params_in_file[std::find(columns_to_rec.begin(), columns_to_rec.end(), col)-columns_to_rec.begin()]].push_back(atof(tokBuffer));
       }
       tokBuffer = strtok(NULL, ";");
+    }
+    if(npar != col){
+      cout << "ERROR in pressure: run has incoherent number of parameters: " << col << " instead of " << npar << endl;
+      return false;
     }
   }
   ifile.close();
@@ -3876,11 +3888,8 @@ bool pressure(string srun){
     else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
     gr.Write();
     gPad->SetName(string(string(gr.GetName()) + "_pad").data());
-//    gPad->SaveAs(string(directory + "graph_"+par.first + ".png").data());
-    if(par.first == "PE0006"){ofile_pressure.cd();}
-    else if(find(temp_crp.begin(), temp_crp.end(), par.first) != temp_crp.end()){ofile_temperature_CRP.cd();}
-    else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
     gPad->Write();
+//    gPad->SaveAs(string(directory + "graph_"+par.first + ".png").data());
     delete gPad;
     
 ////////////////////////////////////////////////
@@ -3898,11 +3907,8 @@ bool pressure(string srun){
     else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
     h.Write();
     gPad->SetName(string(string(h.GetName()) + "_pad").data());
-//    gPad->SaveAs(string(directory + "histo_"+par.first + ".png").data());
-    if(par.first == "PE0006"){ofile_pressure.cd();p_mean = h.GetMean();}
-    else if(find(temp_crp.begin(), temp_crp.end(), par.first) != temp_crp.end()){ofile_temperature_CRP.cd();}
-    else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
     gPad->Write();
+//    gPad->SaveAs(string(directory + "histo_"+par.first + ".png").data());
     delete gPad;
     
     if(par.first != "PE0006"){
@@ -3919,7 +3925,6 @@ bool pressure(string srun){
       gr_rho.SetTitle(string("PE0006/"+par.first).data());
       gr_rho.SetName(string("graph_PE0006Over"+par.first).data());
       gr_rho.Draw("AC");
-      if(par.first == "TE0056"){rho_var = *max_element(begin(rho),end(rho))-*min_element(begin(rho),end(rho));}
       gr_rho.GetXaxis()->SetTimeDisplay(1);
       gr_rho.GetXaxis()->LabelsOption("v");
       if(map_par_values["date"].back()-map_par_values["date"][0] > 24*3600){
@@ -3937,10 +3942,8 @@ bool pressure(string srun){
       else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
       gr_rho.Write();
       gPad->SetName(string(string(gr_rho.GetName()) + "_pad").data());
-//      gPad->SaveAs(string(directory + "graph_PE0006Over"+par.first + ".png").data());
-      if(find(temp_crp.begin(), temp_crp.end(), par.first) != temp_crp.end()){ofile_temperature_CRP.cd();}
-      else if(temp_cryostat.find(par.first) != temp_cryostat.end()){ofile_temperature_cryostat.cd();}
       gPad->Write();
+//      gPad->SaveAs(string(directory + "graph_PE0006Over"+par.first + ".png").data());
       delete gPad;
       
 ////////////////////////////////////////////////
@@ -3950,6 +3953,10 @@ bool pressure(string srun){
       TH1D h_rho(string("histo_PE0006Over"+par.first).data(),string("PE0006Over"+par.first+";PE0006Over"+par.first+";#").data(),100,0.99*rho[min_element(rho.begin(),rho.end()) - rho.begin()],rho[max_element(rho.begin(),rho.end()) - rho.begin()]*1.01);
       for(auto value : rho){
         h_rho.Fill(value);
+      }
+      if(par.first == "TE0056"){
+        rho_mean = h.GetMean();
+        rho_var = h.GetStdDev();
       }
       h_rho.Draw();
       if(find(temp_crp.begin(), temp_crp.end(), par.first) != temp_crp.end()){ofile_temperature_CRP.cd();}
@@ -3961,7 +3968,6 @@ bool pressure(string srun){
       delete gPad;
     }
     
-    cout << "chien" << endl;
   }
   ofile_pressure.Close();
   ofile_temperature_CRP.Close();
@@ -3990,7 +3996,6 @@ bool pressure(string srun){
   temp_vs_height.Fit(temp_gradient,"R+");
   temp_vs_height.Fit(temp_const,"R+");
   double CRP_temp = temp_const->GetParameter(0)+0.5*temp_gradient->GetParameter(1);
-  cout << p_mean/CRP_temp << " " << rho_var << endl;
   ofile_temperature_cryostat.cd();
   temp_vs_height.Write();
   gPad->SetName(string(string(temp_vs_height.GetName()) + "_pad").data());
@@ -4008,9 +4013,9 @@ bool pressure(string srun){
   vector<double> gains_up;
   vector<double> gains_down;
   for(auto fiel : fields_to_plot){
-    gains_middle.push_back(theoretical_gain(1,p_mean/CRP_temp,fiel));
-    gains_up.push_back(theoretical_gain(1,p_mean/CRP_temp + rho_var/2.,fiel));
-    gains_down.push_back(theoretical_gain(1,p_mean/CRP_temp - rho_var/2.,fiel));
+    gains_middle.push_back(theoretical_gain(1,rho_mean,fiel));
+    gains_up.push_back(theoretical_gain(1,rho_mean + rho_var/2.,fiel));
+    gains_down.push_back(theoretical_gain(1,rho_mean - rho_var/2.,fiel));
   }
   TGraph gain_middle(gains_middle.size(),&fields_to_plot[0],&gains_middle[0]);
   gain_middle.SetMarkerColor(kGreen);
@@ -4021,7 +4026,7 @@ bool pressure(string srun){
   TGraph gain_down(gains_down.size(),&fields_to_plot[0],&gains_down[0]);
   gain_down.SetMarkerColor(kRed);
   gain_down.SetLineColor(kRed);
-  gain_up.SetTitle(string("gain with density variating from " + to_string((int)p_mean/CRP_temp - rho_var/2.) + " to " + to_string((int)p_mean/CRP_temp + rho_var/2.)+";LEM Field (kV/cm);Gain in LEM").data());
+  gain_up.SetTitle(string("gain with density variating from " + to_string((int)rho_mean - rho_var/2.) + " to " + to_string((int)rho_mean + rho_var/2.)+";LEM Field (kV/cm);Gain in LEM").data());
   gain_up.Draw("AC");
   gain_middle.Draw("SAME C");
   gain_down.Draw("SAME C");
@@ -4032,21 +4037,200 @@ bool pressure(string srun){
   delete gPad;
       
   ofile_temperature_cryostat.Close();
-////////////////////////////////////////////////
-    //Updating header file
-////////////////////////////////////////////////
-  
-  system("rm ./tmp*");
-  if(srun.find("all") != string::npos){
-    return true;
-  }
-  
-  TFile headerfile(string(runs_headers+srun+".root").data(),"UPDATE");
-  TMyFileHeader *header = (TMyFileHeader*)((TKey*)headerfile.GetListOfKeys()->At(0))->ReadObj();
-  header->SetRho(p_mean/CRP_temp);
-  header->SetRhoVar(rho_var);
-  header->Write(string("header_"+srun).data(),TObject::kOverwrite);
-  headerfile.Close();
   
   return true ;
 }
+
+bool save_run_header(TMyFileHeader header){
+  string ofilename = runs_headers+to_string(header.GetRun())+".root";
+  TFile ofile(ofilename.data(), "RECREATE");
+  if(!ofile.IsOpen()){
+    cout << " ERROR: TFile " << ofilename << " can't be created " << endl;
+    return false;
+  }
+  #if verbose
+  cout << " Header header_" << to_string(header.GetRun()).data() << " saved in " << ofilename << "." << endl;
+  #endif
+  
+  header.Write(string("header_"+to_string(header.GetRun())).data());
+  ofile.Close();
+  return true;
+}
+
+bool set_gain_processed(vector<int> run_list, string cut_type, string m_dq, string m_ds){
+  method_dQ = m_dq;
+  method_ds = m_ds;
+  set_bad_runs();
+  if(!Load_Version("July")){return false;}
+  if (run_list.size() == 0){
+    #if verbose
+    cout << "Processing all runs in " << dQds_Output << "*..." << endl;
+    #endif
+    string wildcard_path = dQds_Output + cut_type + "/*";
+    for( auto irun : glob(wildcard_path) ){
+      if(irun.find("plots") != string::npos){continue;}
+      if(irun.find("fitted") != string::npos){continue;}
+      irun = irun.substr(0, irun.find_first_of("."));
+      run_list.push_back(atoi(irun.data()));
+    }
+  }
+  string cut_type_and_methods = cut_type + "_" + method_ds + "_" + method_dQ;
+  for(auto run : run_list){
+    bool good = IsGood_run(cut_type_and_methods, run);
+    string ofilename = runs_headers+to_string(run)+".root";
+    TFile ofile(ofilename.data(), "UPDATE");
+    if(!ofile.IsOpen()){
+      cout << " ERROR: TFile " << ofilename << " can't be created " << endl;
+      return false;
+    }
+    string headername = "header_"+to_string(run);
+    TMyFileHeader *h = 0;
+    ofile.GetObject(headername.data(),h);
+    if(h->AreGainsProcessed().find(cut_type_and_methods) == h->AreGainsProcessed().end()){cout <<"No cut named " << cut_type_and_methods << " found." << endl; return false;}
+    h->SetGainProcessed(cut_type_and_methods, good);
+    for(auto lem : lems){
+      bool goodlem = IsGood_lem_gain(cut_type_and_methods, run, lem);
+      h->SetGainProcessedLEM(cut_type_and_methods, lem, good and goodlem);
+    }
+    h->Write(headername.data(),TObject::kOverwrite);
+    #if verbose
+    cout << " Header " << headername << " updated in " << ofilename << "." << endl;
+    #endif
+    ofile.Close();
+  }
+  return true;
+}
+
+bool save_runs_headers(vector<int> run_list){
+  if(!Load_Version("Feb")){return false;}
+  if(!load_run_lists()){return false;}
+  
+  string path = path_wa105_311data;
+  string path_output = runs_headers;
+  if (run_list.size() == 0){
+    #if verbose
+    cout << "Processing all runs in " << path_wa105_311data << "*..." << endl;
+    #endif
+    string wildcard_path = path + "*";
+    for( auto irun : glob(wildcard_path) ){
+      run_list.push_back(atoi(irun.data()));
+    }
+  }
+  string filename = "";
+  unsigned int failed = 0;
+  
+  for(auto run : run_list){
+  
+    string ofilename = path_output+to_string(run)+".root";
+    double drift = runs_and_fields[run]["Drift"];
+    double amplification = runs_and_fields[run]["Amplification"];
+    double extraction = runs_and_fields[run]["Extraction"];
+    double induction = runs_and_fields[run]["Induction"];
+    double extr_eff_simu = get_eff(extraction, amplification);
+    double extr_eff_gushin = get_eff(extraction);
+    double ind_eff = get_eff(-1,amplification,induction);
+    double drift_correction_factor = correct_for_drift(drift);
+    string trigger = runs_triggers[run];
+    int tstart = 0;
+    int tend = 0;
+    
+    TChain chain("analysistree/anatree");
+    string foldername = path+to_string(run)+"/";
+    int n_subruns = glob(string(foldername+"*").data()).size();
+    if( n_subruns == 0){
+      #if verbose
+      cout << foldername << " not found or empty" << endl;
+      #endif
+      failed++;
+      continue;
+    }
+    #if verbose
+    cout << "Processing " << n_subruns << " subruns in run " << run << endl;
+    #endif
+
+    string file = "";
+    for(int i=0; i< n_subruns; i++){
+      
+      file=to_string(run)+"-"+to_string(i);
+      if(file == "1009-21"){failed++;continue;}
+      if(path_311data.find("Feb") != string::npos){
+        file = file + "-Parser.root";
+      }
+      else if(path_311data.find("June") != string::npos){
+        file = file + "-RecoFast-Parser.root";
+      }
+      else{
+        cout << "ERROR: unknown reconstruction version" << endl;
+        return false;
+      }
+      filename=foldername+file;
+      if( ExistTest(filename) ){
+        #if verbose
+        cout << "Adding file: " << filename << endl;
+        #endif
+        chain.Add(filename.data());
+      }
+      else{
+        #if verbose
+        cout << "File " << filename << " not found." << endl;
+        #endif
+        failed++;
+        continue;
+      }
+    }
+    #if verbose
+    cout << "Files added. " << endl;
+    #endif
+    
+    int NEntries = (int)chain.GetEntries();
+    int  tEventTimeSeconds;
+    chain.SetBranchAddress("EventTimeSeconds",&tEventTimeSeconds);
+    chain.GetEntry(0);
+    tstart = tEventTimeSeconds;
+    chain.GetEntry(NEntries-1);
+    tend = tEventTimeSeconds;
+    if(!ExistTest(slow_control + to_string(run) + "/" + to_string(run) + ".txt") and !IsBatch){
+      #if verbose
+      cout << "Getting slow control data for run  " << run << "..." << endl;
+      #endif
+      string command  = path_311analysis+"slow_control/Pcotte_getdata.sh " + to_string(tstart) + " " + to_string(tend) + " " + to_string(run);
+      system(command.data());
+    }
+    if(!ExistTest(slow_control + "/" + to_string(run) + "/" + to_string(run) + ".txt")){
+      cout << "ERROR: can not get slow control data for run " << run << endl;
+      failed++;
+      continue;
+    }
+    #if verbose
+    cout << "Opening slow control data for run  " << run << "..." << endl;
+    #endif
+    if(Gr_Rho.GetN() == 0 or H_Rho.GetEntries() == 0){
+      if(!load_gr_and_h_rho(run)){failed++;continue;}
+    }
+    double rho = H_Rho.GetMean();
+    double rho_var = H_Rho.GetStdDev();
+    double density_correction_factor = gain_correction_for_rho(rho, amplification);
+    
+    TMyFileHeader header(run, drift, extraction, amplification, induction, tstart ,tend,string("header_"+to_string(run)).data(), rho, rho_var, extr_eff_simu, extr_eff_gushin, ind_eff, drift_correction_factor, density_correction_factor, theoretical_gain(1,rho,amplification), theoretical_gain(1,rho_ref,amplification), trigger);
+    TFile ofile(ofilename.data(), "RECREATE");
+    if(!ofile.IsOpen()){
+      cout << " ERROR: TFile " << ofilename << " can't be created " << endl;
+      failed++;
+      continue;
+    }
+    #if verbose
+    cout << " Header header_" << to_string(run).data() << " saved in " << ofilename << " has been created " << endl;
+    #endif
+    
+    header.Write(string("header_"+to_string(run)).data());
+    ofile.Close();
+    
+  }//for run
+  if(failed == run_list.size()){
+    cout << "ERROR in save_run_headers: all runs failed" << endl;
+    return false;
+  }
+  return true;
+}
+
+

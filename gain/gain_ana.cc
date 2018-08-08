@@ -31,14 +31,16 @@ string to_string_with_precision(const T a_value, const int n = 3){
 }
 
 
-void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "sum", string m_ds = "3D"){
+void gain_ana(string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local"){
   method_ds = m_ds;
   method_dQ = m_dQ;
   if(!Load_Version(version)){return;}
   if(!load_run_lists()){return;}
+  set_bad_runs();
+  load_force_mpv();
   gErrorIgnoreLevel = kError;
   gStyle->SetOptStat(0);
-//  gStyle->SetOptFit(0);
+  gStyle->SetOptFit(0);
   // Set stat options
   gStyle->SetStatY(0.35);                
   // Set y-position (fraction of pad size)
@@ -55,6 +57,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
   string corrected_or_not = "";
   if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
   string name_to_get = "";
+  string cut_type_and_methods = cut_type + "_" + method_ds + "_" + method_dQ;
   
   //****************************************************************************
   //variables definition here
@@ -66,9 +69,9 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
 //  scans["Induction"] = {1,2,3,4,5};
 
 //  scans["Amplification"] = {2,4,5};
-//  scans["Amplification"] = {100};
+  scans["Amplification"] = {100};
 
-  scans["Drift"] = {1,2,3,4,5,6,7,8,9,10,11};
+//  scans["Drift"] = {1,2,3,4,5,6,7,8,9,10,11};
 //  scans["Extraction"] = {1,2,3,4,5,6,7,8};
 //  scans["Amplification"] = {1,2,3,4,5,6,7};
 //  scans["All"] = {};
@@ -147,7 +150,6 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
         mpv_field_ByLEMs_total_summedviews[lem]->SetName(string("mpv_field_LEM_"+to_string(lem)+"_summedviews").data());
     }
     
-    int empty_scan_num = 0;
     for( auto scan_num : scan_it.second ){
       
       vector<TGraphErrors*> mpv_field;
@@ -187,203 +189,60 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
       cout << "  Doing " << scan_type << " scan number " << scan_num << endl;
       #endif
       
-      //****************************************************************************
-      //define an output file
-
-      const int n_runs = run_list.size();
-      
-      //****************************************************************************
-      //create efiled2run map
-
-      map<float, vector<int>> field2run;
-
-      for( int ii=0; ii < n_runs; ii++ ){
-        field2run[ field[ii] ].push_back( run_list[ii] );
-      }
-
-      //****************************************************************************
-      //read files and fit the distributions
-      
-      int empty_fields = 0;
-      
-      for( auto field_it : field2run ){
-      
-        int found_run_for_field = 0;
-        string run_name;
-
+      for(auto run : run_list){
         #if verbose
-        cout << "    Processing field: " << field_it.first << endl;
+        cout << "  Analysing run " << run << endl;
         #endif
-
-        int files_not_found = 0;
-        for(auto run : field_it.second){
-        
-        
-          if(scan_type == "Amplification" or scan_type == "All"){
-            corr = get_eff(runs_and_fields[run]["Extraction"], runs_and_fields[run]["Amplification"], runs_and_fields[run]["Induction"]);
-          }
-          else{
-            corr = 1.;
-          }
-        
-          if(gain_corrections.find(run) != gain_corrections.end()){corr = gain_corrections[run];}
-
-          string filename_nonfitted = dQds_Output+cut_type+"/"+to_string(run)+".root";
-          string filename_fitted = dQds_Output+cut_type+"/"+to_string(run)+"_fitted.root";
-          TFile *runfile_fitted = new TFile();
-          bool read_fit = false;
-          string ifilename = "";
-          int i_read_fit = read_or_do_fit(filename_fitted, filename_nonfitted, recreate_fit_file, ifilename, files_not_found);
-          if(i_read_fit == 3){continue;}
-          if(i_read_fit == 1){read_fit = true;}
-          TFile *runfile = TFile::Open(ifilename.data(),"READ");
-          if( !read_fit ){
-            #if verbose
-            cout << "    Recording fitted histograms in " << filename_fitted << endl;
-            #endif
-            runfile_fitted = TFile::Open(filename_fitted.data(), "RECREATE");
-            if(!runfile_fitted->IsOpen()){
-              cout << "ERROR: could not open " << filename_fitted << " for writing." << endl;
-              return;
-            }
-          }
-
-          TH1D hdQds;
-          TString FunName = "";
-          int nhits_tot = 0;
-          vector<double> f = {-1,-1};
-          
-          #if verbose 
-          cout << "  Reading histograms..." << endl;
+        TMyFileHeader header = load_run_header(run);
+        if(!IsGood_run(cut_type_and_methods, run)){
+          #if verbose
+          cout << "  Run " << run << " is bad under " << cut_type_and_methods << " cut and methods. Ignoring" << endl;
           #endif
-          
-          name_to_get = "dQds_view0" + corrected_or_not;
-          if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-          if(!read_fit && !runfile_fitted->IsOpen()){
-            runfile->Close(); delete runfile; runfile = 0;
-            runfile = TFile::Open(filename_nonfitted.data(), "READ");
-            runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
-            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-          }
-          
-          nhits_tot += hdQds.GetEntries();
-          if(read_fit){
-            f = ReadFit(&hdQds, mpv_field[0], scan_type, field_it.first);
-//            if(runs_and_fields[run]["Extraction"] < 1800){}
-          }
-          else{
-            f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field[0], scan_type, field_it.first);
-            runfile_fitted->cd();
-            hdQds.Write();
-          }
-          
-          name_to_get = "dQds_view1" + corrected_or_not;
-          if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-          if(!read_fit && !runfile_fitted->IsOpen()){
-            runfile->Close(); delete runfile; runfile = 0;
-            runfile = TFile::Open(filename_nonfitted.data(), "READ");
-            runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
-            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-          }
-          
-          nhits_tot += hdQds.GetEntries();
-          if(read_fit){
-            f = ReadFit(&hdQds,mpv_field[1], scan_type, field_it.first);
-          }
-          else{
-            f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field[1], scan_type, field_it.first);
-            runfile_fitted->cd();
-            hdQds.Write();
-          }
-          
-          if( nhits_tot < min_number_of_hits ){
+          continue;
+        }
+        
+        //Get field to go on x axis
+        double xfield;
+        if(scan_type == "Amplification" or scan_type == "all"){xfield = header.GetAmplification();}
+        else if(scan_type == "Extraction"){xfield = header.GetExtraction();}
+        else if(scan_type == "Induction"){xfield = header.GetInduction();}
+        else if(scan_type == "Drift"){xfield = header.GetDrift();}
+      
+        
+        if(scan_type == "Amplification" or scan_type == "All"){
+//            corr = header.GetTotalCorrGushin();
+          corr = header.GetTotalCorrSimu();
+        }
+        else{
+          corr = 1.;
+        }
+        double mpv0 = header.GetMPV0(cut_type_and_methods);
+        double mpv1 = header.GetMPV1(cut_type_and_methods);
+        map<int, pair<double, double> > mpvslems = header.GetMPVLEMs(cut_type_and_methods);
+        
+        mpv_field[0]->SetPoint(mpv_field[0]->GetN(), xfield, mpv0/(mpv_cosmics*corr));
+        mpv_field[1]->SetPoint(mpv_field[1]->GetN(), xfield, mpv1/(mpv_cosmics*corr));
+        mpv_field[2]->SetPoint(mpv_field[2]->GetN(), xfield, (mpv0+mpv1)/(mpv_cosmics*corr));
+//          if(gain_corrections.find(run) != gain_corrections.end()){corr = gain_corrections[run];}
+        
+        
+        for( auto lem : lems ){
+          if(!IsGood_lem_gain(cut_type_and_methods, run, lem)){
             #if verbose
-            cout << "    Insuficient number of hits (" << nhits_tot << ") for run " << run << ". Skipping this run. \n  next run" << endl;
+            cout << "  LEM " << lem << " in run " << run << " is bad under " << cut_type_and_methods << " cut and methods. Ignoring" << endl;
             #endif
-            if(runfile_fitted->IsOpen()){
-              runfile_fitted->Close();
-            }
-            delete runfile_fitted;
-            runfile->Close();
             continue;
           }
-          else{
-            #if verbose
-            cout << "    Processing " << nhits_tot << " hits for run " << run << endl;
-            #endif
-          }
+          mpv0 = mpvslems[lem].first;
+          mpv1 = mpvslems[lem].second;
           
-          for( auto lem : lems ){
-          
-            name_to_get = "dQds_LEM_"+to_string(lem)+"_view0" + corrected_or_not;
-            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-            if(!read_fit && !runfile_fitted->IsOpen()){
-              runfile->Close(); delete runfile; runfile = 0;
-              runfile = TFile::Open(filename_nonfitted.data(), "READ");
-              runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
-              if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-            }
-            
-            if(read_fit){
-              f = ReadFit(&hdQds,mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
-            }
-            else{
-              f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field_ByLEMs[lem][0], scan_type, field_it.first);
-              runfile_fitted->cd();
-              hdQds.Write();
-            }
-          
-            name_to_get = "dQds_LEM_"+to_string(lem)+"_view1" + corrected_or_not;
-            if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-            if(!read_fit && !runfile_fitted->IsOpen()){
-              runfile->Close(); delete runfile; runfile = 0;
-              runfile = TFile::Open(filename_nonfitted.data(), "READ");
-              runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
-              if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-            }
-            
-            if(read_fit){
-              f = ReadFit(&hdQds,mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
-            }
-            else{
-              f = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, 0.5, mpv_field_ByLEMs[lem][1], scan_type, field_it.first);
-              runfile_fitted->cd();
-              hdQds.Write();
-            }
-          }//for lem
-          if(runfile_fitted->IsOpen()){
-            runfile_fitted->Close();
-          }
-          delete runfile_fitted;
-          #if verbose
-          cout << "    done reading histograms and filling graphs" << endl;
-          #endif
-          runfile->Close();
-          delete runfile;
-          
-          #if verbose
-          cout << "    next run" << endl;
-          #endif
-        }//for runs
-        if(files_not_found == field_it.second.size()){
-          #if verbose
-          cout << "  No file for field " << field_it.first << " in scan " << scan_type << " " << scan_num << "." << endl;
-          #endif
-          empty_fields++;
+          mpv_field_ByLEMs[lem][0]->SetPoint(mpv_field_ByLEMs[lem][0]->GetN(), xfield, mpv0);
+          mpv_field_ByLEMs[lem][1]->SetPoint(mpv_field_ByLEMs[lem][1]->GetN(), xfield, mpv1);
+          mpv_field_ByLEMs[lem][2]->SetPoint(mpv_field_ByLEMs[lem][2]->GetN(), xfield, mpv0+mpv1);
         }
-        #if verbose
-        cout << "    next field" << endl;
-        #endif
-      }//while field2run
-      
-      if(empty_fields == field2run.size()){
-        #if verbose
-        cout << "  No files for scan " << scan_type << " " << scan_num << "." << endl;
-        #endif
-        empty_scan_num++;
-        continue;
-      }
-      sum_views(mpv_field, mpv_field_ByLEMs);
+          
+      }//for runs
+    
       fill_multigraph(mpv_field_ByLEMs, mpv_field_AllLEMs);
       
       if(scan_type != "All"){
@@ -426,9 +285,7 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
         }
         draw_gain_graph(mpv_field[0], scan_type, scan_num, ofile, outpath);
         draw_gain_graph(mpv_field[1], scan_type, scan_num, ofile, outpath);
-        if(mpv_field[2]){
-          draw_gain_graph(mpv_field[2], scan_type, scan_num, ofile, outpath);
-        }
+        draw_gain_graph(mpv_field[2], scan_type, scan_num, ofile, outpath);
       }
 //      draw_gain_graph_superposed_lems(mpv_field_AllLEMs[0], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
 //      draw_gain_graph_superposed_lems(mpv_field_AllLEMs[1], scan_type, scan_nums_for_AllLEMs, ofile, outpath);
@@ -478,12 +335,6 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
     #if verbose
     cout << "  Last scan number done" << endl;
     #endif
-    if(empty_scan_num == scan_it.second.size()){
-      #if verbose
-      cout << "  No scan for " << scan_type << endl;
-      #endif
-      continue;
-    }
     
 //    ofile_total->cd();
 //    draw_gain_multigraph(mpv_field_total, scan_type, ofile_total);
@@ -503,7 +354,6 @@ void gain_ana(string cut_type = "Ds", string version = "June", string m_dQ = "su
     #if verbose
     cout<< "next scan type" << endl;
     #endif
-    gain_corrections.clear();
   }//for scans
   
   #if verbose

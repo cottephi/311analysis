@@ -2,9 +2,9 @@
 outdir=/eos/user/p/pcotte/311analysis/jobs
 runs='{}'
 cut_type='Ds'
-version='June'
+version='July'
 method_dQ='sum'
-method_ds='3D'
+method_ds='local'
 need_help=false
 while  [ -n "$1" ] ; do
   case "$1" in

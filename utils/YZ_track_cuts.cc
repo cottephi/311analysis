@@ -239,6 +239,9 @@ void YZ_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string ve
       else if(path_311data.find("June") != string::npos){
         file = file + "-RecoFast-Parser.root";
       }
+      else if(path_311data.find("July") != string::npos){
+        file = file + "-RecoFast-Parser.root";
+      }
       else{
         cout << "ERROR: unknown reconstruction version" << endl;
         return;
@@ -274,6 +277,9 @@ void YZ_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string ve
       read_tree_Feb(&chain, tracks_before_cuts, tstart, tend);
     }
     else if(path_311data.find("June") != string::npos){
+      read_tree_June(&chain, tracks_before_cuts, tstart, tend);
+    }
+    else if(path_311data.find("July") != string::npos){
       read_tree_June(&chain, tracks_before_cuts, tstart, tend);
     }
     else{

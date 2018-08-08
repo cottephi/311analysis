@@ -1,0 +1,350 @@
+TH2D h_ExtrEff_vs_LemExtr;
+gStyle->SetOptStat(0);
+gStyle->SetPalette(kColorPrintableOnGrey);
+TH2D newth2d("ExtrEff_vs_LemExtr","ExtrEff_vs_LemExtr",40, 10, 35, 40, .5, 5);
+TCanvas *dummycan0;
+gFile->GetObject("can_eff_vs_LemExtr", dummycan0);
+TList *primitives0 = dummycan0->GetListOfPrimitives();
+TGraph2D *graph0 = (TGraph2D*)primitives0->At(0);
+h_ExtrEff_vs_LemExtr = *graph0->GetHistogram();
+int nbinx = h_ExtrEff_vs_LemExtr.GetNbinsX();
+int nbiny = h_ExtrEff_vs_LemExtr.GetNbinsY();
+for(int i = 1; i <= nbinx; i++){
+  for(int j = 1; j <= nbiny; j++){
+    double x = h_ExtrEff_vs_LemExtr.GetXaxis()->GetBinCenter(i);
+    double y = h_ExtrEff_vs_LemExtr.GetYaxis()->GetBinCenter(j);
+    int bin = h_ExtrEff_vs_LemExtr.GetBin(i,j);
+    double z = h_ExtrEff_vs_LemExtr.GetBinContent(bin);
+    newth2d.Fill(x/100,y/1000,z);
+  }
+}
+
+TH1D h_15, h_16, h_17, h_18, h_19, h_20, h_21, h_22, h_23, h_24, h_25, h_26, h_27, h_28, h_29, h_30, h_31, h_32, h_33, h_34;
+for(int i = 1; i <= nbinx; i++){
+  double x = newth2d.GetXaxis()->GetBinCenter(i);
+  if(x > 15.31 and x < 15.32){
+    h_15 = *newth2d.ProjectionY("h_15",i,i);
+  }
+  if( x > 15.93 and x < 15.94){
+    h_16 = *newth2d.ProjectionY("h_16",i,i);
+  }
+  if(x > 17.18 and x < 17.19){
+    h_17 = *newth2d.ProjectionY("h_17",i,i);
+  }
+  if(x > 17.81 and x < 17.82){
+    h_18 = *newth2d.ProjectionY("h_18",i,i);
+  }
+  if(x > 19.06 and x < 19.07){
+    h_19 = *newth2d.ProjectionY("h_19",i,i);
+  }
+  if(x > 20.31 and x < 20.32){
+    h_20 = *newth2d.ProjectionY("h_20",i,i);
+  }
+  if(x > 20.93 and x < 20.94){
+    h_21 = *newth2d.ProjectionY("h_21",i,i);
+  }
+  if(x > 22.18 and x < 22.19){
+    h_22 = *newth2d.ProjectionY("h_22",i,i);
+  }
+  if(x > 22.81 and x < 22.82){
+    h_23 = *newth2d.ProjectionY("h_23",i,i);
+  }
+  if(x > 24.06 and x < 24.07){
+    h_24 = *newth2d.ProjectionY("h_24",i,i);
+  }
+  if(x > 25.31 and x < 25.32){
+    h_25 = *newth2d.ProjectionY("h_25",i,i);
+  }
+  if(x > 25.93 and x < 25.94){
+    h_26 = *newth2d.ProjectionY("h_26",i,i);
+  }
+  if(x > 27.18 and x < 27.19){
+    h_27 = *newth2d.ProjectionY("h_27",i,i);
+  }
+  if(x > 27.81 and x < 27.82){
+    h_28 = *newth2d.ProjectionY("h_28",i,i);
+  }
+  if(x > 29.06 and x < 29.07){
+    h_29 = *newth2d.ProjectionY("h_29",i,i);
+  }
+  if(x > 30.31 and x < 30.32){
+    h_30 = *newth2d.ProjectionY("h_30",i,i);
+  }
+  if(x > 30.93 and x < 30.94){
+    h_31 = *newth2d.ProjectionY("h_31",i,i);
+  }
+  if(x > 32.18 and x < 32.19){
+    h_32 = *newth2d.ProjectionY("h_32",i,i);
+  }
+  if(x > 32.81 and x < 32.82){
+    h_33 = *newth2d.ProjectionY("h_33",i,i);
+  }
+  if(x > 34.06 and x < 34.07){
+    h_34 = *newth2d.ProjectionY("h_34",i,i);
+  }
+}
+h_15.SetTitle("Extraction efficiency at Amplification of 15kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_16.SetTitle("Extraction efficiency at Amplification of 16kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_17.SetTitle("Extraction efficiency at Amplification of 17kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_18.SetTitle("Extraction efficiency at Amplification of 18kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_19.SetTitle("Extraction efficiency at Amplification of 19kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_20.SetTitle("Extraction efficiency at Amplification of 20kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_21.SetTitle("Extraction efficiency at Amplification of 21kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_22.SetTitle("Extraction efficiency at Amplification of 22kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_23.SetTitle("Extraction efficiency at Amplification of 23kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_24.SetTitle("Extraction efficiency at Amplification of 24kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_25.SetTitle("Extraction efficiency at Amplification of 25kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_26.SetTitle("Extraction efficiency at Amplification of 26kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_27.SetTitle("Extraction efficiency at Amplification of 27kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_28.SetTitle("Extraction efficiency at Amplification of 28kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_29.SetTitle("Extraction efficiency at Amplification of 29kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_30.SetTitle("Extraction efficiency at Amplification of 30kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_31.SetTitle("Extraction efficiency at Amplification of 31kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_32.SetTitle("Extraction efficiency at Amplification of 32kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_33.SetTitle("Extraction efficiency at Amplification of 33kV/cm;Extraction field(kV/cm);Extraction efficiency");
+h_34.SetTitle("Extraction efficiency at Amplification of 34kV/cm;Extraction field(kV/cm);Extraction efficiency");
+newth2d.SetMaximum(1);
+h_15.SetMaximum(1);
+h_16.SetMaximum(1);
+h_17.SetMaximum(1);
+h_18.SetMaximum(1);
+h_19.SetMaximum(1);
+h_20.SetMaximum(1);
+h_21.SetMaximum(1);
+h_22.SetMaximum(1);
+h_23.SetMaximum(1);
+h_24.SetMaximum(1);
+h_25.SetMaximum(1);
+h_26.SetMaximum(1);
+h_27.SetMaximum(1);
+h_28.SetMaximum(1);
+h_29.SetMaximum(1);
+h_30.SetMaximum(1);
+h_31.SetMaximum(1);
+h_32.SetMaximum(1);
+h_33.SetMaximum(1);
+h_34.SetMaximum(1);
+newth2d.SetTitle("Extraction efficiency;Amplification field(kV/cm);Extraction field(kV/cm)");
+TFile ofile("extr_eff_simu.root","RECREATE");
+newth2d.Write();
+h_15.Write();
+h_16.Write();
+h_17.Write();
+h_18.Write();
+h_19.Write();
+h_20.Write();
+h_21.Write();
+h_22.Write();
+h_23.Write();
+h_24.Write();
+h_25.Write();
+h_26.Write();
+h_27.Write();
+h_28.Write();
+h_29.Write();
+h_30.Write();
+h_31.Write();
+h_32.Write();
+h_33.Write();
+h_34.Write();
+ofile.Close();
+
+TList *mylist = (TList*)gFile->GetListOfKeys();
+for(auto obj : *mylist){
+  TKey *mykey = (TKey*)obj;
+  string name = mykey->GetName();
+  if(name == "ExtrEff_vs_LemExtr"){
+    TH2D *h = (TH2D*)mykey->ReadObj();
+    h->Draw("COLZ");
+    gPad->SaveAs(string("extraction/"+string(h->GetName())+".png").data());
+  }
+  else{
+    TH1D *h = (TH1D*)mykey->ReadObj();
+    h->Draw("hist");
+    gPad->SaveAs(string("extraction/"+string(h->GetName())+".png").data());
+  }
+  delete gPad;
+}
+
+
+
+
+
+
+
+
+
+
+TH2D h_IndEff_vs_LemInd;
+gStyle->SetOptStat(0);
+gStyle->SetPalette(kColorPrintableOnGrey);
+TH2D newth2d("IndEff_vs_LemInd","IndEff_vs_LemInd",40, 10, 35, 40, 0.2, 5);
+TCanvas *dummycan0;
+gFile->GetObject("can_eff_vs_LemInd", dummycan0);
+TList *primitives0 = dummycan0->GetListOfPrimitives();
+TGraph2D *graph0 = (TGraph2D*)primitives0->At(0);
+h_IndEff_vs_LemInd = *graph0->GetHistogram();
+int nbinx = h_IndEff_vs_LemInd.GetNbinsX();
+int nbiny = h_IndEff_vs_LemInd.GetNbinsY();
+for(int i = 1; i <= nbinx; i++){
+  for(int j = 1; j <= nbiny; j++){
+    double x = h_IndEff_vs_LemInd.GetXaxis()->GetBinCenter(i);
+    double y = h_IndEff_vs_LemInd.GetYaxis()->GetBinCenter(j);
+    int bin = h_IndEff_vs_LemInd.GetBin(i,j);
+    double z = h_IndEff_vs_LemInd.GetBinContent(bin);
+    if(x/100 > 22.81 and x/100 < 22.82 and y/200 > 0.49 and y/200 < 0.51){cout << x << " " << y << endl;z = 0.2335305;}
+    if(x/100 > 25.31 and x/100 < 25.32 and y/200 > 0.49 and y/200 < 0.51){cout << x << " " << y << endl;z = 0.223342;}
+//    cout << x/100 << " " << y/200 << " " << z << endl;
+    newth2d.Fill(x/100,y/200,z);
+  }
+}
+
+
+TH1D h_15, h_16, h_17, h_18, h_19, h_20, h_21, h_22, h_23, h_24, h_25, h_26, h_27, h_28, h_29, h_30, h_31, h_32, h_33, h_34;
+for(int i = 1; i <= nbinx; i++){
+  double x = newth2d.GetXaxis()->GetBinCenter(i);
+  if(x > 15.31 and x < 15.32){
+    h_15 = *newth2d.ProjectionY("h_15",i,i);
+  }
+  if( x > 15.93 and x < 15.94){
+    h_16 = *newth2d.ProjectionY("h_16",i,i);
+  }
+  if(x > 17.18 and x < 17.19){
+    h_17 = *newth2d.ProjectionY("h_17",i,i);
+  }
+  if(x > 17.81 and x < 17.82){
+    h_18 = *newth2d.ProjectionY("h_18",i,i);
+  }
+  if(x > 19.06 and x < 19.07){
+    h_19 = *newth2d.ProjectionY("h_19",i,i);
+  }
+  if(x > 20.31 and x < 20.32){
+    h_20 = *newth2d.ProjectionY("h_20",i,i);
+  }
+  if(x > 20.93 and x < 20.94){
+    h_21 = *newth2d.ProjectionY("h_21",i,i);
+  }
+  if(x > 22.18 and x < 22.19){
+    h_22 = *newth2d.ProjectionY("h_22",i,i);
+  }
+  if(x > 22.81 and x < 22.82){
+    h_23 = *newth2d.ProjectionY("h_23",i,i);
+  }
+  if(x > 24.06 and x < 24.07){
+    h_24 = *newth2d.ProjectionY("h_24",i,i);
+  }
+  if(x > 25.31 and x < 25.32){
+    h_25 = *newth2d.ProjectionY("h_25",i,i);
+  }
+  if(x > 25.93 and x < 25.94){
+    h_26 = *newth2d.ProjectionY("h_26",i,i);
+  }
+  if(x > 27.18 and x < 27.19){
+    h_27 = *newth2d.ProjectionY("h_27",i,i);
+  }
+  if(x > 27.81 and x < 27.82){
+    h_28 = *newth2d.ProjectionY("h_28",i,i);
+  }
+  if(x > 29.06 and x < 29.07){
+    h_29 = *newth2d.ProjectionY("h_29",i,i);
+  }
+  if(x > 30.31 and x < 30.32){
+    h_30 = *newth2d.ProjectionY("h_30",i,i);
+  }
+  if(x > 30.93 and x < 30.94){
+    h_31 = *newth2d.ProjectionY("h_31",i,i);
+  }
+  if(x > 32.18 and x < 32.19){
+    h_32 = *newth2d.ProjectionY("h_32",i,i);
+  }
+  if(x > 32.81 and x < 32.82){
+    h_33 = *newth2d.ProjectionY("h_33",i,i);
+  }
+  if(x > 34.06 and x < 34.07){
+    h_34 = *newth2d.ProjectionY("h_34",i,i);
+  }
+}
+h_15.SetTitle("Induction efficiency at Amplification of 15kV/cm;Induction field(kV/cm);Induction efficiency");
+h_16.SetTitle("Induction efficiency at Amplification of 16kV/cm;Induction field(kV/cm);Induction efficiency");
+h_17.SetTitle("Induction efficiency at Amplification of 17kV/cm;Induction field(kV/cm);Induction efficiency");
+h_18.SetTitle("Induction efficiency at Amplification of 18kV/cm;Induction field(kV/cm);Induction efficiency");
+h_19.SetTitle("Induction efficiency at Amplification of 19kV/cm;Induction field(kV/cm);Induction efficiency");
+h_20.SetTitle("Induction efficiency at Amplification of 20kV/cm;Induction field(kV/cm);Induction efficiency");
+h_21.SetTitle("Induction efficiency at Amplification of 21kV/cm;Induction field(kV/cm);Induction efficiency");
+h_22.SetTitle("Induction efficiency at Amplification of 22kV/cm;Induction field(kV/cm);Induction efficiency");
+h_23.SetTitle("Induction efficiency at Amplification of 23kV/cm;Induction field(kV/cm);Induction efficiency");
+h_24.SetTitle("Induction efficiency at Amplification of 24kV/cm;Induction field(kV/cm);Induction efficiency");
+h_25.SetTitle("Induction efficiency at Amplification of 25kV/cm;Induction field(kV/cm);Induction efficiency");
+h_26.SetTitle("Induction efficiency at Amplification of 26kV/cm;Induction field(kV/cm);Induction efficiency");
+h_27.SetTitle("Induction efficiency at Amplification of 27kV/cm;Induction field(kV/cm);Induction efficiency");
+h_28.SetTitle("Induction efficiency at Amplification of 28kV/cm;Induction field(kV/cm);Induction efficiency");
+h_29.SetTitle("Induction efficiency at Amplification of 29kV/cm;Induction field(kV/cm);Induction efficiency");
+h_30.SetTitle("Induction efficiency at Amplification of 30kV/cm;Induction field(kV/cm);Induction efficiency");
+h_31.SetTitle("Induction efficiency at Amplification of 31kV/cm;Induction field(kV/cm);Induction efficiency");
+h_32.SetTitle("Induction efficiency at Amplification of 32kV/cm;Induction field(kV/cm);Induction efficiency");
+h_33.SetTitle("Induction efficiency at Amplification of 33kV/cm;Induction field(kV/cm);Induction efficiency");
+h_34.SetTitle("Induction efficiency at Amplification of 34kV/cm;Induction field(kV/cm);Induction efficiency");
+newth2d.SetMaximum(1);
+h_15.SetMaximum(1);
+h_16.SetMaximum(1);
+h_17.SetMaximum(1);
+h_18.SetMaximum(1);
+h_19.SetMaximum(1);
+h_20.SetMaximum(1);
+h_21.SetMaximum(1);
+h_22.SetMaximum(1);
+h_23.SetMaximum(1);
+h_24.SetMaximum(1);
+h_25.SetMaximum(1);
+h_26.SetMaximum(1);
+h_27.SetMaximum(1);
+h_28.SetMaximum(1);
+h_29.SetMaximum(1);
+h_30.SetMaximum(1);
+h_31.SetMaximum(1);
+h_32.SetMaximum(1);
+h_33.SetMaximum(1);
+h_34.SetMaximum(1);
+newth2d.SetTitle("Induction efficiency;Amplification field(kV/cm);Induction field(kV/cm)");
+TFile ofile("ind_eff_simu.root","RECREATE");
+newth2d.Write();
+h_15.Write();
+h_16.Write();
+h_17.Write();
+h_18.Write();
+h_19.Write();
+h_20.Write();
+h_21.Write();
+h_22.Write();
+h_23.Write();
+h_24.Write();
+h_25.Write();
+h_26.Write();
+h_27.Write();
+h_28.Write();
+h_29.Write();
+h_30.Write();
+h_31.Write();
+h_32.Write();
+h_33.Write();
+h_34.Write();
+ofile.Close();
+.q
+
+
+TList *mylist = (TList*)gFile->GetListOfKeys();
+for(auto obj : *mylist){
+  TKey *mykey = (TKey*)obj;
+  string name = mykey->GetName();
+  if(name == "IndEff_vs_LemInd"){
+    TH2D *h = (TH2D*)mykey->ReadObj();
+    h->Draw("COLZ");
+    gPad->SaveAs(string("induction/"+string(h->GetName())+".png").data());
+  }
+  else{
+    TH1D *h = (TH1D*)mykey->ReadObj();
+    h->Draw("hist");
+    gPad->SaveAs(string("induction/"+string(h->GetName())+".png").data());
+  }
+  delete gPad;
+}

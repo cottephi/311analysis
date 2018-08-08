@@ -65,19 +65,18 @@ bool only_throughgoing_y = false;
 bool only_throughgoing_z = false;
 
 double rho_ref = 11.2644; //980/87, from 3L
-double rho_run;
-double rho_var_run;
 TH2D h_ExtrEff_vs_LemExtr;
 TH2D h_IndEff_vs_LemInd;
-TGraph gr_rho;
+TGraph Gr_Rho;
 TGraphErrors Gain_graph_3L;
-TH1D h_rho;
+TH1D H_Rho;
 vector<double> simulated_extr;
 vector<double> simulated_amp;
 vector<double> simulated_ind;
 map<int,double> gain_corrections;
 vector<int> tracks_selected_by_highway;
 map<int, map<string,float> > runs_and_fields;
+map<int, string> runs_triggers;
 pair<double,double> Arho_from_3L = make_pair(-1,-1); //pressure 980mbar, temperature 87K
 pair<double,double> Brho_from_3L = make_pair(-1,-1);
 
@@ -115,6 +114,9 @@ string gain_stability_Output;
 vector<int> MyColorPalette = {632+2,632,800+9,800+7,800-3,800-2,820+10,820-9,820,840+8,840+7,840,860+8,860+7,860,880+7,880+1,880};
 vector<string> params = {"date","TE0037","TE0038","TE0039","TE0040","TE0041","TE0042","TE0043","TE0044","TE0045","TE0046","TE0047","TE0048","TE1001","TE1002","TE1003","TE1004","TE0049","TE0050","TE0051","TE0052","TE0053","TE0054","TE0055","TE0056","TE0057","TE0058","TE0059","TE0060","PE0006"};
 
+map<string, vector<int> > bad_runs;
+map<string, map<int, vector<int> > > bad_runs_lems;
+  
 float ExtrField_Gushin[23] = {0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0};
 float ExtrEff_Gushin[23] = {0.3, 0.35, 0.4, 0.4, 0.5, 0.5, 0.6, 0.6, 0.7, 0.7, 0.8, 0.85, 0.9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 TGraph GushinEff(23, ExtrField_Gushin, ExtrEff_Gushin);
@@ -127,12 +129,15 @@ bool load_runs_2D(string scan_type, int scan_num, vector<int> &run_list, vector<
 bool load_runs(string scan_type, int scan_num, vector<int> &run_list, vector<float> &field, vector<string> &const_fields_names, vector<float> &const_fields_values);
 bool load_cosmics();
 bool load_run_lists();
-bool load_eff_simu_graphs();
-bool load_rho_run(int run);
+bool load_extr_eff_simu_graphs();
+bool load_ind_eff_simu_graphs();
+TMyFileHeader load_run_header(int run, bool update = false);
 void load_fit_3L();
 void load_Gushin_Eff();
 void load_gain_eff_corrections();
 bool load_highway(int run);
+void load_force_mpv();
+bool load_gr_rho(int run);
 
 const int NUM_OF_VIEWS = 2;
 const int NUM_OF_LEMS = 12;
@@ -145,6 +150,7 @@ double ADC2CHARGE[2] = {55, 67};
 vector<int> bad_channels = {576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607};
 vector<int> lems = {2, 4, 5, 6, 7, 8, 9, 11}; //active lems
 vector<int> vol_cut = {0, 0, 0, 0, 0, 0}; //in cm
+map<int,pair<double,double> > force_mpv;
 static int default_int = 1;
 double mpv_cosmics = -1.;
 const double drift_velocity = 150. ; //cm/ms
@@ -152,7 +158,7 @@ double T0 = 87;
 double P0=980;
 double corr = 1.;
 double e_lifetime_const = 7.;//ms //Caspar talk 29 June
-string method_ds = "3D";
+string method_ds = "local";
 string method_dQ = "sum";
 bool highway = false;
 bool dray_miti = false;
@@ -235,11 +241,14 @@ pair<int,int> find_channels(double y, double z);
 
 vector<int> find_YZ(int lem);
 
-bool isGood_lem( int lem );
-
 bool IsGoodChan(int ch0, int ch1);
 bool IsGoodChan(double y, double z);
 bool IsGoodChan(hit myhit);
+
+bool isGood_lem( int lem );
+
+bool IsGood_run(string cut_type_and_methods, int run);
+bool IsGood_lem_gain(string cut_type_and_methods, int run, int lem);
 
 double find_projection(hit h);
 
@@ -268,7 +277,7 @@ double find_max_bin(TH1D *hist, int min_bin = 3);
 double langaufun(double *x, double *par);
 
 TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
- vector<double> parlimitslo, vector<double> parlimitshi, vector<double> &fitparams, vector<double> &fiterrors, double &pvalue, double pvaluelim, int &NDF, bool find_best = false, bool gauss = false);
+ vector<double> parlimitslo, vector<double> parlimitshi, vector<double> &fitparams, vector<double> &fiterrors, double &pvalue, double pvaluelim, bool find_best = false, bool gauss = false);
 
 void plot_selected_tracks(vector<track> tracks, string path, int ntracks = -1);
 
@@ -278,13 +287,13 @@ inline vector<string> glob(const string& pat);
 
 inline bool ExistTest (const std::string& name);
 
-vector<double> fit_dQds(TH1D *hdQds, bool gauss = false, int min_number_of_hits = 500, double pvaluelim = 0.05, double sigmalim = 1000, TGraphErrors* graph = 0, string scan_type = "", float x = 0, float xer = 0);
+vector<double> fit_dQds(TH1D *hdQds, bool gauss = false, int min_number_of_hits = 500, double pvaluelim = 0.05, double sigmalim = 1000, TGraphErrors* graph = 0, float x = 0, float xer = 0);
 
 void fill_2d_graph(TGraph2D* graph, double x, double y, double z);
 
 void fill_2d_hist(TH2D* h, double x, double y, double z);
 
-vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph = 0, string scan_type = "", float x = 0, float xer = 0);
+vector<double> ReadFit(TH1D* hdQds, TGraphErrors* graph = 0, float x = 0, float xer = 0);
 
 bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErrors*> > &mpv_field_ByLEMs, vector<TMultiGraph*> &mpv_field_AllLEMs, vector<int> &scan_nums_for_AllLEMs, string scan_type = "", int scan_num = 0);
 
@@ -300,7 +309,7 @@ void sum_views_singlegraph(vector<TGraphErrors*> &graph);
 
 double e_lifetime(TGraphErrors *graph);
 
-double RFromBirk(double drift, double MPV = -1.);
+double RFromBirk(double drift, double MPV = -1., bool convert = false);
 
 double MPVs_from_theory(double ds, double drift = 0.5);
 
@@ -326,13 +335,14 @@ void draw_hist_2d(TH2D* h, string scan_type, TFile *ofile, string directory);
 
 void fit_gain(TGraphErrors* gr, vector<double> par);
 
-double correct_dx_for_lifetime(double dx, double e_lifetime = e_lifetime_const);
 
 void fit_charging_up(TGraphErrors &gr);
 
 double theoretical_gain(double T, double rho, double E);
 
+double correct_dx_for_lifetime(double dx, double e_lifetime = e_lifetime_const);
 double gain_correction_for_rho(double rho, double E);
+double correct_for_drift(double E);
 
 double get_density_for_hit(int hit_time, int run);
 
@@ -350,6 +360,14 @@ bool get_histo_in_inputfile(TH1D &hdQds, TFile *runfile, string name_to_get, boo
 
 string set_cuts(string cut_type);
 
-bool pressure(string srun = "801");
+void set_bad_runs();
+
+bool pressure(string srun);
+
+bool save_run_header(TMyFileHeader header);
+
+bool set_gain_processed(vector<int> run_list, string cut_type, string m_dq = method_dQ, string m_ds = method_ds);
+
+bool save_runs_headers(vector<int> run_list = {});
 
 #endif // __311LIB_H

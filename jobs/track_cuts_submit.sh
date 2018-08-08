@@ -1,10 +1,11 @@
 #! /bin/bash
 outdir=/eos/user/p/pcotte/311analysis/jobs
+#runs='{1189,1190,1191,1194,1195,1196,1197,1182,1183,1187,1188,840}'
 runs='{}'
 cut_type='Ds'
-version='Feb'
+version='July'
 method_dQ='sum'
-method_ds='3D'
+method_ds='local'
 save_tracks='true'
 need_help=false
 while  [ -n "$1" ] ; do

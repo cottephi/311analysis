@@ -111,8 +111,9 @@ void read_tree_charging_up_Feb(TChain *rTree, vector<vector<track> > &tracks_cha
     rTree->GetEntry(i);
     if(i==0){
       if(runs_and_fields.size() == 0){load_run_lists();}
-      if(!load_rho_run(tRun)){return;}
-      Efield = runs_and_fields[tRun]["Amplification"];
+      TMyFileHeader header = load_run_header(tRun);
+      if(header.GetRun() == -1){return;}
+      Efield = header.GetAmplification();
     }
     if(first){
       time_first = tEventTimeSeconds;
@@ -301,8 +302,9 @@ void read_tree_charging_up_June(TChain *rTree, vector<vector<track> > &tracks_ch
     rTree->GetEntry(i);
     if(i==0){
       if(runs_and_fields.size() == 0){load_run_lists();}
-      if(!load_rho_run(tRun)){return;}
-      Efield = runs_and_fields[tRun]["Amplification"];
+      TMyFileHeader header = load_run_header(tRun);
+      if(header.GetRun() == -1){return;}
+      Efield = header.GetAmplification();
     }
     if(first){
       time_first = tEventTimeSeconds;
@@ -393,7 +395,7 @@ void read_tree_charging_up_June(TChain *rTree, vector<vector<track> > &tracks_ch
 
 //////////////////////////////// MAIN //////////////////////////////////////////
 
-void charging_up_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string version = "June", string m_dQ = "sum", string m_ds = "3D", bool is_batch = false){
+void charging_up_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local", bool is_batch = false){
   method_ds = m_ds;
   method_dQ = m_dQ;
   IsBatch = is_batch;
@@ -450,6 +452,9 @@ void charging_up_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", 
       else if(path_311data.find("June") != string::npos){
         file = file + "-RecoFast-Parser.root";
       }
+      else if(path_311data.find("July") != string::npos){
+        file = file + "-RecoFast-Parser.root";
+      }
       else{
         cout << "ERROR: unknown reconstruction version" << endl;
         return;
@@ -482,6 +487,9 @@ void charging_up_track_cuts(vector<int> run_list={840}, string cut_type = "Ds", 
       read_tree_charging_up_Feb(&chain, tracks_before_cuts_charging_up, TimeOfEvents);
     }
     else if(path_311data.find("June") != string::npos){
+      read_tree_charging_up_June(&chain, tracks_before_cuts_charging_up, TimeOfEvents);
+    }
+    else if(path_311data.find("July") != string::npos){
       read_tree_charging_up_June(&chain, tracks_before_cuts_charging_up, TimeOfEvents);
     }
     else{

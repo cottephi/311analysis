@@ -169,4 +169,12 @@
 /eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{842}' -c 'common_purity' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
 /eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{842}' -c 'common_nolen' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
 
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'before_cuts' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'length_Ds' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'length' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'Ds' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'common' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'common_purity' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+/eos/user/p/pcotte/311analysis/jobs/YZ_track_cuts_submit.sh -r '{840}' -c 'common_nolen' -q 'sum' -s 'local' #  > /dev/null 2>&1 &
+
 

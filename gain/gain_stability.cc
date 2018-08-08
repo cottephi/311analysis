@@ -174,7 +174,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
         f0 = ReadFit(hdQds);
       }
       else{
-        f0 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+        f0 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
         runfile_fitted->cd();
         hdQds->Write();
       }
@@ -190,7 +190,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
         f1 = ReadFit(hdQds);
       }
       else{
-        f1 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+        f1 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
         runfile_fitted->cd();
         hdQds->Write();
       }
@@ -229,7 +229,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
         f0 = ReadFit(hdQds);
       }
       else{
-        f0 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+        f0 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
         runfile_fitted->cd();
         hdQds->Write();
       }
@@ -245,7 +245,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
         f1 = ReadFit(hdQds);
       }
       else{
-        f1 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+        f1 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
         runfile_fitted->cd();
         hdQds->Write();
       }
@@ -268,7 +268,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
           f0 = ReadFit(hdQds);
         }
         else{
-          f0 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+          f0 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
           runfile_fitted->cd();
           hdQds->Write();
         }
@@ -283,7 +283,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
           f1 = ReadFit(hdQds);
         }
         else{
-          f1 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+          f1 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
           runfile_fitted->cd();
           hdQds->Write();
         }
@@ -305,7 +305,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
           f0 = ReadFit(hdQds);
         }
         else{
-          f0 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+          f0 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
           runfile_fitted->cd();
           hdQds->Write();
         }
@@ -320,7 +320,7 @@ void gain_stability(const char* c_cut_type = "Ds", string version = "June", stri
           f1 = ReadFit(hdQds);
         }
         else{
-          f1 = fit_dQds(hdQds, false, min_number_of_hits, 10000, .5);
+          f1 = fit_dQds(hdQds, false, min_number_of_hits, 0.05, .5);
           runfile_fitted->cd();
           hdQds->Write();
         }

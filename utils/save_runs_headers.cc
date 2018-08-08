@@ -6,8 +6,8 @@
 using namespace std;
 
 void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
-  if(!Load_Version(version)){return;}
-  if(!load_run_lists()){return;}
+  if(!Load_Version(version)){return false;}
+  if(!load_run_lists()){return false;}
   
   string path = path_wa105_311data;
   string path_output = runs_headers;
@@ -22,14 +22,21 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
     }
   }
   string filename = "";
+  int failed = 0;
   
   for(auto run : run_list){
   
+    if(!load_rho_run(run)){failed++;continue;}
     string ofilename = path_output+to_string(run)+".root";
     double drift = runs_and_fields[run]["Drift"];
-    double amplification = runs_and_fields[run]["Extraction"];
-    double extraction = runs_and_fields[run]["Amplification"];
+    double amplification = runs_and_fields[run]["Amplification"];
+    double extraction = runs_and_fields[run]["Extraction"];
     double induction = runs_and_fields[run]["Induction"];
+    double extr_eff_simu = get_eff(extraction, amplification);
+    double extr_eff_gushin = get_eff(extraction);
+    double ind_eff = get_eff(-1,amplification,induction);
+    double density_correction_factor = gain_correction_for_rho(rho_run, amplification);
+    double drift_correction_factor = correct_for_drift(drift);
     int tstart = 0;
     int tend = 0;
     
@@ -40,6 +47,7 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
       #if verbose
       cout << foldername << " not found or empty" << endl;
       #endif
+      failed++;
       continue;
     }
     #if verbose
@@ -50,7 +58,7 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
     for(int i=0; i< n_subruns; i++){
       
       file=to_string(run)+"-"+to_string(i);
-      if(file == "1009-21"){continue;}
+      if(file == "1009-21"){failed++;continue;}
       if(path_311data.find("Feb") != string::npos){
         file = file + "-Parser.root";
       }
@@ -59,7 +67,7 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
       }
       else{
         cout << "ERROR: unknown reconstruction version" << endl;
-        return;
+        return false;
       }
       filename=foldername+file;
       if( ExistTest(filename) ){
@@ -72,6 +80,7 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
         #if verbose
         cout << "File " << filename << " not found." << endl;
         #endif
+        failed++;
         continue;
       }
     }
@@ -86,10 +95,25 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
     tstart = tEventTimeSeconds;
     chain.GetEntry(NEntries-1);
     tend = tEventTimeSeconds;
-    TMyFileHeader *header = new TMyFileHeader(run, drift, amplification, extraction, induction, tstart ,tend);
+    string command  = path_311analysis+"slow_control/Pcotte_getdata.sh " + to_string(tstart) + " " + to_string(tend) + " " + to_string(run);
+    system(command.data());
+    if(!ExistTest(slow_control + "/" + to_string(run) + "/" + to_string(run) + ".txt")){
+      cout << "ERROR: can not get slow control data for run " << run << endl;
+      failed++;
+      continue;
+    }
+    vector<double> rho = pressure(to_string(run));
+    if(rho[0] < 0){
+      cout << "ERROR: can not get pressure and temperature for run " << run << endl;
+      failed++;
+      continue;
+    }
+    
+    TMyFileHeader *header = new TMyFileHeader(run, drift, amplification, extraction, induction, tstart ,tend,0, rho[0], rho[1], extr_eff_simu, extr_eff_gushin, ind_eff, density_correction_factor, drift_correction_factor);
     TFile ofile(ofilename.data(), "RECREATE");
     if(!ofile.IsOpen()){
       cout << " ERROR: TFile " << ofilename << " can't be created " << endl;
+      failed++;
       continue;
     }
     #if verbose
@@ -100,4 +124,9 @@ void save_runs_headers(vector<int> run_list = {}, string version = "Feb"){
     ofile.Close();
     
   }//for run
+  if(failed == run_list.size()){
+    cout << "ERROR in save_run_headers: all runs failed" << endl;
+    return false;
+  }
+  return true;
 }

@@ -123,17 +123,17 @@ void MPV_vs_stuff_track(int run = 840, string cut_type = "before_cuts", string m
     }
     vector<double> f0 = {-1,-1};
     vector<double> f1 = {-1,-1};
-    f0 = fit_dQds(&dqds_per_stuff[i][0], false, 200, 0.05, 4, &mpv_vs_stuff[0], "", stuffs[i]+0.5*dstuff, 0.5*dstuff);
+    f0 = fit_dQds(&dqds_per_stuff[i][0], false, 200, 0.05, 4, &mpv_vs_stuff[0], stuffs[i]+0.5*dstuff, 0.5*dstuff);
     dqds_per_stuff[i][0].Write();
     dqds_per_stuff[i][0].Draw();
     gPad->SaveAs(string(dirname + "dQds/" + string(dqds_per_stuff[i][0].GetName())+".png").data());
-    f1 = fit_dQds(&dqds_per_stuff[i][1], false, 200, 0.05, 4, &mpv_vs_stuff[1], "", stuffs[i]+0.5*dstuff, 0.5*dstuff);
+    f1 = fit_dQds(&dqds_per_stuff[i][1], false, 200, 0.05, 4, &mpv_vs_stuff[1], stuffs[i]+0.5*dstuff, 0.5*dstuff);
     dqds_per_stuff[i][1].Write();
     dqds_per_stuff[i][1].Draw();
     gPad->SaveAs(string(dirname + "dQds/" + string(dqds_per_stuff[i][1].GetName())+".png").data());
     for( auto lem : lems ){
-      f0 = fit_dQds(&dqds_per_stuff_ByLEMs[lem][i][0], false, 200, 0.05, 4, &mpv_vs_stuff_ByLEMs[lem][0], "", stuffs[i]+0.5*dstuff, 0.5*dstuff);
-      f1 = fit_dQds(&dqds_per_stuff_ByLEMs[lem][i][1], false, 200, 0.05, 4, &mpv_vs_stuff_ByLEMs[lem][1], "", stuffs[i]+0.5*dstuff, 0.5*dstuff);
+      f0 = fit_dQds(&dqds_per_stuff_ByLEMs[lem][i][0], false, 200, 0.05, 4, &mpv_vs_stuff_ByLEMs[lem][0], stuffs[i]+0.5*dstuff, 0.5*dstuff);
+      f1 = fit_dQds(&dqds_per_stuff_ByLEMs[lem][i][1], false, 200, 0.05, 4, &mpv_vs_stuff_ByLEMs[lem][1], stuffs[i]+0.5*dstuff, 0.5*dstuff);
       dqds_per_stuff_ByLEMs[lem][i][0].Write();
       dqds_per_stuff_ByLEMs[lem][i][1].Write();
       if( f0[0] > 0 && f0[0] > 0){

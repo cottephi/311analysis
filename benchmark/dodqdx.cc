@@ -31,36 +31,36 @@ string to_string_with_precision(const T a_value, const int n = 3){
 }
 
 
-void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = "June", string m_dQ = "sum", string m_ds = "3D", bool save_plots = true){
+void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local", bool save_plots = true){
   method_ds = m_ds;
   method_dQ = m_dQ;
   if(!Load_Version(version)){return;}
   if(!load_run_lists()){return;}
   gErrorIgnoreLevel = kError;
   gStyle->SetOptStat(0);
+  
 //  gStyle->SetOptFit(0);
   if (run_list.size() == 0){
-    path = path_wa105_311data;
     #if verbose
     cout << "Processing all runs in " << path_wa105_311data << "*..." << endl;
     #endif
     string wildcard_path = path_wa105_311data + "*";
-    for( auto irun : glob(wildcard_path) ){
-      run_list.push_back(atoi(irun.data()));
-    }
+    for( auto irun : glob(wildcard_path) ){run_list.push_back(atoi(irun.data()));}
   }
+  if(!load_cosmics()){return;}
   
   bool recreate_fit_file = true;
   
   string corrected_or_not = "";
   if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
   string name_to_get = "";
+  string cut_type_and_methods = cut_type + "_" + method_ds + "_" + method_dQ;
   
   //****************************************************************************
-  load_cosmics();
   
   for(auto run : run_list){
 
+    TMyFileHeader header = load_run_header(run);
     string filename_nonfitted = dQds_Output+cut_type+"/"+to_string(run)+".root";
     string filename_fitted = dQds_Output+cut_type+"/"+to_string(run)+"_fitted.root";
     TFile *runfile_fitted = new TFile();
@@ -84,12 +84,16 @@ void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = 
 
     TH1D hdQds0;
     TH1D hdQds1;
+    TF1 func0;
+    TF1 func1;
     vector<pair<TH1D,TH1D> > histograms;
     vector<pair<TF1,TF1> > functions;
+    vector<pair<double,double> > MPVs;
     TString FunName = "";
     int nhits_tot = 0;
     int min_number_of_hits = 200;
     vector<double> f = {-1,-1};
+    double MPV0, MPV1;
     
     #if verbose 
     cout << "  Reading histograms..." << endl;
@@ -133,8 +137,33 @@ void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = 
       runfile_fitted->cd();
       hdQds1.Write();
     }
+    
+    if( ((TList*)hdQds0.GetListOfFunctions())->GetSize() > 0){
+      func0 = *(TF1*)((TList*)hdQds0.GetListOfFunctions())->At(0);
+      MPV0 = func0.GetMaximumX();
+    }
+    else{
+      func0 = TF1("empty","");
+      MPV0 = -1;
+    }
+    if( ((TList*)hdQds1.GetListOfFunctions())->GetSize() > 0){
+      func1 = *(TF1*)((TList*)hdQds1.GetListOfFunctions())->At(0);
+      MPV1 = func1.GetMaximumX();
+    } 
+    else{
+      func1 = TF1("empty","");
+      MPV1 = -1;
+    }
+      
     histograms.push_back(make_pair(hdQds0,hdQds1) );
-    functions.push_back( make_pair(*(TF1*)((TList*)hdQds0.GetListOfFunctions())->At(0), *(TF1*)((TList*)hdQds1.GetListOfFunctions())->At(0)) );
+    functions.push_back( make_pair(func0,func1) );
+    MPVs.push_back( make_pair(MPV0, MPV1) );
+    header.SetMPV0(cut_type_and_methods, MPV0);
+    header.SetMPV1(cut_type_and_methods, MPV1);
+    header.SetH0(cut_type_and_methods, &hdQds0);
+    header.SetH1(cut_type_and_methods, &hdQds1);
+    
+    header.ComputeGain(cut_type_and_methods, mpv_cosmics);
     
     if( nhits_tot < min_number_of_hits ){
       #if verbose
@@ -191,8 +220,31 @@ void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = 
         runfile_fitted->cd();
         hdQds1.Write();
       }
+      
+      if( ((TList*)hdQds0.GetListOfFunctions())->GetSize() > 0){
+        func0 = *(TF1*)((TList*)hdQds0.GetListOfFunctions())->At(0);
+        MPV0 = func0.GetMaximumX();
+      }
+      else{
+        func0 = TF1("empty","");
+        MPV0 = -1;
+      }
+      if( ((TList*)hdQds1.GetListOfFunctions())->GetSize() > 0){
+        func1 = *(TF1*)((TList*)hdQds1.GetListOfFunctions())->At(0);
+        MPV1 = func1.GetMaximumX();
+      }
+      else{
+        func1 = TF1("empty","");
+        MPV1 = -1;
+      }
       histograms.push_back(make_pair(hdQds0,hdQds1) );
-      functions.push_back( make_pair(*(TF1*)((TList*)hdQds0.GetListOfFunctions())->At(0), *(TF1*)((TList*)hdQds1.GetListOfFunctions())->At(0)) );
+      functions.push_back( make_pair(func0,func1) );
+      MPVs.push_back( make_pair(MPV0, MPV1) );
+      header.SetMPVLEM(cut_type_and_methods, lem, make_pair(MPV0,MPV1));
+      header.SetHLEM(cut_type_and_methods, lem, make_pair(&hdQds0,&hdQds1));
+      
+      header.ComputeGain(cut_type_and_methods, mpv_cosmics,lem);
+    
     }//for lem
     if(runfile_fitted->IsOpen()){
       runfile_fitted->Close();
@@ -203,6 +255,7 @@ void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = 
     #endif
     runfile->Close();
     delete runfile;
+    save_run_header(header);
     
     if(!save_plots){return;}
     
@@ -213,15 +266,15 @@ void dodqdx(vector<int> run_list = {}, string cut_type = "Ds", string version = 
       string outfile = outpath + string(histograms[i].first.GetName()).erase(string(histograms[i].first.GetName()).find("_view"),6);
       histograms[i].second.SetLineColor(kRed);
       functions[i].second.SetLineColor(kRed);
-      histograms[i].second.SetTitle("view0 blue, view1 red;fC/cm");
+      histograms[i].second.SetTitle(string("view0 blue MPV "+to_string(MPVs[i].first)+" " + to_string((int)histograms[i].first.GetEntries()) + " hits, view1 "+to_string(MPVs[i].second)+" " + to_string((int)histograms[i].second.GetEntries()) + " hits red;fC/cm").data());
       double max = histograms[i].second.GetMaximum();
       if(histograms[i].first.GetMaximum() > max){max = histograms[i].first.GetMaximum();}
       functions[i].first.SetLineColor(kBlue);
       histograms[i].second.SetMaximum(max*1.1);
       histograms[i].second.Draw();
-      functions[i].second.Draw("SAME");
+      if(string(functions[i].second.GetName()) != "empty"){functions[i].second.Draw("SAME");}
+      if(string(functions[i].first.GetName()) != "empty"){functions[i].first.Draw("SAME");}
       histograms[i].first.Draw("SAME");
-      functions[i].first.Draw("SAME");
       gPad->SaveAs(string(outfile+".png").data());
       delete gPad;
     }

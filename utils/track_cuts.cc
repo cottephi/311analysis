@@ -16,7 +16,7 @@ using namespace std;
 
 //////////////////////////////// MAIN //////////////////////////////////////////
 
-void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version = "June", string m_dQ = "sum", string m_ds = "3D", bool save_tracks = true, bool is_batch = false){
+void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local", bool save_tracks = true, bool is_batch = false){
   method_ds = m_ds;
   method_dQ = m_dQ;
   IsBatch = is_batch;
@@ -97,6 +97,9 @@ void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version 
       else if(path_311data.find("June") != string::npos){
         file = file + "-RecoFast-Parser.root";
       }
+      else if(path_311data.find("July") != string::npos){
+        file = file + "-RecoFast-Parser.root";
+      }
       else{
         cout << "ERROR: unknown reconstruction version" << endl;
         return;
@@ -131,6 +134,9 @@ void track_cuts(vector<int> run_list={}, string cut_type = "Ds", string version 
       read_tree_Feb(&chain, tracks_before_cuts, tstart, tend, to_read);
     }
     else if(path_311data.find("June") != string::npos){
+      read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
+    }
+    else if(path_311data.find("July") != string::npos){
       read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
     }
     else{
