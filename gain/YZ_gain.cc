@@ -32,17 +32,18 @@ string to_string_with_precision(const T a_value, const int n = 3){
 
 
 
-void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", string m_dQ = "sum", string m_ds = "3D"){
+void YZ_gain(int run = 842, string cut_type = "Ds", string v = "July", string m_dQ = "sum", string m_ds = "local"){
   method_ds = m_ds;
   method_dQ = m_dQ;
-  if(!Load_Version(version)){return;}
+  string cut_type_and_methods = cut_type + "_" + method_ds + "_" + method_dQ;
+  if(!Load_Version(v)){return;}
   gErrorIgnoreLevel = kError;
 //  gStyle->SetOptStat(0);
 //  gStyle->SetOptFit(0);
 
 //  gStyle->SetPalette(kColorPrintableOnGrey);
 
-  load_cosmics();
+  if(!load_cosmics()){return;}
   
   int nbinsY = (int)(2*lem_size/dy);
   int nbinsZ = (int)(6*lem_size/dz);
@@ -57,9 +58,9 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
   TH1D distri_view1_crp("distri_view1","distri_view1;gain;#",50,0,5);
   
   map<int,TH2D> mpv; map<int,TH2D> mpv_view0; map<int,TH2D> mpv_view1; map<int,TH1D> distri; map<int,TH1D> distri_view0; map<int,TH1D> distri_view1;
-  TH1D stddev("std_dev","std_dev",20,0,0.4);
-  TH1D stddev_view0("std_dev_view0","std_dev_view0",20,0,0.4);
-  TH1D stddev_view1("std_dev_view1","std_dev_view1",20,0,0.4);
+  TH1D stddev("relat_std_dev","relat_std_dev",20,0,15);
+  TH1D stddev_view0("relat_std_dev_view0","relat_std_dev_view0",20,0,15);
+  TH1D stddev_view1("relat_std_dev_view1","relat_std_dev_view1",20,0,15);
   
   string name, title;
   
@@ -102,139 +103,51 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
   begins = {-(int)(lem_size/dy), 0};
   ends = {(int)(lem_size/dy), (int)(6*lem_size/dz)};
 
-  //Minimum number of hits to have correct statistics
-  int min_number_of_hits = 200;
-
-  bool recreate_fit_file = false;
-  int files_not_found = 0;
-  string filename_nonfitted = dQds_YZ_Output+cut_type+"/"+to_string(run)+".root";
-  string filename_fitted = dQds_YZ_Output+cut_type+"/"+to_string(run)+"_fitted.root";
-  TFile *runfile_fitted = new TFile();
-  bool read_fit = false;
-  string ifilename = "";
-  int i_read_fit = read_or_do_fit(filename_fitted, filename_nonfitted, recreate_fit_file, ifilename, files_not_found);
-  if(i_read_fit == 3){return;}
-  if(i_read_fit == 1){read_fit = true;}
-  TFile *runfile = TFile::Open(ifilename.data(),"READ");
-  if( !read_fit ){
-    #if verbose
-    cout << "    Recording fitted histograms in " << filename_fitted << endl;
-    #endif
-    runfile_fitted = TFile::Open(filename_fitted.data(), "RECREATE");
-    if(!runfile_fitted->IsOpen()){
-      cout << "ERROR: could not open " << filename_fitted << " for writing." << endl;
-      return;
-    }
+  TMyFileHeader header = load_run_header(run);
+  if(header.GetRun() == -1){return;}
+  if(header.GetYZGainsEff().find(cut_type_and_methods) == header.GetYZGainsEff().end()){
+    cout << "ERROR: cut type " << cut_type_and_methods << " not found in run " << run << endl;
+    return;
   }
-
-  
-  TH1D hdQds;
-  TString FunName = "";
-  vector<double> f0 = {-1,-1};
-  vector<double> f1 = {-1,-1};
-  string name_to_get = "";
-  string corrected_or_not = "";
-  if(cut_type.find("tg") != string::npos){corrected_or_not = "Dx_Corrected_";}
-
   #if verbose 
-  cout << "  Reading dQds histograms of run " << run << "..." << endl;
+  cout << "  Reading run " << run << " header file..." << endl;
   #endif
+  auto gains = header.GetYZGainsEff()[cut_type_and_methods];
+  auto mpvs = header.GetYZMPVs()[cut_type_and_methods];
+  auto processed = header.AreYZGainsProcessed()[cut_type_and_methods];
+  
+  
   for( int Y = begins[0]; Y < ends[0]; Y++ ){
     double y = (Y+0.5)*dy;
     for( int Z = begins[1]; Z < ends[1]; Z++ ){
       double z = (Z+0.5)*dz;
-      string sign = "";
-      if(Y < 0){sign = "m";}
-      name_to_get = string("dQds_view0_" + corrected_or_not + "dy_" + sign + to_string(abs(Y)) + "_dz_" + to_string(Z));
-      if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-      if(!read_fit && !runfile_fitted->IsOpen()){
-        runfile->Close(); delete runfile; runfile = 0;
-        runfile = TFile::Open(filename_nonfitted.data(), "READ");
-        runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
-        if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-      }
+      pair<int,int> YZ = make_pair(Y,Z);
+      if(!processed[YZ]){return;}
+      double gain0 = mpvs[YZ].first/mpv_cosmics;
+      double gain1 = mpvs[YZ].second/mpv_cosmics;
+      double gain_eff = gains[YZ];
+      int lem = find_lem(y,z);
       
-      if(read_fit){
-        f0 = ReadFit(&hdQds);
-      }
-      else{
-        f0 = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, .5);
-        runfile_fitted->cd();
-        hdQds.Write();
-      }
-      if(mpv_cosmics < 0 && f0[0] > 0){
-        mpv_view0_crp.Fill(z, y, f0[0]/corr);
-        distri_view0_crp.Fill(f0[0]/corr);
-        int lem = find_lem(y,z);
-        mpv_view0[lem].Fill(z, y, f0[0]/corr);
-        distri_view0[lem].Fill(f0[0]/corr);
-      }
-      else if(f0[0] > 0){
-        mpv_view0_crp.Fill(z, y, f0[0]/(corr*mpv_cosmics));
-        distri_view0_crp.Fill(f0[0]/(corr*mpv_cosmics));
-        int lem = find_lem(y,z);
-        mpv_view0[lem].Fill(z, y, f0[0]/(corr*mpv_cosmics));
-        distri_view0[lem].Fill(f0[0]/(corr*mpv_cosmics));
-      }
+      mpv_view0_crp.Fill(z, y, gain0);
+      distri_view0_crp.Fill(gain0);
+      mpv_view0[lem].Fill(z, y, gain0);
+      distri_view0[lem].Fill(gain0);
+    
+      mpv_view1_crp.Fill(z, y, gain1);
+      distri_view1_crp.Fill(gain1);
+      mpv_view1[lem].Fill(z, y, gain1);
+      distri_view1[lem].Fill(gain1);
+    
+      mpv_crp.Fill(z, y, gain_eff);
+      distri_crp.Fill(gain_eff);
+      mpv[lem].Fill(z, y, gain_eff);
+      distri[lem].Fill(gain_eff);
       
-      name_to_get = string("dQds_view1_" + corrected_or_not + "dy_" + sign + to_string(abs(Y)) + "_dz_" + to_string(Z));
-      if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-      if(!read_fit && !runfile_fitted->IsOpen()){
-        runfile->Close(); delete runfile; runfile = 0;
-        runfile = TFile::Open(filename_nonfitted.data(), "READ");
-        runfile_fitted = TFile::Open(filename_fitted.data(),"RECREATE");
-        if(!get_histo_in_inputfile(hdQds, runfile, name_to_get, read_fit)){return;}
-      }
-      
-      if(read_fit){
-        f1 = ReadFit(&hdQds);
-      }
-      else{
-        f1 = fit_dQds(&hdQds, false, min_number_of_hits, 0.05, .5);
-        runfile_fitted->cd();
-        hdQds.Write();
-      }
-      if(mpv_cosmics < 0 && f1[0] > 0){
-        mpv_view1_crp.Fill(z, y, f1[0]/corr);
-        distri_view1_crp.Fill(f1[0]/corr);
-        int lem = find_lem(y,z);
-        mpv_view1[lem].Fill(z, y, f1[0]/corr);
-        distri_view1[lem].Fill(f1[0]/corr);
-      }
-      else if(f1[0] > 0){
-        mpv_view1_crp.Fill(z, y, f1[0]/(corr*mpv_cosmics));
-        distri_view1_crp.Fill(f1[0]/(corr*mpv_cosmics));
-        int lem = find_lem(y,z);
-        mpv_view1[lem].Fill(z, y, f1[0]/(corr*mpv_cosmics));
-        distri_view1[lem].Fill(f1[0]/(corr*mpv_cosmics));
-      }
-      
-      if(mpv_cosmics < 0 && f0[0] > 0 && f1[0] > 0){
-        mpv_crp.Fill(z, y, (f0[0]+f1[0])/corr);
-        distri_crp.Fill((f0[0]+f1[0])/corr);
-        int lem = find_lem(y,z);
-        mpv[lem].Fill(z, y, (f0[0]+f1[0])/corr);
-        distri[lem].Fill((f0[0]+f1[0])/corr);
-      }
-      else if(f0[0] > 0 && f1[0] > 0){
-        mpv_crp.Fill(z, y, (f0[0]+f1[0])/(corr*mpv_cosmics));
-        distri_crp.Fill((f0[0]+f1[0])/(corr*mpv_cosmics));
-        int lem = find_lem(y,z);
-        mpv[lem].Fill(z, y, (f0[0]+f1[0])/(corr*mpv_cosmics));
-        distri[lem].Fill((f0[0]+f1[0])/(corr*mpv_cosmics));
-      }
     }//for z
   }// for y
-  if(runfile_fitted->IsOpen()){
-    runfile_fitted->Close();
-  }
-  delete runfile_fitted;
   #if verbose
   cout << "    done reading histograms and filling graphs" << endl;
   #endif
-  runfile->Close();
-  delete runfile;
-  
   
   string outpath, outfile;
   int cany = 850;
@@ -305,7 +218,7 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
     gPad->SetName(string(string(distri[lem].GetName())+"_pad").data());
     gPad->Write();
     gPad->SaveAs(string(outpath + string(distri[lem].GetName()) + ".png").data());
-    stddev.Fill(distri[lem].GetStdDev());
+    stddev.Fill(100*distri[lem].GetStdDev()/distri[lem].GetMean());
     
     ofilelem.cd();
     distri_view0[lem].Draw();
@@ -313,7 +226,7 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
     gPad->SetName(string(string(distri_view0[lem].GetName())+"_pad").data());
     gPad->Write();
     gPad->SaveAs(string(outpath + string(distri_view0[lem].GetName()) + ".png").data());
-    stddev_view0.Fill(distri_view0[lem].GetStdDev());
+    stddev_view0.Fill(100*distri_view0[lem].GetStdDev()/distri[lem].GetMean());
     
     ofilelem.cd();
     distri_view1[lem].Draw();
@@ -321,7 +234,7 @@ void YZ_gain(int run = 840, string cut_type = "Ds", string version = "June", str
     gPad->SetName(string(string(distri_view1[lem].GetName())+"_pad").data());
     gPad->Write();
     gPad->SaveAs(string(outpath + string(distri_view1[lem].GetName()) + ".png").data());
-    stddev_view1.Fill(distri_view1[lem].GetStdDev());
+    stddev_view1.Fill(100*distri_view1[lem].GetStdDev()/distri[lem].GetMean());
     delete gPad;
     
     ofilelem.Close();

@@ -58,58 +58,88 @@ string to_string_with_precision(const T a_value, const int n = 3){
 
 //Utilities ********************************************************************
 
-bool Load_Version(string version){
-
+bool Load_Version(string v){
+  #if verbose
+  cout << "Loading version " << v << endl;
+  #endif
+  version = v;
   if(version == "Feb"){
     path_311data = "/eos/user/p/pcotte/311data/2018_Feb_05/";
     path_wa105_311data = "/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_Feb_05/ROOT/recofast/";
+    recofile_suffix = "-Parser.root";
     tpc_boundaries = {-50, 50, -50, 50, 0, 300};
     pitch = 0.3125;
     dx=10;
     dy=5;
     dz=5;
     lem_size = 50;
-    dQdx_cut_min = 0.001;
   }
   else if(version == "June"){
     path_311data = "/eos/user/p/pcotte/311data/2018_June_24/";
     path_wa105_311data = "/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24/ROOT/recofast/";
+    recofile_suffix = "-RecoFast-Parser.root";
     tpc_boundaries = {-50, 50, -48, 48, 0, 288};
     pitch = 0.3;
     dx=10;
     dy=4.8;
     dz=4.8;
     lem_size = 48;
-    dQdx_cut_min = 0.001;
   }
   else if(version == "Junec"){
     path_311data = "/eos/user/p/pcotte/311data/2018_June_24c/";
     path_wa105_311data = "/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_June_24c/ROOT/recofast/";
+    recofile_suffix = "-RecoFast-Parser.root";
     tpc_boundaries = {-50, 50, -48, 48, 0, 288};
     pitch = 0.3;
     dx=10;
     dy=4.8;
     dz=4.8;
     lem_size = 48;
-    dQdx_cut_min = 0.001;
   }
   else if(version == "July"){
     path_311data = "/eos/user/p/pcotte/311data/2018_July_30/";
     path_wa105_311data = "/eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/";
+    recofile_suffix = "-RecoFast-Parser.root";
     tpc_boundaries = {-50, 50, -50, 50, 0, 300};
     pitch = 0.3125;
     dx=10;
     dy=5;
     dz=5;
     lem_size = 50;
-    dQdx_cut_min = 0.001;
+  }
+  else if(version == "LArSoft_old"){
+    path_311data = "/eos/user/p/pcotte/311data/LArSoft/old/";
+    path_wa105_311data = "/eos/user/p/pcotte/311analysis/LArSoft/old/";
+    recofile_suffix = "-RecoFast-Parser.root";
+    tpc_boundaries = {-50, 50, -50, 50, 0, 300};
+    pitch = 0.3125;
+    dx=10;
+    dy=5;
+    dz=5;
+    lem_size = 50;
+  }
+  else if(version == "LArSoft_new"){
+    path_311data = "/eos/user/p/pcotte/311data/LArSoft/new/";
+    path_wa105_311data = "/eos/user/p/pcotte/311analysis/LArSoft/new/";
+    recofile_suffix = "-RecoFast-Parser.root";
+    tpc_boundaries = {-50, 50, -50, 50, 0, 300};
+    pitch = 0.3125;
+    dx=10;
+    dy=5;
+    dz=5;
+    lem_size = 50;
   }
   else{
-    cout << "Unknown reco version " << version << endl;
+    cout << "Load version ERROR: Unknown reco version " << version << endl;
     return false;
   }
+  MinX = tpc_boundaries[0] + vol_cut[0];
+  MaxX = tpc_boundaries[1] - vol_cut[1];
+  MinY = tpc_boundaries[2] + vol_cut[2];
+  MaxY = tpc_boundaries[3] - vol_cut[3];
+  MinZ = tpc_boundaries[4] + vol_cut[4];
+  MaxZ = tpc_boundaries[5] - vol_cut[5];
   check_and_mkdir(path_311data);
-  SelectTrack_Input = path_311data + "reconstructed_files/";
   SelectTrack_Output = path_311data + "selected_tracks_" + method_ds + "_" + method_dQ + "/";
   SelectTrack_MC_Output = path_MC_output + "selected_tracks_" + method_ds + "_" + method_dQ + "/";
   YZ_SelectTrack_Output = path_311data + "YZ_selected_tracks_" + method_ds + "_" + method_dQ + "/";
@@ -127,7 +157,10 @@ bool Load_Version(string version){
   dQds_Output = path_311data + "dQds_" + method_ds + "_" + method_dQ + "/";
   dQds_charging_up_Output = path_311data + "dQds_charging_up_" + method_ds + "_" + method_dQ + "/";
   dQds_YZ_Output = path_311data + "dQds_YZ_" + method_ds + "_" + method_dQ + "/"; 
-
+  
+  #if verbose
+  cout << "...done." << endl;
+  #endif
   return true;
 }
 
@@ -775,7 +808,7 @@ bool load_run_lists(){
     cout << "ERROR loading runs : empty run list" << endl;
     return false;
   }
-  cout << "done" << endl;
+  cout << "...done" << endl;
   return true;
 }
 
@@ -822,16 +855,20 @@ bool load_ind_eff_simu_graphs(){
   return true;
 }
 
-TMyFileHeader load_run_header(int run, bool update){
+TMyFileHeader load_run_header(int run, bool clean){
   string filepath = runs_headers + to_string(run) + ".root";
   TMyFileHeader header = TMyFileHeader();
-  if(update or !ExistTest(filepath)){if(!save_runs_headers({run})){return header;}}
+  if(!ExistTest(filepath)){if(!save_runs_headers({run})){return header;}}
   TFile fileheader(filepath.data(),"READ");
   if(!fileheader.IsOpen()){
     cout << "ERROR: can not find header file for run " << run << endl;
     return header;
   }
   header = *(TMyFileHeader*)((TKey*)fileheader.GetListOfKeys()->At(0))->ReadObj();
+  fileheader.Close();
+  if(clean){
+    header.Clean();
+  }
   return header;
 }
 
@@ -1099,6 +1136,17 @@ bool IsGood_lem_gain(string cut_type_and_methods, int run, int lem){
   }
   return true;
 }
+bool IsGood_yz(string cut_type_and_methods, int run, pair<int,int> YZ){
+  if(!IsGood_run(cut_type_and_methods, run)){return false;}
+    if( bad_runs_yz.find(cut_type_and_methods) != bad_runs_yz.end() ){
+      if( bad_runs_yz[cut_type_and_methods].find(run) != bad_runs_yz[cut_type_and_methods].end() ){
+        if( find(bad_runs_yz[cut_type_and_methods][run].begin(), bad_runs_yz[cut_type_and_methods][run].end(), YZ) != bad_runs_yz[cut_type_and_methods][run].end() ){
+        return false;
+      }
+    }
+  }
+  return true;
+}
 
 double find_projection(hit h){
   //return the correct variable projection on the view
@@ -1117,9 +1165,12 @@ double find_projection(hit h){
 }
 
 double get_theta(track t){
-  double theta = fabs(acos( ( t.end_x - t.start_x )/abs( t.length ) ));
-  if ( theta > TMath::Pi()/2 ){
-    theta = fabs(theta - TMath::Pi());
+  double theta = fabs(acos( ( t.end_x - t.start_x )/abs( t.length ) ))*180./TMath::Pi();
+  if ( theta > 180 ){
+    theta = 360-theta;
+  }
+  if ( theta < 90 ){
+    theta = 180-theta;
   }
   return theta;
 }
@@ -1127,23 +1178,36 @@ double get_theta(track t){
 double get_phi(track t){
   if( abs(t.end_z - t.start_z)!=0 ){
     if( (t.end_z - t.start_z) > 0 ){
-      return atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) );
+      return atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) )*180./TMath::Pi();
     }
     else if( atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) ) < 0 ){
-      return atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) )+TMath::Pi();
+      return atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) )*180./TMath::Pi()+180.;
     }
     else{
-      return atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) )-TMath::Pi();
+      return atan( (t.end_y - t.start_y)/(t.end_z - t.start_z) )*180./TMath::Pi()-180.;
     }
   }
   else if( (t.end_y - t.start_y) > 0 ){
-    return TMath::Pi()/2.;
+    return 90.;
   }
   else{
-    return -TMath::Pi()/2.;
+    return -90.;
   }
 }
 
+double get_reduced_phi(track t){
+  if( abs(t.end_z - t.start_z)!=0 ){
+    double phi = atan( fabs(t.end_y - t.start_y)/fabs(t.end_z - t.start_z) )*180./TMath::Pi();
+    if (phi > 90){
+      phi = 180-phi;
+    }
+    return phi;
+  }
+  else{
+    return 90;
+  }
+}
+  
 vector<double> get_dss(track t){
   double ds_0 = pitch/fabs(TMath::Sin(get_theta(t))*TMath::Sin(get_phi(t)));
   double ds_1 = pitch/fabs(TMath::Sin(get_theta(t))*TMath::Cos(get_phi(t)));
@@ -1151,20 +1215,20 @@ vector<double> get_dss(track t){
 }
 
 vector<double> get_dss_from_angles(double theta, double phi){
-  double ds_0 = pitch/fabs(TMath::Sin(theta)*TMath::Sin(phi));
-  double ds_1 = pitch/fabs(TMath::Sin(theta)*TMath::Cos(phi));
+  double ds_0 = pitch/fabs(TMath::Sin(theta*TMath::Pi()/180.)*TMath::Sin(phi*TMath::Pi()/180.));
+  double ds_1 = pitch/fabs(TMath::Sin(theta*TMath::Pi()/180.)*TMath::Cos(phi*TMath::Pi()/180.));
   return {ds_0,ds_1};
 }
 
 //double get_theta(track t){
-//  return acos( ( t.end_x - t.start_x )/abs( t.length ) );
+//  return acos( ( t.end_x - t.start_x )/abs( t.length ) )*180./TMath::Pi();
 //}
 
 //double get_phi(track t){
 //  if(abs(t.end_z - t.start_z)!=0)
-//    return atan( abs(t.end_y - t.start_y)/(t.end_z - t.start_z) );
+//    return atan( abs(t.end_y - t.start_y)/(t.end_z - t.start_z) )*180./TMath::Pi();
 //  else
-//    return TMath::Pi()/2.;
+//    return 90.;
 //}
 
 void read_tree_Feb(TChain *rTree, vector<track> & tracks, int &tstart, int &tend, int to_read){
@@ -1221,52 +1285,52 @@ void read_tree_Feb(TChain *rTree, vector<track> & tracks, int &tstart, int &tend
 
   //Track variables
   short tNumberOfTracks;
-//  short tTrackID_pmtrack[NMaxTracksPerEventTimesNViews];
-//  short tTrack_NumberOfHits_pmtrack[NMaxTracksPerEventTimesNViews];
-  float tTrack_Length_pmtrack[NMaxTracksPerEventTimesNViews];
+//  short tTrackID[NMaxTracksPerEventTimesNViews];
+  short tTrack_NumberOfHits[NMaxTracksPerEventTimesNViews];
+  float tTrack_Length[NMaxTracksPerEventTimesNViews];
 
-  float tTrack_StartPoint_X_pmtrack[NMaxTracksPerEvent];
-  float tTrack_StartPoint_Y_pmtrack[NMaxTracksPerEvent];
-  float tTrack_StartPoint_Z_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_StartPoint_DistanceToBoundary_pmtrack[NMaxTracksPerEvent];
-  float tTrack_EndPoint_X_pmtrack[NMaxTracksPerEvent];
-  float tTrack_EndPoint_Y_pmtrack[NMaxTracksPerEvent];
-  float tTrack_EndPoint_Z_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_EndPoint_DistanceToBoundary_pmtrack[NMaxTracksPerEvent];
+  float tTrack_StartPoint_X[NMaxTracksPerEvent];
+  float tTrack_StartPoint_Y[NMaxTracksPerEvent];
+  float tTrack_StartPoint_Z[NMaxTracksPerEvent];
+//  float tTrack_StartPoint_DistanceToBoundary[NMaxTracksPerEvent];
+  float tTrack_EndPoint_X[NMaxTracksPerEvent];
+  float tTrack_EndPoint_Y[NMaxTracksPerEvent];
+  float tTrack_EndPoint_Z[NMaxTracksPerEvent];
+//  float tTrack_EndPoint_DistanceToBoundary[NMaxTracksPerEvent];
   
-  float tTrack_StartDirection_Theta_pmtrack[NMaxTracksPerEvent];
-  float tTrack_StartDirection_Phi_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_StartDirection_X_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_StartDirection_Y_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_StartDirection_Z_pmtrack[NMaxTracksPerEvent];
+  float tTrack_StartDirection_Theta[NMaxTracksPerEvent];
+  float tTrack_StartDirection_Phi[NMaxTracksPerEvent];
+//  float tTrack_StartDirection_X[NMaxTracksPerEvent];
+//  float tTrack_StartDirection_Y[NMaxTracksPerEvent];
+//  float tTrack_StartDirection_Z[NMaxTracksPerEvent];
 
-  float tTrack_EndDirection_Theta_pmtrack[NMaxTracksPerEvent];
-  float tTrack_EndDirection_Phi_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_EndDirection_X_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_EndDirection_Y_pmtrack[NMaxTracksPerEvent];
-//  float tTrack_EndDirection_Z_pmtrack[NMaxTracksPerEvent];
+  float tTrack_EndDirection_Theta[NMaxTracksPerEvent];
+  float tTrack_EndDirection_Phi[NMaxTracksPerEvent];
+//  float tTrack_EndDirection_X[NMaxTracksPerEvent];
+//  float tTrack_EndDirection_Y[NMaxTracksPerEvent];
+//  float tTrack_EndDirection_Z[NMaxTracksPerEvent];
 
-//  float tTrack_PitchInViews_pmtrack[NMaxTracksPerEvent];
-  short tTrack_NumberOfHitsPerView_pmtrack[NMaxTracksPerEvent][2];
+//  float tTrack_PitchInViews[NMaxTracksPerEvent];
+  short tTrack_NumberOfHitsPerView[NMaxTracksPerEvent][2];
 
   //Track hit variables
-  float tTrack_Hit_X_pmtrack[NMaxHitsPerEvent];
-  float tTrack_Hit_Y_pmtrack[NMaxHitsPerEvent];
-  float tTrack_Hit_Z_pmtrack[NMaxHitsPerEvent];
-  float tTrack_dx_LocalTrackDirection_pmtrack[NMaxHitsPerEvent];
-  float tTrack_dx_3DPosition_pmtrack[NMaxHitsPerEvent];
-//  short tTrack_Hit_TPC_pmtrack[NMaxHitsPerEvent];
-//  short tTrack_Hit_View_pmtrack[NMaxHitsPerEvent];
-//  short tTrack_Hit_Channel_pmtrack[NMaxHitsPerEvent];
-//  float tTrack_Hit_PeakTime_pmtrack[NMaxHitsPerEvent];
-  float tTrack_Hit_ChargeSummedADC_pmtrack[NMaxHitsPerEvent];
-  float tTrack_Hit_ChargeIntegral_pmtrack[NMaxHitsPerEvent];
-//  float tTrack_Hit_PeakHeight_pmtrack[NMaxHitsPerEvent];
-//  float tTrack_Hit_StartTime_pmtrack[NMaxHitsPerEvent];
-//  float tTrack_Hit_EndTime_pmtrack[NMaxHitsPerEvent];
-//  float tTrack_Hit_Width_pmtrack[NMaxHitsPerEvent];
-  float tTrack_Hit_GoodnessOfFit_pmtrack[NMaxHitsPerEvent];
-//  short tTrack_Hit_Multiplicity_pmtrack[NMaxHitsPerEvent];
+  float tTrack_Hit_X[NMaxHitsPerEvent];
+  float tTrack_Hit_Y[NMaxHitsPerEvent];
+  float tTrack_Hit_Z[NMaxHitsPerEvent];
+  float tTrack_dx_LocalTrackDirection[NMaxHitsPerEvent];
+  float tTrack_dx_3DPosition[NMaxHitsPerEvent];
+//  short tTrack_Hit_TPC[NMaxHitsPerEvent];
+  short tTrack_Hit_View[NMaxHitsPerEvent];
+//  short tTrack_Hit_Channel[NMaxHitsPerEvent];
+//  float tTrack_Hit_PeakTime[NMaxHitsPerEvent];
+  float tTrack_Hit_ChargeSummedADC[NMaxHitsPerEvent];
+  float tTrack_Hit_ChargeIntegral[NMaxHitsPerEvent];
+//  float tTrack_Hit_PeakHeight[NMaxHitsPerEvent];
+//  float tTrack_Hit_StartTime[NMaxHitsPerEvent];
+//  float tTrack_Hit_EndTime[NMaxHitsPerEvent];
+//  float tTrack_Hit_Width[NMaxHitsPerEvent];
+  float tTrack_Hit_GoodnessOfFit[NMaxHitsPerEvent];
+//  short tTrack_Hit_Multiplicity[NMaxHitsPerEvent];
 
   //Link branches in the ROOT file to variables
   //Metadata
@@ -1311,52 +1375,52 @@ void read_tree_Feb(TChain *rTree, vector<track> & tracks, int &tstart, int &tend
 
 //  //Track variables
   rTree->SetBranchAddress("NumberOfTracks_pmtrack",&tNumberOfTracks);
-//  rTree->SetBranchAddress("TrackID_pmtrack",&tTrackID_pmtrack);
-//  rTree->SetBranchAddress("Track_NumberOfHits_pmtrack",&tTrack_NumberOfHits_pmtrack);
-  rTree->SetBranchAddress("Track_Length_pmtrack",&tTrack_Length_pmtrack);
+//  rTree->SetBranchAddress("TrackID_pmtrack",&tTrackID);
+  rTree->SetBranchAddress("Track_NumberOfHits_pmtrack",&tTrack_NumberOfHits);
+  rTree->SetBranchAddress("Track_Length_pmtrack",&tTrack_Length);
 
-  rTree->SetBranchAddress("Track_StartPoint_X_pmtrack", &tTrack_StartPoint_X_pmtrack);
-  rTree->SetBranchAddress("Track_StartPoint_Y_pmtrack", &tTrack_StartPoint_Y_pmtrack);
-  rTree->SetBranchAddress("Track_StartPoint_Z_pmtrack", &tTrack_StartPoint_Z_pmtrack);
-//  rTree->SetBranchAddress("Track_StartPoint_DistanceToBoundary_pmtrack", &tTrack_StartPoint_DistanceToBoundary_pmtrack);
-  rTree->SetBranchAddress("Track_EndPoint_X_pmtrack", &tTrack_EndPoint_X_pmtrack);
-  rTree->SetBranchAddress("Track_EndPoint_Y_pmtrack", &tTrack_EndPoint_Y_pmtrack);
-  rTree->SetBranchAddress("Track_EndPoint_Z_pmtrack", &tTrack_EndPoint_Z_pmtrack);
-//  rTree->SetBranchAddress("Track_EndPoint_DistanceToBoundary_pmtrack",&tTrack_EndPoint_DistanceToBoundary_pmtrack);
+  rTree->SetBranchAddress("Track_StartPoint_X_pmtrack", &tTrack_StartPoint_X);
+  rTree->SetBranchAddress("Track_StartPoint_Y_pmtrack", &tTrack_StartPoint_Y);
+  rTree->SetBranchAddress("Track_StartPoint_Z_pmtrack", &tTrack_StartPoint_Z);
+//  rTree->SetBranchAddress("Track_StartPoint_DistanceToBoundary_pmtrack", &tTrack_StartPoint_DistanceToBoundary);
+  rTree->SetBranchAddress("Track_EndPoint_X_pmtrack", &tTrack_EndPoint_X);
+  rTree->SetBranchAddress("Track_EndPoint_Y_pmtrack", &tTrack_EndPoint_Y);
+  rTree->SetBranchAddress("Track_EndPoint_Z_pmtrack", &tTrack_EndPoint_Z);
+//  rTree->SetBranchAddress("Track_EndPoint_DistanceToBoundary_pmtrack",&tTrack_EndPoint_DistanceToBoundary);
 
-  rTree->SetBranchAddress("Track_StartDirection_Theta_pmtrack",&tTrack_StartDirection_Theta_pmtrack);
-  rTree->SetBranchAddress("Track_StartDirection_Phi_pmtrack",&tTrack_StartDirection_Phi_pmtrack);
-//  rTree->SetBranchAddress("Track_StartDirection_X_pmtrack", &tTrack_StartDirection_X_pmtrack);
-//  rTree->SetBranchAddress("Track_StartDirection_Y_pmtrack", &tTrack_StartDirection_Y_pmtrack);
-//  rTree->SetBranchAddress("Track_StartDirection_Z_pmtrack", &tTrack_StartDirection_Z_pmtrack);
+  rTree->SetBranchAddress("Track_StartDirection_Theta_pmtrack",&tTrack_StartDirection_Theta);
+  rTree->SetBranchAddress("Track_StartDirection_Phi_pmtrack",&tTrack_StartDirection_Phi);
+//  rTree->SetBranchAddress("Track_StartDirection_X_pmtrack", &tTrack_StartDirection_X);
+//  rTree->SetBranchAddress("Track_StartDirection_Y_pmtrack", &tTrack_StartDirection_Y);
+//  rTree->SetBranchAddress("Track_StartDirection_Z_pmtrack", &tTrack_StartDirection_Z);
 
-  rTree->SetBranchAddress("Track_EndDirection_Theta_pmtrack",&tTrack_EndDirection_Theta_pmtrack);
-  rTree->SetBranchAddress("Track_EndDirection_Phi_pmtrack",&tTrack_EndDirection_Phi_pmtrack);
-//  rTree->SetBranchAddress("Track_EndDirection_X_pmtrack", &tTrack_EndDirection_X_pmtrack);
-//  rTree->SetBranchAddress("Track_EndDirection_Y_pmtrack", &tTrack_EndDirection_Y_pmtrack);
-//  rTree->SetBranchAddress("Track_EndDirection_Z_pmtrack", &tTrack_EndDirection_Z_pmtrack);
+  rTree->SetBranchAddress("Track_EndDirection_Theta_pmtrack",&tTrack_EndDirection_Theta);
+  rTree->SetBranchAddress("Track_EndDirection_Phi_pmtrack",&tTrack_EndDirection_Phi);
+//  rTree->SetBranchAddress("Track_EndDirection_X_pmtrack", &tTrack_EndDirection_X);
+//  rTree->SetBranchAddress("Track_EndDirection_Y_pmtrack", &tTrack_EndDirection_Y);
+//  rTree->SetBranchAddress("Track_EndDirection_Z_pmtrack", &tTrack_EndDirection_Z);
 
-//  rTree->SetBranchAddress("Track_PitchInViews_pmtrack", &tTrack_PitchInViews_pmtrack);
-  rTree->SetBranchAddress("Track_NumberOfHitsPerView_pmtrack",&tTrack_NumberOfHitsPerView_pmtrack);
+//  rTree->SetBranchAddress("Track_PitchInViews_pmtrack", &tTrack_PitchInViews);
+  rTree->SetBranchAddress("Track_NumberOfHitsPerView_pmtrack",&tTrack_NumberOfHitsPerView);
 
 //  //Track hit variables
-  rTree->SetBranchAddress("Track_Hit_X_pmtrack", &tTrack_Hit_X_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_Y_pmtrack", &tTrack_Hit_Y_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_Z_pmtrack", &tTrack_Hit_Z_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_dx_LocalTrackDirection_pmtrack", &tTrack_dx_LocalTrackDirection_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_dx_3DPosition_pmtrack", &tTrack_dx_3DPosition_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_TPC_pmtrack", &tTrack_Hit_TPC_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_View_pmtrack", &tTrack_Hit_View_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_Channel_pmtrack", &tTrack_Hit_Channel_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_PeakTime_pmtrack", &tTrack_Hit_PeakTime_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_ChargeSummedADC_pmtrack", &tTrack_Hit_ChargeSummedADC_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_ChargeIntegral_pmtrack", &tTrack_Hit_ChargeIntegral_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_PeakHeight_pmtrack", &tTrack_Hit_PeakHeight_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_StartTime_pmtrack", &tTrack_Hit_StartTime_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_EndTime_pmtrack", &tTrack_Hit_EndTime_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_Width_pmtrack", &tTrack_Hit_Width_pmtrack);
-  rTree->SetBranchAddress("Track_Hit_GoodnessOfFit_pmtrack", &tTrack_Hit_GoodnessOfFit_pmtrack);
-//  rTree->SetBranchAddress("Track_Hit_Multiplicity_pmtrack", &tTrack_Hit_Multiplicity_pmtrack);
+  rTree->SetBranchAddress("Track_Hit_X_pmtrack", &tTrack_Hit_X);
+  rTree->SetBranchAddress("Track_Hit_Y_pmtrack", &tTrack_Hit_Y);
+  rTree->SetBranchAddress("Track_Hit_Z_pmtrack", &tTrack_Hit_Z);
+  rTree->SetBranchAddress("Track_Hit_dx_LocalTrackDirection_pmtrack", &tTrack_dx_LocalTrackDirection);
+  rTree->SetBranchAddress("Track_Hit_dx_3DPosition_pmtrack", &tTrack_dx_3DPosition);
+//  rTree->SetBranchAddress("Track_Hit_TPC_pmtrack", &tTrack_Hit_TPC);
+  rTree->SetBranchAddress("Track_Hit_View_pmtrack", &tTrack_Hit_View);
+//  rTree->SetBranchAddress("Track_Hit_Channel_pmtrack", &tTrack_Hit_Channel);
+//  rTree->SetBranchAddress("Track_Hit_PeakTime_pmtrack", &tTrack_Hit_PeakTime);
+  rTree->SetBranchAddress("Track_Hit_ChargeSummedADC_pmtrack", &tTrack_Hit_ChargeSummedADC);
+  rTree->SetBranchAddress("Track_Hit_ChargeIntegral_pmtrack", &tTrack_Hit_ChargeIntegral);
+//  rTree->SetBranchAddress("Track_Hit_PeakHeight_pmtrack", &tTrack_Hit_PeakHeight);
+//  rTree->SetBranchAddress("Track_Hit_StartTime_pmtrack", &tTrack_Hit_StartTime);
+//  rTree->SetBranchAddress("Track_Hit_EndTime_pmtrack", &tTrack_Hit_EndTime);
+//  rTree->SetBranchAddress("Track_Hit_Width_pmtrack", &tTrack_Hit_Width);
+  rTree->SetBranchAddress("Track_Hit_GoodnessOfFit_pmtrack", &tTrack_Hit_GoodnessOfFit);
+//  rTree->SetBranchAddress("Track_Hit_Multiplicity_pmtrack", &tTrack_Hit_Multiplicity);
 
   if( to_read == 0){
     to_read = NEntries;
@@ -1380,84 +1444,118 @@ void read_tree_Feb(TChain *rTree, vector<track> & tracks, int &tstart, int &tend
     //initialize classes (not pointers for the moment)
 
     int a=0; //Need this counter to remember where we are in this array.
-    for(int j=0; j<tNumberOfTracks; j++) //Track loop
-    {
+    for(int j=0; j<tNumberOfTracks; j++){ //Track loop
+      
       track dummy_track;
+
+      dummy_track.throughgoing = false;
+      dummy_track.throughgoingX = false;
+      dummy_track.throughgoingY = false;
+      dummy_track.throughgoingZ = false;
+      dummy_track.on_edge = false;
+      dummy_track.highway_selected = false;
+      dummy_track.blc = false;
 
       dummy_track.run = tRun;
       dummy_track.subrun = tSubrun;
       dummy_track.event = tEventNumberInRun;
+      dummy_track.event_ntracks = tNumberOfTracks;
       dummy_track.id = j;
-      dummy_track.start_x = tTrack_StartPoint_X_pmtrack[j];
-      dummy_track.start_y = tTrack_StartPoint_Y_pmtrack[j];
-      dummy_track.start_z = tTrack_StartPoint_Z_pmtrack[j];
+      dummy_track.start_x = tTrack_StartPoint_X[j];
+      dummy_track.start_y = tTrack_StartPoint_Y[j];
+      dummy_track.start_z = tTrack_StartPoint_Z[j];
 
-      dummy_track.end_x = tTrack_EndPoint_X_pmtrack[j];
-      dummy_track.end_y = tTrack_EndPoint_Y_pmtrack[j];
-      dummy_track.end_z = tTrack_EndPoint_Z_pmtrack[j];
-      
-      if(fabs(tTrack_StartDirection_Theta_pmtrack[j]*TMath::Pi()/180.) > TMath::Pi()/2.){
-        dummy_track.start_theta = fabs(tTrack_StartDirection_Theta_pmtrack[j]*TMath::Pi()/180. - TMath::Pi());
-      }
-      else{
-        dummy_track.start_theta = tTrack_StartDirection_Theta_pmtrack[j]*TMath::Pi()/180.;
-      }
-      dummy_track.start_phi = tTrack_StartDirection_Phi_pmtrack[j]*TMath::Pi()/180.;
-//      dummy_track.start_vx = tTrack_StartDirection_X_pmtrack[j];
-//      dummy_track.start_vy = tTrack_StartDirection_Y_pmtrack[j];
-//      dummy_track.start_vz = tTrack_StartDirection_Z_pmtrack[j];
+      dummy_track.end_x = tTrack_EndPoint_X[j];
+      dummy_track.end_y = tTrack_EndPoint_Y[j];
+      dummy_track.end_z = tTrack_EndPoint_Z[j];
       
       
-      if(fabs(tTrack_EndDirection_Theta_pmtrack[j]*TMath::Pi()/180.) > TMath::Pi()/2.){
-        dummy_track.end_theta = fabs(tTrack_EndDirection_Theta_pmtrack[j]*TMath::Pi()/180. - TMath::Pi());
+      if( max(dummy_track.end_x, dummy_track.start_x) > MaxX and min(dummy_track.end_x, dummy_track.start_x) < MinX ){
+        dummy_track.throughgoingX = true;
+      } //end if x
+      else if( max(dummy_track.end_x, dummy_track.start_x) > MaxX and min(dummy_track.end_x, dummy_track.start_x) < MinX ){
+        dummy_track.on_edge = true;
       }
-      else{
-        dummy_track.end_theta = tTrack_EndDirection_Theta_pmtrack[j]*TMath::Pi()/180.;
+      if( max(dummy_track.end_y, dummy_track.start_y) > MaxY and min(dummy_track.end_y, dummy_track.start_y) < MinY ){
+        dummy_track.throughgoingY = true;
+      } //end if z
+      if( max(dummy_track.end_z, dummy_track.start_z) > MaxZ and min(dummy_track.end_z, dummy_track.start_z) < MinZ ){
+        dummy_track.throughgoingZ = true;
+      } //end if y
+      if(dummy_track.throughgoingX or dummy_track.throughgoingY or dummy_track.throughgoingZ){
+        dummy_track.throughgoing = true;
       }
-      dummy_track.end_phi = tTrack_EndDirection_Phi_pmtrack[j]*TMath::Pi()/180.;
-//      dummy_track.end_vx = tTrack_EndDirection_X_pmtrack[j];
-//      dummy_track.end_vy = tTrack_EndDirection_Y_pmtrack[j];
-//      dummy_track.end_vz = tTrack_EndDirection_Z_pmtrack[j];
+      
+      int lem0 = find_lem(0, dummy_track.start_z);
+      int lem1 = find_lem(0, dummy_track.end_z);
+      if(isGood_lem(lem0) and isGood_lem(lem1) ){dummy_track.blc = true;}
+      if(highway){
+        if(tracks_selected_by_highway.size() == 0){
+          cout << "ERROR in Read_tree_Feb : please load highway output" << endl;
+          return;
+        }
+        int track_ID = 1000*(1+dummy_track.event) + dummy_track.id;
+        if( find(tracks_selected_by_highway.begin(), tracks_selected_by_highway.end(), track_ID) != tracks_selected_by_highway.end() ){
+          dummy_track.highway_selected = true;
+        }
+      }
+      dummy_track.start_theta = fabs(tTrack_StartDirection_Theta[j]);
+      if( dummy_track.start_theta > 180 ){
+        dummy_track.start_theta = 360 - dummy_track.start_theta;
+      }
+      if( dummy_track.start_theta < 90 ){
+        dummy_track.start_theta = 180 - dummy_track.start_theta;
+      }
+      dummy_track.start_phi = tTrack_StartDirection_Phi[j];
+//      dummy_track.start_vx = tTrack_StartDirection_X[j];
+//      dummy_track.start_vy = tTrack_StartDirection_Y[j];
+//      dummy_track.start_vz = tTrack_StartDirection_Z[j];
+      
+      dummy_track.end_theta = fabs(tTrack_EndDirection_Theta[j]);
+      if( dummy_track.end_theta > 180 ){
+        dummy_track.end_theta = 360 - dummy_track.end_theta;
+      }
+      if( dummy_track.end_theta < 90 ){
+        dummy_track.end_theta = 180 - dummy_track.end_theta;
+      }
+      dummy_track.end_phi = tTrack_EndDirection_Phi[j];
+//      dummy_track.end_vx = tTrack_EndDirection_X[j];
+//      dummy_track.end_vy = tTrack_EndDirection_Y[j];
+//      dummy_track.end_vz = tTrack_EndDirection_Z[j];
 
-      dummy_track.length = tTrack_Length_pmtrack[j];
+      dummy_track.length = tTrack_Length[j];
 
       dummy_track.theta = get_theta(dummy_track);
       dummy_track.phi = get_phi(dummy_track);
       
+      
+      for(int l=a; l < (a+tTrack_NumberOfHits[j]); l++){
+        hit dummy_hits;
 
-      for(int k=0; k<NUM_OF_VIEWS; k++) //View loop (for this track)
-      {
-        for(int l=a; l<a+tTrack_NumberOfHitsPerView_pmtrack[j][k]; l++) //Hit loop
-        {
-          hit dummy_hits;
-
-          dummy_hits.run = tRun;
-          dummy_hits.subrun = tSubrun;
-          dummy_hits.event = tEventNumberInRun;
-          dummy_hits.view = k;
-          dummy_hits.track_id = dummy_track.id;
-          dummy_hits.dq_sum = tTrack_Hit_ChargeSummedADC_pmtrack[l]/ADC2CHARGE[k];
-          dummy_hits.dq_integral = tTrack_Hit_ChargeIntegral_pmtrack[l]/ADC2CHARGE[k];
-          dummy_hits.dx_3D = tTrack_dx_3DPosition_pmtrack[l];
-          dummy_hits.dx_local = tTrack_dx_LocalTrackDirection_pmtrack[l];
-          dummy_hits.sp_x = tTrack_Hit_X_pmtrack[l];
-          dummy_hits.sp_y = tTrack_Hit_Y_pmtrack[l];
-          dummy_hits.sp_z = tTrack_Hit_Z_pmtrack[l];
-          dummy_hits.purity_correction = correct_dx_for_lifetime(50-tTrack_Hit_X_pmtrack[l]);
-          dummy_hits.lem  = find_lem(dummy_hits.sp_y, dummy_hits.sp_z);
-          dummy_hits.gain_density_correction_factor = gain_correction_for_rho(get_density_for_hit(tEventTimeSeconds, tRun), Efield);
-          dummy_hits.GoF = tHit_GoodnessOfFit[l];
-
-          dummy_track.hits_trk.push_back(dummy_hits);
-        } //end hits
-        a+=tTrack_NumberOfHitsPerView_pmtrack[j][k];
-      } //end view
-
-    dummy_track.nhits = dummy_track.hits_trk.size();
-    tracks.push_back(dummy_track);
+        dummy_hits.run = tRun;
+        dummy_hits.subrun = tSubrun;
+        dummy_hits.event = tEventNumberInRun;
+        dummy_track.event_ntracks = tNumberOfTracks;
+        dummy_hits.view = tTrack_Hit_View[l];
+        dummy_hits.track_id = dummy_track.id;
+        dummy_hits.dq_sum = tTrack_Hit_ChargeSummedADC[l]/ADC2CHARGE[tTrack_Hit_View[l]];
+        dummy_hits.dq_integral = tTrack_Hit_ChargeIntegral[l]/ADC2CHARGE[tTrack_Hit_View[l]];
+        dummy_hits.dx_3D = tTrack_dx_3DPosition[l];
+        dummy_hits.dx_local = tTrack_dx_LocalTrackDirection[l];
+        dummy_hits.sp_x = tTrack_Hit_X[l];
+        dummy_hits.sp_y = tTrack_Hit_Y[l];
+        dummy_hits.sp_z = tTrack_Hit_Z[l];
+        dummy_hits.purity_correction = correct_dx_for_lifetime(50-tTrack_Hit_X[l]);
+        dummy_hits.lem  = find_lem(dummy_hits.sp_y, dummy_hits.sp_z);
+        dummy_hits.gain_density_correction_factor = gain_correction_for_rho(get_density_for_hit(tEventTimeSeconds, tRun), Efield);
+        dummy_hits.GoF = tHit_GoodnessOfFit[l];
+        
+        dummy_track.hits_trk.push_back(dummy_hits);
+      } //end hits
+      tracks.push_back(dummy_track);
+      a+=tTrack_NumberOfHits[j];
     }//end tracks
   }//Event loop
-
 }
 
 //Cuts *************************************************************************
@@ -1490,7 +1588,8 @@ int drays_mitigation(track & t){
 
     auto h = t.hits_trk.at(hh);
     if(method_ds == "3D"){ds = h.dx_3D;}
-    else{ds = h.dx_local;}
+    else if(method_ds == "local"){ds = h.dx_local;}
+    else{ds = h.dx_phil;}
     if(method_dQ == "sum"){dq = h.dq_sum;}
     else{dq = h.dq_integral;}
 
@@ -1579,7 +1678,7 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
   //Hit variables
   int tNumberOfHits;
 //  short tHit_TPC[NMaxHitsPerEvent];
-//  short tHit_View[NMaxHitsPerEvent];
+  short tHit_View[NMaxHitsPerEvent];
 //  short tHit_Channel[NMaxHitsPerEvent];
 //  float tHit_PeakTime[NMaxHitsPerEvent];
 //  float tHit_ChargeSummedADC[NMaxHitsPerEvent];
@@ -1590,7 +1689,7 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 //  float tHit_Width[NMaxHitsPerEvent];
   float tHit_GoodnessOfFit[NMaxHitsPerEvent];
 //  short tHit_Multiplicity[NMaxHitsPerEvent];
-//  short tHit_TrackID[NMaxHitsPerEvent];
+  short tHit_TrackID[NMaxHitsPerEvent];
 //  short tHit_ClusterID[NMaxHitsPerEvent];
 
   //Cluster variables
@@ -1611,7 +1710,7 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
   //Track variables
   short tNumberOfTracks;
 //  short tTrackID[NMaxTracksPerEventTimesNViews];
-//  short tTrack_NumberOfHits[NMaxTracksPerEventTimesNViews];
+  short tTrack_NumberOfHits[NMaxTracksPerEventTimesNViews];
   float tTrack_Length_Trajectory[NMaxTracksPerEventTimesNViews];
   float tTrack_Length_StraightLine[NMaxTracksPerEventTimesNViews];
 
@@ -1643,11 +1742,12 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
   float tTrack_Hit_X[NMaxHitsPerEvent];
   float tTrack_Hit_Y[NMaxHitsPerEvent];
   float tTrack_Hit_Z[NMaxHitsPerEvent];
-//  float tTrack_dx_LocalTrackDirection[NMaxHitsPerEvent];
+  float tTrack_Hit_Theta[NMaxHitsPerEvent];
+  float tTrack_Hit_Phi[NMaxHitsPerEvent];
   float tTrack_dx_3DPosition[NMaxHitsPerEvent];
   float tTrack_ds_3DLocalTrackDirection[NMaxHitsPerEvent];
 //  short tTrack_Hit_TPC[NMaxHitsPerEvent];
-//  short tTrack_Hit_View[NMaxHitsPerEvent];
+  short tTrack_Hit_View[NMaxHitsPerEvent];
 //  short tTrack_Hit_Channel[NMaxHitsPerEvent];
 //  float tTrack_Hit_PeakTime[NMaxHitsPerEvent];
   float tTrack_Hit_ChargeSummedADC[NMaxHitsPerEvent];
@@ -1671,7 +1771,7 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 //  //Hit variables
   rTree->SetBranchAddress("NumberOfHits",&tNumberOfHits);
 //  rTree->SetBranchAddress("Hit_TPC",&tHit_TPC);
-//  rTree->SetBranchAddress("Hit_View",&tHit_View);
+  rTree->SetBranchAddress("Hit_View",&tHit_View);
 //  rTree->SetBranchAddress("Hit_Channel",&tHit_Channel);
 //  rTree->SetBranchAddress("Hit_ChargeSummedADC",&tHit_ChargeSummedADC);
 //  rTree->SetBranchAddress("Hit_ChargeIntegral",&tHit_ChargeIntegral);
@@ -1682,7 +1782,7 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 //  rTree->SetBranchAddress("Hit_Width",&tHit_Width);
   rTree->SetBranchAddress("Hit_GoodnessOfFit",&tHit_GoodnessOfFit);
 //  rTree->SetBranchAddress("Hit_Multiplicity",&tHit_Multiplicity);
-//  rTree->SetBranchAddress("Hit_TrackID",&tHit_TrackID);
+  rTree->SetBranchAddress("Hit_TrackID",&tHit_TrackID);
 //  rTree->SetBranchAddress("Hit_ClusterID",&tHit_ClusterID);
 
 //  //Cluster variables
@@ -1703,7 +1803,7 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 //  //Track variables
   rTree->SetBranchAddress("NumberOfTracks",&tNumberOfTracks);
 //  rTree->SetBranchAddress("TrackID",&tTrackID);
-//  rTree->SetBranchAddress("Track_NumberOfHits",&tTrack_NumberOfHits);
+  rTree->SetBranchAddress("Track_NumberOfHits",&tTrack_NumberOfHits);
   rTree->SetBranchAddress("Track_Length_Trajectory",&tTrack_Length_Trajectory);
   rTree->SetBranchAddress("Track_Length_StraightLine",&tTrack_Length_StraightLine);
 
@@ -1735,11 +1835,12 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
   rTree->SetBranchAddress("Track_Hit_X", &tTrack_Hit_X);
   rTree->SetBranchAddress("Track_Hit_Y", &tTrack_Hit_Y);
   rTree->SetBranchAddress("Track_Hit_Z", &tTrack_Hit_Z);
-//  rTree->SetBranchAddress("Track_Hit_dx_LocalTrackDirection", &tTrack_dx_LocalTrackDirection);
+  rTree->SetBranchAddress("Track_Hit_LocalTrackDirection_Theta", &tTrack_Hit_Theta);
+  rTree->SetBranchAddress("Track_Hit_LocalTrackDirection_Phi", &tTrack_Hit_Phi);
   rTree->SetBranchAddress("Track_Hit_ds_3DPosition", &tTrack_dx_3DPosition);
   rTree->SetBranchAddress("Track_Hit_ds_LocalTrackDirection", &tTrack_ds_3DLocalTrackDirection);
 //  rTree->SetBranchAddress("Track_Hit_TPC", &tTrack_Hit_TPC);
-//  rTree->SetBranchAddress("Track_Hit_View", &tTrack_Hit_View);
+  rTree->SetBranchAddress("Track_Hit_View", &tTrack_Hit_View);
 //  rTree->SetBranchAddress("Track_Hit_Channel", &tTrack_Hit_Channel);
 //  rTree->SetBranchAddress("Track_Hit_PeakTime", &tTrack_Hit_PeakTime);
   rTree->SetBranchAddress("Track_Hit_ChargeSummedADC", &tTrack_Hit_ChargeSummedADC);
@@ -1750,7 +1851,6 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 //  rTree->SetBranchAddress("Track_Hit_Width", &tTrack_Hit_Width);
   rTree->SetBranchAddress("Track_Hit_GoodnessOfFit", &tTrack_Hit_GoodnessOfFit);
 //  rTree->SetBranchAddress("Track_Hit_Multiplicity", &tTrack_Hit_Multiplicity);
-
   if( to_read == 0){
     to_read = NEntries;
   }
@@ -1772,13 +1872,25 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
     //initialize classes (not pointers for the moment)
 
     int a=0; //Need this counter to remember where we are in this array.
-    for(int j=0; j<tNumberOfTracks; j++) //Track loop
-    {
+    for(int j=0; j<tNumberOfTracks; j++){ //Track loop
+    
       track dummy_track;
+      dummy_track.nhitsview[0] = 0; dummy_track.nhitsview[1] = 0;
+      dummy_track.throughgoing = false;
+      dummy_track.throughgoingX = false;
+      dummy_track.throughgoingY = false;
+      dummy_track.throughgoingZ = false;
+      dummy_track.on_edge = false;
+      dummy_track.on_edgeX = false;
+      dummy_track.on_edgeY = false;
+      dummy_track.on_edgeZ = false;
+      dummy_track.highway_selected = false;
+      dummy_track.blc = false;
 
       dummy_track.run = tRun;
       dummy_track.subrun = tSubrun;
       dummy_track.event = tEventNumberInRun;
+      dummy_track.event_ntracks = tNumberOfTracks;
       dummy_track.id = j;
       dummy_track.start_x = tTrack_StartPoint_X[j];
       dummy_track.start_y = tTrack_StartPoint_Y[j];
@@ -1788,25 +1900,66 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
       dummy_track.end_y = tTrack_EndPoint_Y[j];
       dummy_track.end_z = tTrack_EndPoint_Z[j];
       
-      if(fabs(tTrack_StartDirection_Theta[j]*TMath::Pi()/180.) > TMath::Pi()/2.){
-        dummy_track.start_theta = fabs(tTrack_StartDirection_Theta[j]*TMath::Pi()/180. - TMath::Pi());
+      
+      if( max(dummy_track.end_x, dummy_track.start_x) > MaxX and min(dummy_track.end_x, dummy_track.start_x) < MinX ){
+        dummy_track.throughgoingX = true;
+      } //end if x
+      if( max(dummy_track.end_x, dummy_track.start_x) > MaxX or min(dummy_track.end_x, dummy_track.start_x) < MinX ){
+        dummy_track.on_edgeX = true;
       }
-      else{
-        dummy_track.start_theta = tTrack_StartDirection_Theta[j]*TMath::Pi()/180.;
+      if( max(dummy_track.end_y, dummy_track.start_y) > MaxY and min(dummy_track.end_y, dummy_track.start_y) < MinY ){
+        dummy_track.throughgoingY = true;
+      } //end if z
+      if( max(dummy_track.end_y, dummy_track.start_y) > MaxY or min(dummy_track.end_y, dummy_track.start_y) < MinY ){
+        dummy_track.on_edgeY = true;
       }
-      dummy_track.start_phi = tTrack_StartDirection_Phi[j]*TMath::Pi()/180.;
+      if( max(dummy_track.end_z, dummy_track.start_z) > MaxZ and min(dummy_track.end_z, dummy_track.start_z) < MinZ ){
+        dummy_track.throughgoingZ = true;
+      } //end if y
+      if( max(dummy_track.end_z, dummy_track.start_z) > MaxZ or min(dummy_track.end_z, dummy_track.start_z) < MinZ ){
+        dummy_track.on_edgeZ = true;
+      }
+      if(dummy_track.throughgoingX or dummy_track.throughgoingY or dummy_track.throughgoingZ){
+        dummy_track.throughgoing = true;
+      }
+      if(dummy_track.on_edgeX or dummy_track.on_edgeY or dummy_track.on_edgeZ){
+        dummy_track.on_edge = true;
+      }
+      
+      int lem0 = find_lem(0, dummy_track.start_z);
+      int lem1 = find_lem(0, dummy_track.end_z);
+      if(isGood_lem(lem0) and isGood_lem(lem1) ){dummy_track.blc = true;}
+      if(highway){
+        if(tracks_selected_by_highway.size() == 0){
+          cout << "ERROR in Read_tree_June : please load highway output" << endl;
+          return;
+        }
+        int track_ID = 1000*(1+dummy_track.event) + dummy_track.id;
+        if( find(tracks_selected_by_highway.begin(), tracks_selected_by_highway.end(), track_ID) != tracks_selected_by_highway.end() ){
+          dummy_track.highway_selected = true;
+        }
+      }
+      
+      dummy_track.start_theta = fabs(tTrack_StartDirection_Theta[j]);
+      if( dummy_track.start_theta > 180 ){
+        dummy_track.start_theta = 360 - dummy_track.start_theta;
+      }
+      if( dummy_track.start_theta < 90 ){
+        dummy_track.start_theta = 180 - dummy_track.start_theta;
+      }
+      dummy_track.start_phi = tTrack_StartDirection_Phi[j];
 //      dummy_track.start_vx = tTrack_StartDirection_X[j];
 //      dummy_track.start_vy = tTrack_StartDirection_Y[j];
 //      dummy_track.start_vz = tTrack_StartDirection_Z[j];
       
-      
-      if(fabs(tTrack_EndDirection_Theta[j]*TMath::Pi()/180.) > TMath::Pi()/2.){
-        dummy_track.end_theta = fabs(tTrack_EndDirection_Theta[j]*TMath::Pi()/180. - TMath::Pi());
+      dummy_track.end_theta = fabs(tTrack_EndDirection_Theta[j]);
+      if( dummy_track.end_theta > 180 ){
+        dummy_track.end_theta = 360 - dummy_track.end_theta;
       }
-      else{
-        dummy_track.end_theta = tTrack_EndDirection_Theta[j]*TMath::Pi()/180.;
+      if( dummy_track.end_theta < 90 ){
+        dummy_track.end_theta = 180 - dummy_track.end_theta;
       }
-      dummy_track.end_phi = tTrack_EndDirection_Phi[j]*TMath::Pi()/180.;
+      dummy_track.end_phi = tTrack_EndDirection_Phi[j];
 //      dummy_track.end_vx = tTrack_EndDirection_X[j];
 //      dummy_track.end_vy = tTrack_EndDirection_Y[j];
 //      dummy_track.end_vz = tTrack_EndDirection_Z[j];
@@ -1815,39 +1968,57 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 
       dummy_track.theta = get_theta(dummy_track);
       dummy_track.phi = get_phi(dummy_track);
+      dummy_track.long_in_view = -1;
+      if(get_reduced_phi(dummy_track) < 20 ){
+        dummy_track.long_in_view = 0;
+      }
+      if(get_reduced_phi(dummy_track) > 70 ){
+        dummy_track.long_in_view = 1;
+      }
+      
+      for(int l=a; l < (a+tTrack_NumberOfHits[j]); l++){
+        hit dummy_hits;
+        double myds = 0;
+        double mytheta = fabs(tTrack_Hit_Theta[l]);
+        double myphi = tTrack_Hit_Phi[l];
+        if(mytheta > 180){mytheta = 360-mytheta;}
+        if(mytheta < 90){mytheta = 180-mytheta;}
+        if(tTrack_Hit_View[l] == 0){
+          myds = pitch / (TMath::Sin(mytheta*TMath::Pi()/180.)*TMath::Sin(myphi*TMath::Pi()/180.));
+        }
+        if(tTrack_Hit_View[l] == 1){
+          myds = pitch / (TMath::Sin(mytheta*TMath::Pi()/180.)*TMath::Cos(myphi*TMath::Pi()/180.));
+        }
+        
+        dummy_hits.run = tRun;
+        dummy_hits.subrun = tSubrun;
+        dummy_hits.event = tEventNumberInRun;
+        dummy_hits.view = tTrack_Hit_View[l];
+        dummy_hits.track_id = dummy_track.id;
+        dummy_hits.dq_sum = tTrack_Hit_ChargeSummedADC[l]/ADC2CHARGE[tTrack_Hit_View[l]];
+        dummy_hits.dq_integral = tTrack_Hit_ChargeIntegral[l]/ADC2CHARGE[tTrack_Hit_View[l]];
+        dummy_hits.dx_3D = tTrack_dx_3DPosition[l];
+        dummy_hits.dx_local = tTrack_ds_3DLocalTrackDirection[l];
+        dummy_hits.sp_x = tTrack_Hit_X[l];
+        dummy_hits.sp_y = tTrack_Hit_Y[l];
+        dummy_hits.sp_z = tTrack_Hit_Z[l];
+        dummy_hits.sp_theta = mytheta;
+        dummy_hits.sp_phi = myphi;
+        dummy_hits.dx_phil = myds;
+        dummy_hits.purity_correction = correct_dx_for_lifetime(50-tTrack_Hit_X[l]);
+        dummy_hits.lem  = find_lem(dummy_hits.sp_y, dummy_hits.sp_z);
+        dummy_hits.gain_density_correction_factor = gain_correction_for_rho(get_density_for_hit(tEventTimeSeconds, tRun), Efield);
+        dummy_hits.GoF = tHit_GoodnessOfFit[l];
+        dummy_track.nhitsview[dummy_hits.view]++;
 
-      for(int k=0; k<NUM_OF_VIEWS; k++) //View loop (for this track)
-      {
-        for(int l=a; l<a+tTrack_NumberOfHitsPerView[j][k]; l++) //Hit loop
-        {
-          hit dummy_hits;
-
-          dummy_hits.run = tRun;
-          dummy_hits.subrun = tSubrun;
-          dummy_hits.event = tEventNumberInRun;
-          dummy_hits.view = k;
-          dummy_hits.track_id = dummy_track.id;
-          dummy_hits.dq_sum = tTrack_Hit_ChargeSummedADC[l]/ADC2CHARGE[k];
-          dummy_hits.dq_integral = tTrack_Hit_ChargeIntegral[l]/ADC2CHARGE[k];
-          dummy_hits.dx_3D = tTrack_dx_3DPosition[l];
-          dummy_hits.dx_local = tTrack_ds_3DLocalTrackDirection[l];
-          dummy_hits.sp_x = tTrack_Hit_X[l];
-          dummy_hits.sp_y = tTrack_Hit_Y[l];
-          dummy_hits.sp_z = tTrack_Hit_Z[l];
-          dummy_hits.purity_correction = correct_dx_for_lifetime(50-tTrack_Hit_X[l]);
-          dummy_hits.lem  = find_lem(dummy_hits.sp_y, dummy_hits.sp_z);
-          dummy_hits.gain_density_correction_factor = gain_correction_for_rho(get_density_for_hit(tEventTimeSeconds, tRun), Efield);
-          dummy_hits.GoF = tHit_GoodnessOfFit[l];
-//          cout << dummy_hits.gain_density_correction_factor << endl;
-
-          dummy_track.hits_trk.push_back(dummy_hits);
-        } //end hits
-        a+=tTrack_NumberOfHitsPerView[j][k];
-      } //end view
-    dummy_track.nhits = dummy_track.hits_trk.size();
-    tracks.push_back(dummy_track);
+        dummy_track.hits_trk.push_back(dummy_hits);
+      } //end hits
+      tracks.push_back(dummy_track);
+      a+=tTrack_NumberOfHits[j];
     }//end tracks
   }//Event loop
+  
+  
   return;
 }
 
@@ -2087,7 +2258,7 @@ TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
 
   //lower bound varies from 0.0*mean to 0.5*mean in septs of 0.05
   //upper bound varies from 0.9*mean to 3.1*mean in
-  double min_chi =9999.; double min_j =0.; double min_i =0.;
+  double max_p = 0; /*double min_chi =9999.;*/ double min_j =0.; double min_i =0.;
   double x_max = find_max_bin(his);
 
   if( find_best ){
@@ -2096,8 +2267,12 @@ TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
         ffit->SetRange( i*his->GetMean(),j*his->GetMean() );
         his->Fit(FunName.Data(),"RBSQ");   // fit within specified range, use ParLimits, do not plot
         if( i*his->GetMean() < x_max and j*his->GetMean() > x_max ){
-          if( ( ffit->GetChisquare()/ffit->GetNDF() ) < min_chi ){
-            min_chi = ffit->GetChisquare()/ffit->GetNDF();
+//          if( ( ffit->GetChisquare()/ffit->GetNDF() ) < min_chi ){
+//            min_chi = ffit->GetChisquare()/ffit->GetNDF();
+//            min_j = j; min_i =i;
+//          }
+          if( ffit->GetProb() > max_p ){
+            max_p = ffit->GetProb();
             min_j = j; min_i =i;
           }
         }
@@ -2109,17 +2284,17 @@ TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
   else{
     his->Fit(FunName.Data(),"LRBSQ");
   }
-  
-  pvalue = homemade_get_pvalue(ffit, his);
-  if(pvalue < pvaluelim){
-    double bin_max = his->FindBin( find_max_bin( his, 4 ) );
-    fitrange[0] = his->GetBinCenter(bin_max-4);
-    fitrange[1] = his->GetBinCenter(bin_max+7);
-    ffit->SetRange(fitrange[0], fitrange[1]);
-    his->GetListOfFunctions()->Clear();
-    his->Fit(FunName.Data(),"LRBSQ");
-    pvalue = homemade_get_pvalue(ffit, his);
-  }
+  pvalue = ffit->GetProb();
+//  pvalue = homemade_get_pvalue(ffit, his);
+//  if(pvalue < pvaluelim){
+//    double bin_max = his->FindBin( find_max_bin( his, 4 ) );
+//    fitrange[0] = his->GetBinCenter(bin_max-4);
+//    fitrange[1] = his->GetBinCenter(bin_max+7);
+//    ffit->SetRange(fitrange[0], fitrange[1]);
+//    his->GetListOfFunctions()->Clear();
+//    his->Fit(FunName.Data(),"LRBSQ");
+//    pvalue = homemade_get_pvalue(ffit, his);
+//  }
   for (unsigned int i=0; i<startvalues.size(); i++) {
     fitparams.push_back(ffit->GetParameter(i));    // obtain fit parameters
     fiterrors.push_back(ffit->GetParError(i));     // obtain fit parameter errors
@@ -2128,81 +2303,296 @@ TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
   return (ffit);              // return fit function
 }
 
-void plot_selected_tracks(vector<track> tracks, string path, int ntracks){
+void plot_tracks(vector<track> tracks, string cut_type, int maxtracks, double dqds_cut){
   
-  string title = "tracks";
   if(tracks.size() == 0){
     return;
   }
-
-  TH2D* XY = new TH2D("XY_front_view","XY_front_view",500,-50,50,500,-50,50);
-  TH2D* XZ = new TH2D("XZ_side_view","XZ_side_view",1500,0,300,500,-50,50);
-  TH2D* YZ = new TH2D("YZ_top_view","YZ_top_view",1500,0,300,500,-50,50);
-  TH3D* XYZ = new TH3D("XYZ","XYZ",600,0,300,200,-50,50,200,-50,50);
-  XY->SetStats(false);
-  XZ->SetStats(false);
-  YZ->SetStats(false);
-  XYZ->SetStats(false);
+  
+  int run = tracks[0].run;
   int trk = 0;
-  for( auto atrack : tracks){
-    for(auto ahit : atrack.hits_trk){
-      XY->Fill(ahit.sp_y,ahit.sp_x);
-      XZ->Fill(ahit.sp_z,ahit.sp_x);
-      YZ->Fill(ahit.sp_z,ahit.sp_y);
-      XYZ->Fill(ahit.sp_z,ahit.sp_y,ahit.sp_x);
+  
+  string outfile = SelectTrack_Output + cut_type + "/plots/" + to_string(run);
+  check_and_mkdir(outfile);
+  outfile = outfile + "/tracks";
+  if(maxtracks > 0){
+    outfile = outfile + "_0_to_" + to_string(maxtracks);
+  }
+  if(dqds_cut != 0){
+    if(dqds_cut < 0){
+      outfile = outfile + "_dQds_inf_to_" + to_string_with_precision(dqds_cut,2);
     }
+    else{
+      outfile = outfile + "_dQds_sup_to_" + to_string_with_precision(dqds_cut,2);
+    }
+  }
+  TH1D dQds0("dQds0","view 0;dQds (fC/cm)",100,0,50);
+  dQds0.GetXaxis()->CenterTitle();
+  dQds0.GetYaxis()->CenterTitle();
+  TH1D dQds1("dQds1","view 1;dQds (fC/cm)",100,0,50);
+  dQds1.GetXaxis()->CenterTitle();
+  dQds1.GetYaxis()->CenterTitle();
+  TH2D XY("XY_front_view","Front (XY) view;y (cm);x (cm);dQds (fC/cm)",100/pitch,-50,50,100/pitch,-50,50);
+  XY.GetXaxis()->CenterTitle();
+  XY.GetYaxis()->CenterTitle();
+  TH2D XZ("XZ_side_view","Side (XZ) view;z (cm);x (cm);dQds (fC/cm)",300/pitch,0,300,100/pitch,-50,50);
+  XZ.GetXaxis()->SetLabelSize(0.07); 
+  XZ.GetXaxis()->SetTitleSize(0.07);
+  XZ.GetXaxis()->CenterTitle();
+  XZ.GetYaxis()->CenterTitle();
+  XZ.GetYaxis()->SetLabelSize(0.07); 
+  XZ.GetYaxis()->SetTitleSize(0.07);
+  TH2D YZ("YZ_top_view","Top (YZ) view;z (cm);y (cm);dQds (fC/cm)",300/pitch,0,300,100/pitch,-50,50);
+  YZ.GetXaxis()->SetLabelSize(0.07); 
+  YZ.GetXaxis()->SetTitleSize(0.07);
+  YZ.GetXaxis()->CenterTitle();
+  YZ.GetYaxis()->CenterTitle();
+  YZ.GetYaxis()->SetLabelSize(0.07); 
+  YZ.GetYaxis()->SetTitleSize(0.07);
+  TH3D XYZ("XYZ","XYZ;z (cm);y (cm);x (cm)",300/pitch,0,300,100/pitch,-50,50,100/pitch,-50,50);
+  XYZ.GetXaxis()->CenterTitle();
+  XYZ.GetYaxis()->CenterTitle();
+  XYZ.GetZaxis()->CenterTitle();
+  XY.SetStats(false);
+  XZ.SetStats(false);
+  YZ.SetStats(false);
+  XYZ.SetStats(false);
+  
+  for( auto atrack : tracks){
+  
     trk++;
-    if(trk == ntracks){
+    if(trk == maxtracks){
       break;
+    }
+    #if verbose
+    cout << "Plotting track " << trk << endl;
+    #endif 
+    TGraph onetheta0, onetheta1, onephi0, onephi1;
+    TH1D onedQ0(string("dQ0_Event_" + to_string(atrack.event) + "_track_" + to_string(atrack.id)).data(),string("view 0. Total charge: " + to_string((int)atrack.sumQ[0]) + "fC;dQ (fC)").data(),100,0,200);
+    onedQ0.GetXaxis()->CenterTitle();
+    onedQ0.GetYaxis()->CenterTitle();
+    TH1D onedQ1(string("dQ1_Event_" + to_string(atrack.event) + "_track_" + to_string(atrack.id)).data(),string("view 1. Total charge: " + to_string((int)atrack.sumQ[1]) + "fC;dQ (fC)").data(),100,0,200);
+    onedQ1.GetXaxis()->CenterTitle();
+    onedQ1.GetYaxis()->CenterTitle();
+    TH1D oneds0(string("ds0_Event_" + to_string(atrack.event) + "_track_" + to_string(atrack.id)).data(),"view 0;ds (cm)",100,0,10);
+    oneds0.GetXaxis()->CenterTitle();
+    oneds0.GetYaxis()->CenterTitle();
+    TH1D oneds1(string("ds1_Event_" + to_string(atrack.event) + "_track_" + to_string(atrack.id)).data(),"view 1;ds (cm)",100,0,10);
+    oneds1.GetXaxis()->CenterTitle();
+    oneds1.GetYaxis()->CenterTitle();
+    TH1D onedQds0(string("dQds0_Event_" + to_string(atrack.event) + "_track_" + to_string(atrack.id)).data(),"view 0;dQds (fC/cm)",100,0,50);
+    onedQds0.GetXaxis()->CenterTitle();
+    onedQds0.GetYaxis()->CenterTitle();
+    TH1D onedQds1(string("dQds1_Event_" + to_string(atrack.event) + "_track_" + to_string(atrack.id)).data(),"view 1;dQds (fC/cm)",100,0,50);
+    onedQds1.GetXaxis()->CenterTitle();
+    onedQds1.GetYaxis()->CenterTitle();
+    TH2D oneXY("oneXY_front_view","Front (XY) view;y (cm);x (cm);dQds (fC/cm)",500,-50,50,500,-50,50);
+    oneXY.GetXaxis()->CenterTitle();
+    oneXY.GetYaxis()->CenterTitle();
+    TH2D oneXZ("oneXZ_side_view","Side (XZ) view;z (cm);x (cm);dQds (fC/cm)",1500,0,300,500,-50,50);
+    oneXZ.GetXaxis()->CenterTitle();
+    oneXZ.GetXaxis()->SetLabelSize(0.07); 
+    oneXZ.GetXaxis()->SetTitleSize(0.07);
+    oneXZ.GetYaxis()->CenterTitle();
+    oneXZ.GetYaxis()->SetLabelSize(0.07); 
+    oneXZ.GetYaxis()->SetTitleSize(0.07);
+    TH2D oneYZ("oneYZ_top_view","Top (YZ) view;z (cm);y (cm);dQds (fC/cm)",1500,0,300,500,-50,50);
+    oneYZ.GetXaxis()->SetLabelSize(0.07); 
+    oneYZ.GetXaxis()->SetTitleSize(0.07);
+    oneYZ.GetXaxis()->CenterTitle();
+    oneYZ.GetYaxis()->CenterTitle();
+    oneYZ.GetYaxis()->SetLabelSize(0.07); 
+    oneYZ.GetYaxis()->SetTitleSize(0.07);
+    TH3D oneXYZ("oneXYZ","XYZ;z (cm);y (cm);x (cm)",600,0,300,200,-50,50,200,-50,50);
+    oneXYZ.GetXaxis()->CenterTitle();
+    oneXYZ.GetYaxis()->CenterTitle();
+    oneXYZ.SetStats(false);
+    oneXYZ.SetStats(false);
+    oneXYZ.SetStats(false);
+  
+    for(auto ahit : atrack.hits_trk){
+      double dq;
+      double ds;
+      if(method_ds == "3D"){ds = ahit.dx_3D;}
+      else if(method_ds == "local"){ds = ahit.dx_local;}
+      else{ds = ahit.dx_phil;}
+      if(method_dQ == "sum"){dq = ahit.dq_sum;}
+      else{dq = ahit.dq_integral;}
+      double dqds = dq/ds;
+      bool Continue = false;
+      if(dqds_cut != 0){
+        if(dqds_cut < 0){
+          if(dqds > fabs(dqds_cut)){Continue = true;}
+        }
+        if(dqds_cut > 0){
+          if(dqds < dqds_cut){Continue = true;}
+        }
+      }
+      if(Continue){continue;}
+      if(ahit.view == 0){
+        onedQ0.Fill(dq);
+        oneds0.Fill(ds);
+        onedQds0.Fill(dqds);
+        dQds0.Fill(dqds);
+        onetheta0.SetPoint(onetheta0.GetN(),onetheta0.GetN(),ahit.sp_theta);
+        onephi0.SetPoint(onephi0.GetN(),onephi0.GetN(),ahit.sp_phi);
+      }
+      else{
+        onedQ1.Fill(dq);
+        oneds1.Fill(ds);
+        onedQds1.Fill(dqds);
+        dQds1.Fill(dqds);
+        onetheta1.SetPoint(onetheta1.GetN(),onetheta1.GetN(),ahit.sp_theta);
+        onephi1.SetPoint(onephi1.GetN(),onephi1.GetN(),fabs(ahit.sp_phi));
+      }
+      oneXY.Fill(ahit.sp_y,ahit.sp_x, dqds);
+      oneXZ.Fill(ahit.sp_z,ahit.sp_x, dqds);
+      oneYZ.Fill(ahit.sp_z,ahit.sp_y, dqds);
+      oneXYZ.Fill(ahit.sp_z,ahit.sp_y,ahit.sp_x, dqds);
+      XY.Fill(ahit.sp_y,ahit.sp_x, dqds);
+      XZ.Fill(ahit.sp_z,ahit.sp_x, dqds);
+      YZ.Fill(ahit.sp_z,ahit.sp_y, dqds);
+      XYZ.Fill(ahit.sp_z,ahit.sp_y,ahit.sp_x, dqds);
+    }
+    TCanvas onetrack_can("tracks","tracks",2000,3000);
+      onetrack_can.Divide(1,6);
+      onetrack_can.cd(1);
+      TPad *oneXY_pad = new TPad("oneXY_pad","oneXY_pad",0,0,0.25,1);
+      oneXY_pad->Draw();
+      oneXY_pad->cd();
+        oneXY.Draw("COLZ");
+      onetrack_can.cd(1);
+      TPad *oneXZ_pad = new TPad("oneXZ_pad","oneXZ_pad",0.25,0,1,0.5);
+      oneXZ_pad->Draw();
+      oneXZ_pad->cd();
+        oneXZ.Draw("COLZ");
+      onetrack_can.cd(1);
+      TPad *oneYZ_pad = new TPad("oneYZ_pad","oneYZ_pad",0.25,0.51,1,1);
+      oneYZ_pad->Draw();
+      oneYZ_pad->cd();
+        oneYZ.Draw("COLZ");
+      onetrack_can.cd(2);
+      TPad *onedQ0_pad = new TPad("onedQ0_pad","onedQ0_pad",0,0,0.5,1);
+      onedQ0_pad->Draw();
+      onedQ0_pad->cd();
+        onedQ0.Draw();
+      onetrack_can.cd(2);
+      TPad *onedQ1_pad = new TPad("onedQ1_pad","onedQ1_pad",0.5,0,1,1);
+      onedQ1_pad->Draw();
+      onedQ1_pad->cd();
+        onedQ1.Draw();
+      onetrack_can.cd(3);
+      TPad *oneds0_pad = new TPad("oneds0_pad","oneds0_pad",0,0,0.5,1);
+      oneds0_pad->Draw();
+      oneds0_pad->cd();
+        oneds0.Draw();
+      onetrack_can.cd(3);
+      TPad *oneds1_pad = new TPad("oneds1_pad","oneds1_pad",0.5,0,1,1);
+      oneds1_pad->Draw();
+      oneds1_pad->cd();
+        oneds1.Draw();
+      onetrack_can.cd(4);
+      TPad *onedQds0_pad = new TPad("onedQds0_pad","onedQds0_pad",0,0,0.5,1);
+      onedQds0_pad->Draw();
+      onedQds0_pad->cd();
+        onedQds0.Draw();
+      onetrack_can.cd(4);
+      TPad *onedQds1_pad = new TPad("onedQds1_pad","onedQds1_pad",0.5,0,1,1);
+      onedQds1_pad->Draw();
+      onedQds1_pad->cd();
+        onedQds1.Draw();
+      onetrack_can.cd(5);
+      TPad *onetheta0_pad = new TPad("onetheta0_pad","onetheta0_pad",0,0,0.5,1);
+      onetheta0_pad->Draw();
+      onetheta0_pad->cd();
+        onetheta0.SetTitle("view 0;hit number;theta (rad)");
+        onetheta0.Draw("AP");
+        onetheta0.SetMinimum(90);onetheta0.SetMaximum(180);
+        onetheta0.Draw("AP");
+        onetheta0.GetXaxis()->CenterTitle();
+        onetheta0.GetYaxis()->CenterTitle();
+      onetrack_can.cd(5);
+      TPad *onetheta1_pad = new TPad("onetheta1_pad","onetheta1_pad",0.5,0,1,1);
+      onetheta1_pad->Draw();
+      onetheta1_pad->cd();
+        onetheta1.SetTitle("view 1;hit number;theta (rad)");
+        onetheta1.Draw("AP");
+        onetheta1.SetMinimum(90);onetheta1.SetMaximum(180);
+        onetheta1.Draw("AP");
+        onetheta1.GetXaxis()->CenterTitle();
+        onetheta1.GetYaxis()->CenterTitle();
+      onetrack_can.cd(6);
+      TPad *onephi0_pad = new TPad("onephi0_pad","onephi0_pad",0,0,0.5,1);
+      onephi0_pad->Draw();
+      onephi0_pad->cd();
+        onephi0.SetTitle("view 0;hit number;phi (rad)");
+        onephi0.Draw("AP");
+        onephi0.SetMinimum(-180);onephi0.SetMaximum(180);
+        onephi0.Draw("AP");
+        onephi0.GetXaxis()->CenterTitle();
+        onephi0.GetYaxis()->CenterTitle();
+      onetrack_can.cd(6);
+      TPad *onephi1_pad = new TPad("onephi1_pad","onephi1_pad",0.5,0,1,1);
+      onephi1_pad->Draw();
+      onephi1_pad->cd();
+        onephi1.SetTitle("view 1;hit number;phi (rad)");
+        onephi1.Draw("AP");
+        onephi1.SetMinimum(-180);onephi1.SetMaximum(180);
+        onephi1.Draw("AP");
+        onephi1.GetXaxis()->CenterTitle();
+        onephi1.GetYaxis()->CenterTitle();
+    if(trk == 1){
+      onetrack_can.Print(string(outfile+".pdf(").data(),"pdf");
+    }
+    else{
+      onetrack_can.Print(string(outfile+".pdf").data(),"pdf");
     }
   }
   
-  TFile *ofile = new TFile(string(path+title+".root").data(), "RECREATE");
-  TCanvas *track_can = new TCanvas("tracks","tracks",2000,500);
-    TPad *XY_pad = new TPad("XY_pad","XY_pad",0.05,0.05,0.24,0.95);
+//  string outfileroot = outfile + ".root";
+//  TFile ofile(outfileroot.data(), "RECREATE");
+  TCanvas track_can("tracks","tracks",2000,1000);
+    TPad *XY_pad = new TPad("XY_pad","XY_pad",0,0.5,0.25,1);
     XY_pad->Draw();
     XY_pad->cd();
-      XY->SetTitle("Front (XY) view");
-      XY->GetXaxis()->SetTitle("y(cm)");
-      XY->GetYaxis()->SetTitle("x(cm)");
-      XY->Draw("COLZ");
-    track_can->cd();
-    TPad *XZ_pad = new TPad("XZ_pad","XZ_pad",0.26,0.05,0.95,0.49);
+      XY.Draw("COLZ");
+    track_can.cd();
+    TPad *XZ_pad = new TPad("XZ_pad","XZ_pad",0.25,0.51,1,0.75);
     XZ_pad->Draw();
     XZ_pad->cd();
-      XZ->SetTitle("Side (XZ) view");
-      XZ->GetXaxis()->SetTitle("z(cm)");
-      XZ->GetYaxis()->SetTitle("x(cm)");
-      XZ->Draw("COLZ");
-    track_can->cd();
-    TPad *YZ_pad = new TPad("YZ_pad","YZ_pad",0.26,0.51,0.95,0.95);
+      XZ.Draw("COLZ");
+    track_can.cd();
+    TPad *YZ_pad = new TPad("YZ_pad","YZ_pad",0.25,0.76,1,1);
     YZ_pad->Draw();
     YZ_pad->cd();
-      YZ->SetTitle("Top (YZ) view");
-      YZ->GetXaxis()->SetTitle("z(cm)");
-      YZ->GetYaxis()->SetTitle("y(cm)");
-      YZ->Draw("COLZ");
-  track_can->Write();
-  XY->Write();
-  XZ->Write();
-  XZ->Write();
+      YZ.Draw("COLZ");
+    track_can.cd();
+    TPad *dQds0_pad = new TPad("dQds0_pad","dQds0_pad",0,0,0.5,0.5);
+    dQds0_pad->Draw();
+    dQds0_pad->cd();
+      dQds0.Draw();
+    track_can.cd();
+    TPad *dQds1_pad = new TPad("dQds1_pad","dQds1_pad",0.5,0,1,0.5);
+    dQds1_pad->Draw();
+    dQds1_pad->cd();
+      dQds1.Draw();
+//  track_can.Write();
+  track_can.Print(string(outfile+".pdf").data(),"pdf");
+//  XY.Write();
+//  XZ.Write();
+//  XZ.Write();
+//  dQds0.Write();
+//  dQds1.Write();
   
-  delete XY;
-  delete XZ;
-  delete YZ;
-  delete track_can;
   
-  TCanvas *track_can_XYZ = new TCanvas("tracks_3Dview","tracks 3D view",1500,500);
-  track_can_XYZ->cd();
-    XYZ->GetXaxis()->SetTitle("z(cm)");
-    XYZ->GetYaxis()->SetTitle("y(cm)");
-    XYZ->GetZaxis()->SetTitle("x(cm)");
-    XYZ->Draw("COLZ");
-  track_can_XYZ->Write();
-  XYZ->Write();
-  delete XYZ;
-  delete track_can_XYZ;
+  TCanvas track_can_XYZ("tracks_3Dview","tracks 3D view",1500,500);
+  track_can_XYZ.cd();
+    XYZ.Draw("COLZ");
+//  track_can_XYZ.Write();
+  track_can_XYZ.Print(string(outfile+".pdf)").data(),"pdf");
+//  XYZ.Write();
   
+//  ofile.Close();
   return;
 }
 
@@ -2271,29 +2661,29 @@ vector<double> fit_dQds(TH1D *hdQds, bool gauss, int min_number_of_hits, double 
     #endif
     return {-1,-1};
   }
-  double MPV = function->GetMaximumX();
-  double xmax, xmin;
-  function->GetRange(xmin,xmax);
-  int nstep = 0;
-  while ( (MPV == xmin or MPV == xmax) and nstep < 5 ){
-    function->SetRange(xmin-5,xmax+5);
-    function->GetRange(xmin,xmax);
-    MPV = function->GetMaximumX();
-    nstep++;
-  }
-  if(nstep == 5){
-    #if verbose
-    cout << "    Bad fit for " << hdQds->GetName() << " (MPV is equal to one of fit function ranges)" << endl;
-    #endif
-    return {-1,-1};
-  }
+//  double MPV = function->GetMaximumX();
+//  double xmax, xmin;
+//  function->GetRange(xmin,xmax);
+//  int nstep = 0;
+//  while ( (MPV == xmin or MPV == xmax) and nstep < 5 ){
+//    function->SetRange(xmin-5,xmax+5);
+//    function->GetRange(xmin,xmax);
+//    MPV = function->GetMaximumX();
+//    nstep++;
+//  }
+//  if(nstep == 5){
+//    #if verbose
+//    cout << "    Bad fit for " << hdQds->GetName() << " (MPV is equal to one of fit function ranges)" << endl;
+//    #endif
+//    return {-1,-1};
+//  }
   ((TF1*)hdQds->GetListOfFunctions()->At(0))->SetLineColor(600);
   if( graph != 0 ){
     //insert points in graph
-    graph->SetPoint(graph->GetN(), x, MPV/(corr*mpv_cosmics));
+    graph->SetPoint(graph->GetN(), x, fp[1]/(corr*mpv_cosmics));
     graph->SetPointError(graph->GetN()-1, xer, fpe[1]/(corr*mpv_cosmics));
   }//if graph
-  return {MPV,fpe[1]};
+  return {fp[1],fpe[1]};
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2363,19 +2753,19 @@ bool init_graph_gain(vector<TGraphErrors*> &mpv_field, map<int, vector<TGraphErr
   mpv_field[1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_view1").data());
   mpv_field[2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_summed_views").data());
       
-  for( int lem = 0; lem < NUM_OF_GOOD_LEMS; lem++ ){
+  for( auto lem : lems ){
     scan_nums_for_AllLEMs.push_back(scan_num);
-    mpv_field_ByLEMs[lems[lem]] = {};
-    mpv_field_ByLEMs[lems[lem]].push_back(new TGraphErrors()); mpv_field_ByLEMs[lems[lem]].push_back(new TGraphErrors()); mpv_field_ByLEMs[lems[lem]].push_back(new TGraphErrors());
-    mpv_field_ByLEMs[lems[lem]][0]->SetMarkerStyle(31);
-    mpv_field_ByLEMs[lems[lem]][1]->SetMarkerStyle(31);
-    mpv_field_ByLEMs[lems[lem]][2]->SetMarkerStyle(31);
-    mpv_field_ByLEMs[lems[lem]][0]->SetMarkerSize(2);
-    mpv_field_ByLEMs[lems[lem]][1]->SetMarkerSize(2);
-    mpv_field_ByLEMs[lems[lem]][2]->SetMarkerSize(2);
-    mpv_field_ByLEMs[lems[lem]][0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view0").data());
-    mpv_field_ByLEMs[lems[lem]][1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_view1").data());
-    mpv_field_ByLEMs[lems[lem]][2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lems[lem])+"_summed_views").data());
+    mpv_field_ByLEMs[lem] = {};
+    mpv_field_ByLEMs[lem].push_back(new TGraphErrors()); mpv_field_ByLEMs[lem].push_back(new TGraphErrors()); mpv_field_ByLEMs[lem].push_back(new TGraphErrors());
+    mpv_field_ByLEMs[lem][0]->SetMarkerStyle(31);
+    mpv_field_ByLEMs[lem][1]->SetMarkerStyle(31);
+    mpv_field_ByLEMs[lem][2]->SetMarkerStyle(31);
+    mpv_field_ByLEMs[lem][0]->SetMarkerSize(2);
+    mpv_field_ByLEMs[lem][1]->SetMarkerSize(2);
+    mpv_field_ByLEMs[lem][2]->SetMarkerSize(2);
+    mpv_field_ByLEMs[lem][0]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lem)+"_view0").data());
+    mpv_field_ByLEMs[lem][1]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lem)+"_view1").data());
+    mpv_field_ByLEMs[lem][2]->SetName(string("gain_"+scan_type+"_"+to_string(scan_num)+"_LEM_"+to_string(lem)+"_summed_views").data());
   }
   return true;
 }
@@ -2403,20 +2793,20 @@ bool init_graph_purity_and_charging_up(vector<TGraphErrors> &graph,  map<int, ve
   graph[1].SetName(string(name+"_view1").data());
   graph[2].SetName(string(name+"_summed_view").data());
   
-  for( int lem = 0; lem < NUM_OF_GOOD_LEMS; lem++ ){
-    graph_ByLEMs[lems[lem]] = {};
-    graph_ByLEMs[lems[lem]].push_back(TGraphErrors()); graph_ByLEMs[lems[lem]].push_back(TGraphErrors()); graph_ByLEMs[lems[lem]].push_back(TGraphErrors());
-    graph_ByLEMs[lems[lem]][0].SetMarkerStyle(31);
-    graph_ByLEMs[lems[lem]][1].SetMarkerStyle(31);
-    graph_ByLEMs[lems[lem]][2].SetMarkerStyle(31);
-    graph_ByLEMs[lems[lem]][0].SetMarkerStyle(2);
-    graph_ByLEMs[lems[lem]][1].SetMarkerStyle(2);
-    graph_ByLEMs[lems[lem]][2].SetMarkerStyle(2);
-    graph_ByLEMs[lems[lem]][0].SetMarkerColor(kRed);
-    graph_ByLEMs[lems[lem]][1].SetMarkerColor(kBlue);
-    graph_ByLEMs[lems[lem]][0].SetName(string(name+"_LEM_"+to_string(lems[lem])+"_view0").data());
-    graph_ByLEMs[lems[lem]][1].SetName(string(name+"_LEM_"+to_string(lems[lem])+"_view1").data());
-    graph_ByLEMs[lems[lem]][2].SetName(string(name+"_LEM_"+to_string(lems[lem])+"_summed_view").data());
+  for( auto lem : lems ){
+    graph_ByLEMs[lem] = {};
+    graph_ByLEMs[lem].push_back(TGraphErrors()); graph_ByLEMs[lem].push_back(TGraphErrors()); graph_ByLEMs[lem].push_back(TGraphErrors());
+    graph_ByLEMs[lem][0].SetMarkerStyle(31);
+    graph_ByLEMs[lem][1].SetMarkerStyle(31);
+    graph_ByLEMs[lem][2].SetMarkerStyle(31);
+    graph_ByLEMs[lem][0].SetMarkerStyle(2);
+    graph_ByLEMs[lem][1].SetMarkerStyle(2);
+    graph_ByLEMs[lem][2].SetMarkerStyle(2);
+    graph_ByLEMs[lem][0].SetMarkerColor(kRed);
+    graph_ByLEMs[lem][1].SetMarkerColor(kBlue);
+    graph_ByLEMs[lem][0].SetName(string(name+"_LEM_"+to_string(lem)+"_view0").data());
+    graph_ByLEMs[lem][1].SetName(string(name+"_LEM_"+to_string(lem)+"_view1").data());
+    graph_ByLEMs[lem][2].SetName(string(name+"_LEM_"+to_string(lem)+"_summed_view").data());
   }
   return true;
 }
@@ -2452,8 +2842,8 @@ void sum_views(vector<TGraphErrors> &graph, map<int, vector<TGraphErrors> > &gra
 
   sum_views_singlegraph(graph);
   
-  for( int lem = 0; lem < NUM_OF_GOOD_LEMS; lem++){
-    if( graph_ByLEMs[lems[lem]][0].GetN() > 2 and graph_ByLEMs[lems[lem]][1].GetN() > 2 ){sum_views_singlegraph(graph_ByLEMs[lems[lem]]);}
+  for( auto lem : lems){
+    if( graph_ByLEMs[lem][0].GetN() > 2 and graph_ByLEMs[lem][1].GetN() > 2 ){sum_views_singlegraph(graph_ByLEMs[lem]);}
   }//for lem
   return;
 }
@@ -3511,21 +3901,21 @@ bool init_histo_track_cuts(vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds_B
   
   for( int X = 0; X < (int)(100/dx); X++ ){
     int x = dx*X;
-    for( int lem = 0; lem < NUM_OF_GOOD_LEMS; lem++ ){
+    for( auto lem : lems ){
       if(x == 0){
-        histname = "dQds_LEM_"+to_string(lems[lem])+"_view0";
-        hdQds_ByLEMs[lems[lem]].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
-        histname = "dQds_LEM_"+to_string(lems[lem])+"_view1";
-        hdQds_ByLEMs[lems[lem]].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
-        histname = "dQds_LEM_"+to_string(lems[lem])+"_view0_Dx_Corrected";
-        hdQds_ByLEMs_Dx_Corrected[lems[lem]].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
-        histname = "dQds_LEM_"+to_string(lems[lem])+"_view1_Dx_Corrected";
-        hdQds_ByLEMs_Dx_Corrected[lems[lem]].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
+        histname = "dQds_LEM_"+to_string(lem)+"_view0";
+        hdQds_ByLEMs[lem].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
+        histname = "dQds_LEM_"+to_string(lem)+"_view1";
+        hdQds_ByLEMs[lem].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
+        histname = "dQds_LEM_"+to_string(lem)+"_view0_Dx_Corrected";
+        hdQds_ByLEMs_Dx_Corrected[lem].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
+        histname = "dQds_LEM_"+to_string(lem)+"_view1_Dx_Corrected";
+        hdQds_ByLEMs_Dx_Corrected[lem].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
       }
-      histname = "dQds_dx_"+to_string(x)+"_LEM_"+to_string(lems[lem])+"_view0";
-      hdQds_ByDx_ByLEMs[x][lems[lem]].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
-      histname = "dQds_dx_"+to_string(x)+"_LEM_"+to_string(lems[lem])+"_view1";
-      hdQds_ByDx_ByLEMs[x][lems[lem]].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
+      histname = "dQds_dx_"+to_string(x)+"_LEM_"+to_string(lem)+"_view0";
+      hdQds_ByDx_ByLEMs[x][lem].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
+      histname = "dQds_dx_"+to_string(x)+"_LEM_"+to_string(lem)+"_view1";
+      hdQds_ByDx_ByLEMs[x][lem].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
     }
     histname = "dQds_dx_"+to_string(x)+"_view0";
     hdQds_ByDx[x].push_back(TH1D(histname.data(), title.data(), 100, 0, 50));
@@ -3542,14 +3932,15 @@ void rec_track_dQds(track t, vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds
     double dq;
     double ds;
     if(method_ds == "3D"){ds = h.dx_3D;}
-    else{ds = h.dx_local;}
+    else if(method_ds == "local"){ds = h.dx_local;}
+    else{ds = h.dx_phil;}
     if(method_dQ == "sum"){dq = h.dq_sum;}
     else{dq = h.dq_integral;}
 //    double dqds = h.gain_density_correction_factor * dq/ds;
     double dqds = dq/ds;
     
     //cut on dqdx
-    if( dqds <= dQdx_cut_min or dqds > 50 or h.sp_x < tpc_boundaries[0] or h.sp_x >= tpc_boundaries[1] or h.sp_y < tpc_boundaries[2] or h.sp_y > tpc_boundaries[3] or h.sp_z < tpc_boundaries[4] or h.sp_z > tpc_boundaries[5] ){ continue; }
+    if( h.sp_x < tpc_boundaries[0] or h.sp_x >= tpc_boundaries[1] or h.sp_y < tpc_boundaries[2] or h.sp_y > tpc_boundaries[3] or h.sp_z < tpc_boundaries[4] or h.sp_z > tpc_boundaries[5] ){ continue; }
     
     
     hdQds[h.view].Fill(dqds);
@@ -3565,20 +3956,13 @@ void rec_track_dQds(track t, vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds
 bool select_tracks(string cut_type, vector<track> tracks, vector<track> & mips, vector<TH1D> &hdQds, map<int, vector<TH1D> > &hdQds_ByLEMs, map<int, vector<TH1D> > &hdQds_ByDx, map<int, map<int, vector<TH1D> > > &hdQds_ByDx_ByLEMs, vector<TH1D> &hdQds_Dx_Corrected,  map<int, vector<TH1D> > &hdQds_ByLEMs_Dx_Corrected){
   //select particles crossing the detector in any direction
   int count_mip=0;
+  bool reverse_cut = false;
   
-  if((only_throughgoing and only_throughgoing_x) or (only_throughgoing and only_throughgoing_y) or (only_throughgoing and only_throughgoing_z) or (only_throughgoing_z and only_throughgoing_x) or (only_throughgoing_y and only_throughgoing_x) or (only_throughgoing_z and only_throughgoing_y) ){
-    cout << "  ERROR : can not have 2 only_throughgoings set to true at the same time" << endl;
-    return false;
+  if(cut_type.find("reverse") != string::npos){
+    reverse_cut = true;
   }
-
+  
   for(auto t : tracks){
-
-    int minx = tpc_boundaries[0] + vol_cut[0];
-    int maxx = tpc_boundaries[1] - vol_cut[1];
-    int miny = tpc_boundaries[2] + vol_cut[2];
-    int maxy = tpc_boundaries[3] - vol_cut[3];
-    int minz = tpc_boundaries[4] + vol_cut[4];
-    int maxz = tpc_boundaries[5] - vol_cut[5];
 
     double mag = t.length;
     
@@ -3589,53 +3973,99 @@ bool select_tracks(string cut_type, vector<track> tracks, vector<track> & mips, 
       continue;
     }
     
-    if( mag > length_cut ) {
-    
-      if(highway){
-        if(tracks_selected_by_highway.size() == 0){
-          cout << "ERROR in select_track : please load highway output" << endl;
-          return false;
-        }
-        int track_ID = 1000*(1+t.event) + t.id;
-        if( find(tracks_selected_by_highway.begin(), tracks_selected_by_highway.end(), track_ID) == tracks_selected_by_highway.end() ){continue;}
-      }
+    if( (!reverse_cut and
+        mag > length_cut
+        and t.id < ntracks
+        and t.event_ntracks < nmaxtracksinevent
+        and t.nhitsview[0] > nhits_cut
+        and t.nhitsview[1] > nhits_cut
+        and (t.throughgoing or !only_throughgoing)
+        and (t.on_edge or !keep_on_edge)
+        and (t.throughgoingY or !only_throughgoingY)
+        and (t.on_edgeX or !keep_on_edgeY)
+        and (t.throughgoingZ or !only_throughgoingZ)
+        and (t.on_edgeX or !keep_on_edgeZ)
+        and (t.throughgoingX or !only_throughgoingX)
+        and (t.on_edgeX or !keep_on_edgeX)
+        and (t.highway_selected or !highway)
+        and (t.blc or !below_central_lem)
+        and (t.theta < -theta_cut or theta_cut >= 0)
+        and (t.theta > theta_cut or theta_cut <= 0)
+        and get_reduced_phi(t) > phi_range[0]
+        and get_reduced_phi(t) < phi_range[1]
+        and t.theta > theta_range[0]
+        and t.theta < theta_range[1]
+        and (fabs(t.start_theta - t.end_theta) < deltatheta_cut)
+        and (t.long_in_view >= 0 or !only_long_view)
+        and (fabs(t.start_phi - t.end_phi) < deltaphi_cut) )
+        
+        or (reverse_cut and
+        !(  mag > length_cut
+        and t.id < ntracks
+        and t.event_ntracks < nmaxtracksinevent
+        and t.nhitsview[0] > nhits_cut
+        and t.nhitsview[1] > nhits_cut
+        and (t.throughgoing or !only_throughgoing)
+        and (t.on_edge or !keep_on_edge)
+        and (t.throughgoingY or !only_throughgoingY)
+        and (t.on_edgeX or !keep_on_edgeY)
+        and (t.throughgoingZ or !only_throughgoingZ)
+        and (t.on_edgeX or !keep_on_edgeZ)
+        and (t.throughgoingX or !only_throughgoingX)
+        and (t.on_edgeX or !keep_on_edgeX)
+        and (t.highway_selected or !highway)
+        and (t.blc or !below_central_lem) )
+        and (t.theta < -theta_cut or theta_cut >= 0)
+        and (t.theta > theta_cut or theta_cut <= 0)
+        and get_reduced_phi(t) > phi_range[0]
+        and get_reduced_phi(t) < phi_range[1]
+        and t.theta > theta_range[0]
+        and t.theta < theta_range[1]
+        and (fabs(t.start_theta - t.end_theta) < deltatheta_cut)
+        and (t.long_in_view >= 0 or !only_long_view)
+        and (fabs(t.start_phi - t.end_phi) < deltaphi_cut) )
+        ) {
       
       //cut on the track angle. Avoid track parallel to a view, or parallel to drift direction. Also ignore bended tracks 
-      if( theta_cut > 0 and (t.theta < theta_cut or t.theta > TMath::Pi()-theta_cut) ){continue;}
-      if( phi_cut > 0 and (fabs(t.phi) - ((int)(fabs(t.phi)/(TMath::Pi()/2.)))*TMath::Pi()/2. < phi_cut or fabs(t.phi) - ((int)(fabs(t.phi)/(TMath::Pi()/2.)))*TMath::Pi()/2. > TMath::Pi()/2.-phi_cut) ){continue;}
+//      if( theta_cut > 0 and (t.theta < theta_cut or t.theta > 180-theta_cut) ){continue;}
+//      if( phi_cut > 0 and (fabs(t.phi) - ((int)(fabs(t.phi)/90))*90 < phi_cut or fabs(t.phi) - ((int)(fabs(t.phi)/90))*90 > 90-phi_cut) ){continue;}
+      bool Continue = false;
+      t.nhitsview[0] = 0; t.nhitsview[1] = 0;
+      t.sumQ[0] = 0; t.sumQ[1] = 0;
+      
       //remove hits with too small ds
       for( vector<hit>::iterator h = t.hits_trk.begin(); h != t.hits_trk.end(); ){
         double ds;
+        double dQ;
+        if(method_dQ == "sum"){dQ = h->dq_sum;}
+        else{dQ = h->dq_integral;}
         if(method_ds == "3D"){ds = h->dx_3D;}
-        else{ds = h->dx_local;}
-        if( ds > ds_cut or ds < pitch or h->sp_x < minx or h->sp_x > maxx or h->sp_y < miny or h->sp_y > maxy or h->sp_z < minz or h->sp_z > maxz or h->GoF > GoF_cut ){
+        else if(method_ds == "local"){ds = h->dx_local;}
+        else{ds = h->dx_phil;}
+        double dqds = dQ/ds;
+        if(
+        (!reverse_cut and ( dqds <= dQdx_cut_min or dqds > dQdx_cut_max or ds > ds_cut or ds < pitch or h->sp_x < MinX or h->sp_x > MaxX or h->sp_y < MinY or h->sp_y > MaxY or h->sp_z < MinZ or h->sp_z > MaxZ or h->GoF > GoF_cut or !isGood_lem(h->lem) or !IsGoodChan(h->sp_y, h->sp_z) or (only_long_view and t.long_in_view != h->view) ) ) 
+        or 
+        (reverse_cut and !(dqds <= dQdx_cut_min or dqds > dQdx_cut_max or ds > ds_cut or ds < pitch or h->sp_x < MinX or h->sp_x > MaxX or h->sp_y < MinY or h->sp_y > MaxY or h->sp_z < MinZ or h->sp_z > MaxZ or h->GoF > GoF_cut or !isGood_lem(h->lem) or !IsGoodChan(h->sp_y, h->sp_z) or (only_long_view and t.long_in_view != h->view) ) ) 
+        ){
           h = t.hits_trk.erase(h);
         }
         else{
+          t.nhitsview[h->view]++;
+          t.sumQ[h->view] += dQ;
           ++h;
         }
       }
-      
-      if(!only_throughgoing and !only_throughgoing_x and !only_throughgoing_y and !only_throughgoing_z and t.hits_trk.size() != 0){
-        mips.push_back(t);
-        rec_track_dQds(t, hdQds, hdQds_ByLEMs, hdQds_ByDx, hdQds_ByDx_ByLEMs, hdQds_Dx_Corrected, hdQds_ByLEMs_Dx_Corrected);
-        count_mip++;
+      if(t.hits_trk.size() == 0){continue;}
+      double Qasym = 0;
+      if(t.sumQ[0] > 0){
+        Qasym = t.sumQ[1]/t.sumQ[0];
       }
-      else if( max(t.end_x, t.start_x) > maxx and min(t.end_x, t.start_x) < minx and !only_throughgoing_y and !only_throughgoing_z and t.hits_trk.size() != 0){
-        mips.push_back(t);
-        rec_track_dQds(t, hdQds, hdQds_ByLEMs, hdQds_ByDx, hdQds_ByDx_ByLEMs, hdQds_Dx_Corrected, hdQds_ByLEMs_Dx_Corrected);
-        count_mip++;
-      } //end if x
-      else if( max(t.end_y, t.start_y) > maxy and min(t.end_y, t.start_y) < miny and !only_throughgoing_x and !only_throughgoing_z and t.hits_trk.size() != 0){
-        mips.push_back(t);
-        rec_track_dQds(t, hdQds, hdQds_ByLEMs, hdQds_ByDx, hdQds_ByDx_ByLEMs, hdQds_Dx_Corrected, hdQds_ByLEMs_Dx_Corrected);
-        count_mip++;
-      } //end if z
-      else if( max(t.end_z, t.start_z) > maxz and min(t.end_z, t.start_z) < minz and !only_throughgoing_x and !only_throughgoing_y and t.hits_trk.size() != 0){
-        mips.push_back(t);
-        rec_track_dQds(t, hdQds, hdQds_ByLEMs, hdQds_ByDx, hdQds_ByDx_ByLEMs, hdQds_Dx_Corrected, hdQds_ByLEMs_Dx_Corrected);
-        count_mip++;
-      } //end if y
+      if( (!reverse_cut and (Qasym < Qasym_cut[0]       or Qasym > Qasym_cut[1]      )) or (reverse_cut and !(Qasym < Qasym_cut[0]       or Qasym > Qasym_cut[1]      )) ){continue;}
+      if( (!reverse_cut and (t.nhitsview[0] < nhits_cut or t.nhitsview[1] < nhits_cut)) or (reverse_cut and !(t.nhitsview[0] < nhits_cut or t.nhitsview[1] < nhits_cut)) ){continue;}
+      mips.push_back(t);
+      rec_track_dQds(t, hdQds, hdQds_ByLEMs, hdQds_ByDx, hdQds_ByDx_ByLEMs, hdQds_Dx_Corrected, hdQds_ByLEMs_Dx_Corrected);
+      count_mip++;
     }//end mag
   }//end for tracks
   
@@ -3706,18 +4136,109 @@ bool get_histo_in_inputfile(TH1D &hdQds, TFile *runfile, string name_to_get, boo
 
 string set_cuts(string cut_type){
   string to_return = "";
-  if(cut_type.find("dray") != string::npos){dray_miti = true; to_return+="dray_";}
-  if(cut_type.find("common") != string::npos){length_cut = 50.;method_dQ = "sum";method_ds = "local"; to_return+="common_"; highway = true;}
-//  if(cut_type.find("theta") != string::npos) {theta_cut = 0.1745; to_return+="theta_";}
-//  if(cut_type.find("phi") != string::npos) {phi_cut = 0.1745; to_return+="phi_";}
-  if(cut_type.find("length") != string::npos) {length_cut = 40.; to_return+="length_";}
-  if(cut_type.find("nolen") != string::npos) {length_cut = 0.; to_return+="nolen_";}
-  if(cut_type.find("Ds") != string::npos) {ds_cut = 1.; to_return+="Ds_";}
+  if(cut_type.find("reverse") != string::npos){
+    to_return = "reverse_";
+  }
+  if(cut_type.find("laura") != string::npos){
+    length_cut = 50.;
+    nmaxtracksinevent = 80;
+    only_throughgoingX = true;
+    keep_on_edgeX = true;
+    to_return = to_return + "laura_";
+    
+  }
+  else if(cut_type.find("christoph") != string::npos){
+    nmaxtracksinevent = 10;
+    only_throughgoingX = true;
+    below_central_lem = true;
+    to_return = to_return + "christoph_";
+    
+  }
+  else if(cut_type.find("philippe") != string::npos){
+    nmaxtracksinevent = 10;
+    only_throughgoingX = true;
+//    keep_on_edgeX = true;
+    theta_cut = 2.3;
+    to_return = to_return + "philippe_";
+    
+  }
+  if(cut_type.find("dray") != string::npos){
+    dray_miti = true; to_return+="dray_";
+  }
+  if(cut_type.find("common") != string::npos){
+    length_cut = 50.;method_dQ = "sum";method_ds = "local"; to_return+="common_"; highway = true;
+  }
+  if(cut_type.find("length") != string::npos and cut_type.find("laura") == string::npos) {
+    length_cut = 50.; to_return+="length_";
+  }
+  if(cut_type.find("nolen") != string::npos) {
+    length_cut = 0.; to_return+="nolen_";
+  }
+  if(cut_type.find("Ds") != string::npos) {
+    ds_cut = 1.; to_return+="Ds_";
+  }
 //  if(cut_type.find("GoF") != string::npos) {GoF_cut = 0.2; to_return+="GoF_";}
-  if(cut_type.find("purity") != string::npos) {only_throughgoing_x = true; to_return+="tgx_";}
-//  else if(cut_type.find("tgy") != string::npos) {only_throughgoing_y = true; to_return+="tgy_";}
-//  else if(cut_type.find("tgz") != string::npos) {only_throughgoing_z = true; to_return+="tgz_";}
-//  else if(cut_type.find("tg") != string::npos) {only_throughgoing = true; to_return+="tg_";}
+  if(cut_type.find("tgx") != string::npos) {
+    only_throughgoingX = true; to_return+="tgx_";
+  }
+  if(cut_type.find("tgy") != string::npos) {
+    only_throughgoingY = true; to_return+="tgy_";
+  }
+  if(cut_type.find("tgz") != string::npos) {
+    only_throughgoingZ = true; to_return+="tgz_";
+  }
+  if(cut_type.find("tg") != string::npos and cut_type.find("tgx") == string::npos and cut_type.find("tgy") == string::npos and cut_type.find("tgz") == string::npos) {
+    only_throughgoing = true; to_return+="tg_";
+  }
+  if(cut_type.find("on_edgeX") != string::npos) {
+    keep_on_edgeX = true; to_return+="on_edgeX_";
+  }
+  if(cut_type.find("on_edgeY") != string::npos) {
+    keep_on_edgeY = true; to_return+="on_edgeY_";
+  }
+  if(cut_type.find("on_edgeZ") != string::npos) {
+    keep_on_edgeZ = true; to_return+="on_edgeZ_";
+  }
+  if(cut_type.find("on_edge") != string::npos and cut_type.find("on_edgeX") == string::npos and cut_type.find("on_edgeY") == string::npos and cut_type.find("on_edgeZ") == string::npos) {
+    keep_on_edge = true; to_return+="on_edge_";
+  }
+  if(cut_type.find("below_central_lem") != string::npos or cut_type.find("bcl") != string::npos) {
+    below_central_lem = true; to_return+="bcl_";
+  }
+  if(cut_type.find("ntracks") != string::npos) {
+    ntracks = 10; to_return+="ntracks_";
+  }
+  if(cut_type.find("maxtracksevent") != string::npos) {
+    nmaxtracksinevent = 10; to_return+="maxtracksevent_";
+  }
+  if(cut_type.find("mtheta") != string::npos) {
+    theta_cut = -2.3; to_return+="mtheta_";
+  }
+  if(cut_type.find("ptheta") != string::npos) {
+    theta_cut = 2.3; to_return+="ptheta_";
+  }
+  if(cut_type.find("deltatheta") != string::npos) {
+    deltatheta_cut = 10.; to_return+="deltatheta_";
+  }
+  if(cut_type.find("deltaphi") != string::npos) {
+    deltaphi_cut = 10.; to_return+="deltaphi_";
+  }
+  if(cut_type.find("phirange") != string::npos) {
+    phi_range[0] = 30; phi_range[1] = 60; to_return+="phirange_";
+  }
+  if(cut_type.find("thetarange") != string::npos) {
+    theta_range[0] = 135; theta_range[1] = 180; to_return+="thetarange_";
+  }
+  if(cut_type.find("Qasym") != string::npos) {
+    Qasym_cut[0] = 0.8; Qasym_cut[1] = 1.2; to_return+="Qasym_";
+  }
+  if(cut_type.find("nhits") != string::npos) {
+    nhits_cut = 50; to_return+="nhits_";
+  }
+  if(cut_type.find("onlylongview") != string::npos) {
+    only_long_view = true; to_return+="onlylongview_";
+  }
+  
   if(to_return == ""){to_return = "before_cuts";}
   else{to_return = to_return.substr(0, to_return.size()-1);}
   return to_return;
@@ -3742,6 +4263,8 @@ void set_bad_runs(){
   bad_runs_lems["common_local_sum"][840] = {5,7,8};
   bad_runs_lems["common_local_sum"][835] = {8};
   bad_runs_lems["common_local_sum"][833] = {8};
+  
+  bad_runs_yz["zob"][1] = {make_pair(-1,-1)};
 
   return;
 }
@@ -4092,6 +4615,19 @@ bool set_gain_processed(vector<int> run_list, string cut_type, string m_dq, stri
       bool goodlem = IsGood_lem_gain(cut_type_and_methods, run, lem);
       h->SetGainProcessedLEM(cut_type_and_methods, lem, good and goodlem);
     }
+    if(h->GetYZMPVs().size() != 0){
+      vector<int> begins = {-(int)(lem_size/dy), 0};
+      vector<int> ends = {(int)(lem_size/dy), (int)(6*lem_size/dz)};
+      for( int Y = begins[0]; Y < ends[0]; Y++ ){
+        for( int Z = begins[1]; Z < ends[1]; Z++ ){
+          pair<int,int> YZ = make_pair(Y,Z);
+          double mpv0 = h->GetYZMPVs()[cut_type_and_methods][YZ].first;
+          double mpv1 = h->GetYZMPVs()[cut_type_and_methods][YZ].second;
+          bool goodYZ = (IsGood_yz(cut_type_and_methods, run, make_pair(Y,Z)) and mpv0 > 0 and mpv1 > 0);
+          h->SetYZGainProcessed(cut_type_and_methods, make_pair(Y,Z), goodYZ);
+        }
+      }
+    }
     h->Write(headername.data(),TObject::kOverwrite);
     #if verbose
     cout << " Header " << headername << " updated in " << ofilename << "." << endl;
@@ -4102,8 +4638,8 @@ bool set_gain_processed(vector<int> run_list, string cut_type, string m_dq, stri
 }
 
 bool save_runs_headers(vector<int> run_list){
-  if(!Load_Version("Feb")){return false;}
-  if(!load_run_lists()){return false;}
+  if(version == ""){if(!Load_Version("Feb")){return false;}}
+  if(runs_and_fields.size() == 0){if(!load_run_lists()){return false;}}
   
   string path = path_wa105_311data;
   string path_output = runs_headers;
@@ -4159,6 +4695,9 @@ bool save_runs_headers(vector<int> run_list){
       else if(path_311data.find("June") != string::npos){
         file = file + "-RecoFast-Parser.root";
       }
+      else if(path_311data.find("July") != string::npos){
+        file = file + "-RecoFast-Parser.root";
+      }
       else{
         cout << "ERROR: unknown reconstruction version" << endl;
         return false;
@@ -4211,7 +4750,7 @@ bool save_runs_headers(vector<int> run_list){
     double rho_var = H_Rho.GetStdDev();
     double density_correction_factor = gain_correction_for_rho(rho, amplification);
     
-    TMyFileHeader header(run, drift, extraction, amplification, induction, tstart ,tend,string("header_"+to_string(run)).data(), rho, rho_var, extr_eff_simu, extr_eff_gushin, ind_eff, drift_correction_factor, density_correction_factor, theoretical_gain(1,rho,amplification), theoretical_gain(1,rho_ref,amplification), trigger);
+    TMyFileHeader header(run, drift, extraction, amplification, induction, tstart ,tend,string("header_"+to_string(run)).data(), rho, rho_var, extr_eff_simu, 0, extr_eff_gushin, 0, ind_eff, 0, drift_correction_factor, 0, density_correction_factor, 0, theoretical_gain(1,rho,amplification), theoretical_gain(1,rho_ref,amplification), trigger);
     TFile ofile(ofilename.data(), "RECREATE");
     if(!ofile.IsOpen()){
       cout << " ERROR: TFile " << ofilename << " can't be created " << endl;

@@ -1,0 +1,59 @@
+include Makefile.inc
+
+# libraries to compile
+MODULES = daq
+
+EXECS   = $(patsubst src/%.cc, bin/%.exe, $(wildcard src/*.cc))
+LIBSO   = -L lib/ $(foreach mod, $(MODULES), -l$(mod))
+
+all: $(EXECS)
+
+$(EXECS) : buildmod
+
+# rule for building executables
+bin/%.exe : src/%.o
+	@echo 'Building $@ ...'
+	$(LD) $(LDFLAGS) $< -o $@  $(LIBSO)
+
+src/%.o: src/%.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+# build modules
+buildmod: buildinit buildit
+#	@echo $(LIBSO)
+#	@for mod in $(MODULES);\
+	do make -C $$mod/; done
+
+buildit: $(MODULES)
+
+$(MODULES):
+	make -C $@
+
+# run first to set-up includes and directories
+buildinit:
+	@ [ -d include ] || mkdir include
+	@ [ -d bin ]     || mkdir bin
+	@ [ -d lib ]     || mkdir lib
+	@for mod in $(MODULES);\
+	do \
+	for file in $$mod/inc/*.h; \
+	do \
+	ln -sf ../$$file include/; done \
+	done
+
+clean:
+	@for mod in $(MODULES);\
+	do make clean -C $$mod/; done
+	rm -fv src/*.o
+	rm -fv $(EXECS)
+
+# clean dist
+distclean: clean
+	@find include/ -type f -delete
+	@for mod in $(MODULES);\
+	do make distclean -C $$mod/; done
+	rm -fv src/*.*~
+	rm -fv src/*.o
+	rm -fv include/*.h
+

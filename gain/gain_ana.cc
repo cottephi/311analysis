@@ -31,10 +31,10 @@ string to_string_with_precision(const T a_value, const int n = 3){
 }
 
 
-void gain_ana(string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local"){
+void gain_ana(string cut_type = "Ds", string v = "July", string m_dQ = "sum", string m_ds = "local"){
   method_ds = m_ds;
   method_dQ = m_dQ;
-  if(!Load_Version(version)){return;}
+  if(!Load_Version(v)){return;}
   if(!load_run_lists()){return;}
   set_bad_runs();
   load_force_mpv();
@@ -52,12 +52,6 @@ void gain_ana(string cut_type = "Ds", string version = "July", string m_dQ = "su
   // Set height of stat-box (fraction of pad size)
   
   gStyle->SetPalette(kColorPrintableOnGrey);
-  bool recreate_fit_file = false;
-  
-  string corrected_or_not = "";
-  if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
-  string name_to_get = "";
-  string cut_type_and_methods = cut_type + "_" + method_ds + "_" + method_dQ;
   
   //****************************************************************************
   //variables definition here

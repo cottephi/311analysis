@@ -49,20 +49,38 @@ string path_wa105_311data;
 double lem_size;
 vector<int> tpc_boundaries;
 double pitch;
-double dQdx_cut_min;
+double dQdx_cut_min = 0.001;
+double dQdx_cut_max = 50;
 double dx,dy,dz;
 bool IsBatch = false;
 
 //cuts********************************************************************************
 double length_cut = 0;
-double theta_cut = -1.;
+double theta_cut = 0;
 double phi_cut = -1.;
+double phi_range[2] = {-180,180};
+double theta_range[2] = {90,180};
+double deltatheta_cut = 10;
+double deltaphi_cut = 10;
 double ds_cut = 1e9;
 double GoF_cut = 1e9;
+double Qasym_cut[2] = {0,1e9};
+int ntracks = 1e9;
+int nhits_cut = 0;
+unsigned int nhits_min = 0;
+int nmaxtracksinevent = 1000000;
 bool only_throughgoing = false;
-bool only_throughgoing_x = false;
-bool only_throughgoing_y = false;
-bool only_throughgoing_z = false;
+bool only_throughgoingX = false;
+bool only_throughgoingY = false;
+bool only_throughgoingZ = false;
+bool below_central_lem = false;
+bool keep_on_edge = false;
+bool keep_on_edgeX = false;
+bool keep_on_edgeY = false;
+bool keep_on_edgeZ = false;
+bool highway = false;
+bool dray_miti = false;
+bool only_long_view = false;
 
 double rho_ref = 11.2644; //980/87, from 3L
 TH2D h_ExtrEff_vs_LemExtr;
@@ -89,6 +107,7 @@ const string runs_headers = "/eos/user/p/pcotte/311data/runs_headers/";
 const string slow_control = "/eos/user/p/pcotte/311data/slow_control/";
 const string highway_output = "/eos/user/p/pcotte/from_github_311analysis/Analysis/Event-track-selection/HighwayAlgorithm/HighwayOutput/text_files/";
 
+string version = "";
 string SelectTrack_Input;
 string SelectTrack_Output;
 string SelectTrack_MC_Output;
@@ -110,12 +129,14 @@ string dQds_YZ_Output;
 string dQds_MC_Output;
 string charging_up_Output;
 string gain_stability_Output;
+string recofile_suffix;
 
 vector<int> MyColorPalette = {632+2,632,800+9,800+7,800-3,800-2,820+10,820-9,820,840+8,840+7,840,860+8,860+7,860,880+7,880+1,880};
 vector<string> params = {"date","TE0037","TE0038","TE0039","TE0040","TE0041","TE0042","TE0043","TE0044","TE0045","TE0046","TE0047","TE0048","TE1001","TE1002","TE1003","TE1004","TE0049","TE0050","TE0051","TE0052","TE0053","TE0054","TE0055","TE0056","TE0057","TE0058","TE0059","TE0060","PE0006"};
 
 map<string, vector<int> > bad_runs;
 map<string, map<int, vector<int> > > bad_runs_lems;
+map<string, map<int, vector<pair<int,int> > > > bad_runs_yz;
   
 float ExtrField_Gushin[23] = {0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0};
 float ExtrEff_Gushin[23] = {0.3, 0.35, 0.4, 0.4, 0.5, 0.5, 0.6, 0.6, 0.7, 0.7, 0.8, 0.85, 0.9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -131,7 +152,7 @@ bool load_cosmics();
 bool load_run_lists();
 bool load_extr_eff_simu_graphs();
 bool load_ind_eff_simu_graphs();
-TMyFileHeader load_run_header(int run, bool update = false);
+TMyFileHeader load_run_header(int run, bool clean = false);
 void load_fit_3L();
 void load_Gushin_Eff();
 void load_gain_eff_corrections();
@@ -148,8 +169,16 @@ int tdc = 1667;
 /*double ADC2CHARGE = 45.31875; //ADC*ticks (from qScan)*/
 double ADC2CHARGE[2] = {55, 67};
 vector<int> bad_channels = {576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607};
+//vector<int> bad_channels = {};
 vector<int> lems = {2, 4, 5, 6, 7, 8, 9, 11}; //active lems
-vector<int> vol_cut = {0, 0, 0, 0, 0, 0}; //in cm
+//vector<int> lems = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}; //active lems
+vector<int> vol_cut = {2, 2, 0, 0, 2, 2}; //in cm
+int MinX = -1e5;
+int MaxX = 1e5;
+int MinY = -1e5;
+int MaxY = 1e5;
+int MinZ = -1e5;
+int MaxZ = 1e5;
 map<int,pair<double,double> > force_mpv;
 static int default_int = 1;
 double mpv_cosmics = -1.;
@@ -160,8 +189,6 @@ double corr = 1.;
 double e_lifetime_const = 7.;//ms //Caspar talk 29 June
 string method_ds = "local";
 string method_dQ = "sum";
-bool highway = false;
-bool dray_miti = false;
 
 double golden_ratio = 1.618;
 
@@ -180,10 +207,13 @@ class hit{
     double sp_x;
     double sp_y;
     double sp_z;
+    double sp_theta;
+    double sp_phi;
     double dq_sum;
     double dq_integral;
     double dx_3D;
     double dx_local;
+    double dx_phil;
     double dx_MC;
     double purity_correction;
     int lem;
@@ -196,7 +226,9 @@ class track{
     int run;
     int subrun;
     int event;
+    int event_ntracks;
     int id;
+    int long_in_view;
     double start_x;
     double start_y;
     double start_z;
@@ -216,9 +248,19 @@ class track{
     double length;
     double theta;
     double phi;
+    double sumQ[2];
+    bool throughgoing;
+    bool throughgoingX;
+    bool throughgoingY;
+    bool throughgoingZ;
+    bool on_edgeX;
+    bool on_edgeY;
+    bool on_edgeZ;
+    bool on_edge;
+    bool highway_selected;
+    bool blc;
     vector<double> MPVs_dQds;
-    int nhits;
-//    vector<free_hit> free_hits_trk;
+    int nhitsview[2];
     vector<hit> hits_trk;
 };
 
@@ -249,6 +291,7 @@ bool isGood_lem( int lem );
 
 bool IsGood_run(string cut_type_and_methods, int run);
 bool IsGood_lem_gain(string cut_type_and_methods, int run, int lem);
+bool IsGood_yz(string cut_type_and_methods, int run, pair<int,int> YZ);
 
 double find_projection(hit h);
 
@@ -258,8 +301,8 @@ void read_tree_June(TChain *rTree, vector<track> & tracks, int &tstart, int &ten
 int drays_mitigation(track & t);
 
 double get_theta(track t);
-
 double get_phi(track t);
+double get_reduced_phi(track t);
 
 vector<double> get_dss(track t);
 
@@ -279,7 +322,7 @@ double langaufun(double *x, double *par);
 TF1 *langaufit(TH1D *his, double *fitrange, vector<double> startvalues,
  vector<double> parlimitslo, vector<double> parlimitshi, vector<double> &fitparams, vector<double> &fiterrors, double &pvalue, double pvaluelim, bool find_best = false, bool gauss = false);
 
-void plot_selected_tracks(vector<track> tracks, string path, int ntracks = -1);
+void plot_tracks(vector<track> tracks, string cut_type, int ntracks = 100, double dqds_cut = 0);
 
 ////////////not 311-related/////////////
 

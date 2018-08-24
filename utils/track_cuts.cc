@@ -16,18 +16,16 @@ using namespace std;
 
 //////////////////////////////// MAIN //////////////////////////////////////////
 
-void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string version = "July", string m_dQ = "sum", string m_ds = "local", bool save_tracks = true, bool is_batch = false){
+void track_cuts(vector<int> run_list={1197}, string cut_type = "philippe", string v = "July", string m_dQ = "sum", string m_ds = "local", bool save_tracks = true, bool is_batch = false){
   method_ds = m_ds;
   method_dQ = m_dQ;
   IsBatch = is_batch;
-  if(!Load_Version(version)){return;}
+  if(!Load_Version(v)){return;}
   cut_type = set_cuts(cut_type);
   
-  string path = path_wa105_311data;
   int to_read = 0;
   if(!load_run_lists()){return;}
   if (run_list.size() == 0){
-    path = path_wa105_311data;
     #if verbose
     cout << "Processing all runs in " << path_wa105_311data << "*..." << endl;
     #endif
@@ -74,7 +72,7 @@ void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string versi
     #endif
 
     TChain chain("analysistree/anatree");
-    string foldername = path+to_string(run)+"/";
+    string foldername = path_wa105_311data+to_string(run)+"/";
     int n_subruns = glob(string(foldername+"*").data()).size();
     if( n_subruns == 0){
       #if verbose
@@ -89,22 +87,10 @@ void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string versi
     string file = "";
     for(int i=0; i< n_subruns; i++){
       
-      file=to_string(run)+"-"+to_string(i);
+      file = to_string(run)+"-"+to_string(i);
       if(file == "1009-21"){continue;}
-      if(path_311data.find("Feb") != string::npos){
-        file = file + "-Parser.root";
-      }
-      else if(path_311data.find("June") != string::npos){
-        file = file + "-RecoFast-Parser.root";
-      }
-      else if(path_311data.find("July") != string::npos){
-        file = file + "-RecoFast-Parser.root";
-      }
-      else{
-        cout << "ERROR: unknown reconstruction version" << endl;
-        return;
-      }
-      filename=foldername+file;
+      file = file + recofile_suffix;
+      filename = foldername+file;
       if( ExistTest(filename) ){
         #if verbose
         cout << "Adding file: " << filename << endl;
@@ -130,19 +116,19 @@ void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string versi
     cout << "Run " << run << " has " << chain.GetEntries() << " events " << endl;
     cout << "Reading input file..." << endl;
     #endif
-    if(path_311data.find("Feb") != string::npos){
-      read_tree_Feb(&chain, tracks_before_cuts, tstart, tend, to_read);
-    }
-    else if(path_311data.find("June") != string::npos){
-      read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
-    }
-    else if(path_311data.find("July") != string::npos){
-      read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
-    }
-    else{
-      cout << "ERROR: unknown reconstruction version" << endl;
-      return;
-    }
+//    if(path_311data.find("Feb") != string::npos){
+//      read_tree_Feb(&chain, tracks_before_cuts, tstart, tend, to_read);
+//    }
+//    else if(path_311data.find("June") != string::npos){
+//      read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
+//    }
+//    else if(path_311data.find("July") != string::npos){
+    read_tree_June(&chain, tracks_before_cuts, tstart, tend, to_read);
+//    }
+//    else{
+//      cout << "ERROR: unknown reconstruction version" << endl;
+//      return;
+//    }
     if(tracks_before_cuts.size() == 0){
       #if verbose
       cout << "Empty run " << run << endl;
@@ -159,21 +145,8 @@ void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string versi
       continue;
     }
   
-    string ofilepath_dQds = dQds_Output;
-    if(!ExistTest(ofilepath_dQds)){
-      #if verbose
-      cout << "Creating directory " << ofilepath_dQds.data() << endl;
-      #endif
-      mkdir(ofilepath_dQds.data(),0777);
-    }
-    ofilepath_dQds = ofilepath_dQds+cut_type+"/";
-    if(!ExistTest(ofilepath_dQds)){
-      #if verbose
-      cout << "Creating directory " << ofilepath_dQds.data() << endl;
-      #endif
-      mkdir(ofilepath_dQds.data(),0777);
-    }
-    ofilepath_dQds = ofilepath_dQds + to_string(run)+".root";
+    string ofilepath_dQds = dQds_Output + cut_type+"/" + to_string(run)+".root";
+    check_and_mkdir(ofilepath_dQds);
     TFile ofile_dQds(ofilepath_dQds.data(), "RECREATE");
     if(!ofile_dQds.IsOpen()){
       cout << " ERROR: TFile " << ofilepath_dQds << " can't be created " << endl;
@@ -209,21 +182,8 @@ void track_cuts(vector<int> run_list={840}, string cut_type = "Ds", string versi
     #if verbose
     cout << "Creating tracks files..." << endl;
     #endif
-    string ofilepath_tracks = SelectTrack_Output;
-    if(!ExistTest(ofilepath_tracks)){
-      #if verbose
-      cout << "Creating directory " << ofilepath_tracks.data() << endl;
-      #endif
-      mkdir(ofilepath_tracks.data(),0777);
-    }
-    ofilepath_tracks = ofilepath_tracks+cut_type+"/";
-    if(!ExistTest(ofilepath_tracks)){
-      #if verbose
-      cout << "Creating directory " << ofilepath_tracks.data() << endl;
-      #endif
-      mkdir(ofilepath_tracks.data(),0777);
-    }
-    ofilepath_tracks=ofilepath_tracks+"tracks_"+to_string(run)+".root";
+    string ofilepath_tracks = SelectTrack_Output + cut_type + "/tracks_" + to_string(run)+".root";
+    check_and_mkdir(ofilepath_tracks);
     TFile ofile(ofilepath_tracks.data(), "RECREATE");
     if(!ofile.IsOpen()){
       cout << " ERROR: TFile " << ofilepath_tracks << " can't be created " << endl;

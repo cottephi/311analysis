@@ -1,0 +1,39 @@
+
+Processing loadHeader.cc...
+Processing loadLib.cc...
+Processing utils/track_cuts.cc({1197},"before_cuts","July","sum","local")...
+Loading version July
+...done.
+Loading runs from /eos/user/p/pcotte/311analysis/all_runs.csv...
+...done
+  Initialising histos...
+  ...done
+Processing 10 subruns in run 1197
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-0-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-1-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-2-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-3-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-4-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-5-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-6-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-7-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-8-RecoFast-Parser.root
+Adding file: /eos/experiment/wa105/offline/LArSoft/Data/Reco/2018_July_30/ROOT/recofast/1197/1197-9-RecoFast-Parser.root
+Files added. 
+Run 1197 has 3290 events 
+Reading input file...
+ FCN=0.48533 FROM MIGRAD    STATUS=CONVERGED     704 CALLS         705 TOTAL
+                     EDM=3.25527e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  T            7.49853e-01   1.38597e-01   7.28536e-06  -5.47289e-03
+   2  A*rho        3.06860e+03   5.29184e+02   3.16796e-03   9.94853e-06
+   3  B*rho        1.41412e+02   7.18958e+00   6.74304e-05  -9.43359e-04
+Selecting tracks using before_cuts cuts...
+ Selected 50078 tracks over 50078 tracks 
+Doing cut before_cuts
+ TFile /eos/user/p/pcotte/311data/2018_July_30/dQds_local_sum/before_cuts/1197.root has been created 
+Creating tracks files...
+ TFile /eos/user/p/pcotte/311data/2018_July_30/selected_tracks_local_sum/before_cuts/tracks_1197.root has been created 
+end with run 1197
+All done..

@@ -5,4 +5,6 @@ jobs_output/LSFJOB*
 *.root
 *.png
 obj/*
+RawDataSoft/plots
+RawDataSott/testfiles
 WA105Soft

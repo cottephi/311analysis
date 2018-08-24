@@ -30,14 +30,17 @@ string to_string_with_precision(const T a_value, const int n = 3){
   return out.str();
 }
 
-
-void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string version = "July", string m_dQ = "sum", string m_ds = "local", bool save_plots = true){
+// vector<int> run_list = {/*1165, 1166, 1167, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1180, 1181, */1182, 1183, 1187, 1188, 1189, 1190, 1191, /*1192, 1193,*/ 1194, 1195, 1196, 1197, /*1198, 1199,*/ 840}
+//vector<int> run_list = {1183}
+void dodqdx(vector<int> run_list = {/*1165, 1166, 1167, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1180, 1181, */1182, 1183, 1187, 1188, 1189, 1190, 1191, /*1192, 1193,*/ 1194, 1195, 1196, 1197, /*1198, 1199,*/ 840}, string cut_type = "philippe", string v = "July", string m_dQ = "sum", string m_ds = "local", bool save_plots = true){
+  TH1::AddDirectory(kFALSE);
   method_ds = m_ds;
   method_dQ = m_dQ;
-  if(!Load_Version(version)){return;}
+  if(!Load_Version(v)){return;}
   if(!load_run_lists()){return;}
   gErrorIgnoreLevel = kError;
   gStyle->SetOptStat(0);
+  
   
 //  gStyle->SetOptFit(0);
   if (run_list.size() == 0){
@@ -50,6 +53,8 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
   if(!load_cosmics()){return;}
   
   bool recreate_fit_file = true;
+  bool update_header = true;
+  bool clean = true;
   
   string corrected_or_not = "";
   if(cut_type.find("tg") != string::npos){corrected_or_not = "_Dx_Corrected";}
@@ -59,8 +64,13 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
   //****************************************************************************
   
   for(auto run : run_list){
+    
+    #if verbose
+    cout << "  Processing run " << run << endl;
+    #endif
 
-    TMyFileHeader header = load_run_header(run);
+    TMyFileHeader header = load_run_header(run,clean);
+    if(header.GetRun() == -1){return;}
     string filename_nonfitted = dQds_Output+cut_type+"/"+to_string(run)+".root";
     string filename_fitted = dQds_Output+cut_type+"/"+to_string(run)+"_fitted.root";
     TFile *runfile_fitted = new TFile();
@@ -89,11 +99,20 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
     vector<pair<TH1D,TH1D> > histograms;
     vector<pair<TF1,TF1> > functions;
     vector<pair<double,double> > MPVs;
+    vector<pair<double,double> > LMPVs;
+    vector<pair<double,double> > LWs;
+    vector<pair<double,double> > GWs;
+    vector<pair<double,double> > errLMPVs;
+    vector<pair<double,double> > errLWs;
+    vector<pair<double,double> > errGWs;
     TString FunName = "";
     int nhits_tot = 0;
     int min_number_of_hits = 200;
     vector<double> f = {-1,-1};
     double MPV0, MPV1;
+    double LMPV0, LMPV1, err_LMPV0, err_LMPV1;
+    double LW0, LW1, err_LW0, err_LW1;
+    double GW0, GW1, err_GW0, err_GW1;
     
     #if verbose 
     cout << "  Reading histograms..." << endl;
@@ -108,6 +127,7 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
       if(!get_histo_in_inputfile(hdQds0, runfile, name_to_get, read_fit)){return;}
     }
     
+    hdQds0.SetTitle("dQds");
     nhits_tot += hdQds0.GetEntries();
     if(read_fit){
       f = ReadFit(&hdQds0);
@@ -128,6 +148,7 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
       if(!get_histo_in_inputfile(hdQds1, runfile, name_to_get, read_fit)){return;}
     }
     
+    hdQds1.SetTitle("dQds");
     nhits_tot += hdQds1.GetEntries();
     if(read_fit){
       f = ReadFit(&hdQds1);
@@ -140,48 +161,60 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
     
     if( ((TList*)hdQds0.GetListOfFunctions())->GetSize() > 0){
       func0 = *(TF1*)((TList*)hdQds0.GetListOfFunctions())->At(0);
-      MPV0 = func0.GetMaximumX();
+      if(func0.GetNpar() > 1){
+        MPV0 = func0.GetMaximumX();
+        LMPV0 = func0.GetParameter(1);
+        LW0 = func0.GetParameter(0);
+        GW0 = func0.GetParameter(3);
+        err_LMPV0 = func0.GetParError(1);
+        err_LW0 = func0.GetParError(0);
+        err_GW0 = func0.GetParError(3);
+      }
     }
     else{
       func0 = TF1("empty","");
-      MPV0 = -1;
     }
     if( ((TList*)hdQds1.GetListOfFunctions())->GetSize() > 0){
       func1 = *(TF1*)((TList*)hdQds1.GetListOfFunctions())->At(0);
-      MPV1 = func1.GetMaximumX();
+      if(func1.GetNpar() > 1){
+        MPV1 = func1.GetMaximumX();
+        LMPV1 = func1.GetParameter(1);
+        LW1 = func1.GetParameter(0);
+        GW1 = func1.GetParameter(3);
+        err_LMPV1 = func1.GetParError(1);
+        err_LW1 = func1.GetParError(0);
+        err_GW1 = func1.GetParError(3);
+      }
     } 
     else{
       func1 = TF1("empty","");
-      MPV1 = -1;
     }
       
     histograms.push_back(make_pair(hdQds0,hdQds1) );
     functions.push_back( make_pair(func0,func1) );
     MPVs.push_back( make_pair(MPV0, MPV1) );
-    header.SetMPV0(cut_type_and_methods, MPV0);
-    header.SetMPV1(cut_type_and_methods, MPV1);
+    LMPVs.push_back( make_pair(LMPV0, LMPV1) );
+    LWs.push_back( make_pair(LW0, LW1) );
+    GWs.push_back( make_pair(GW0, GW1) );
+    errLMPVs.push_back( make_pair(err_LMPV0, err_LMPV1) );
+    errLWs.push_back( make_pair(err_LW0, err_LW1) );
+    errGWs.push_back( make_pair(err_GW0, err_GW1) );
+    header.SetMPV0(cut_type_and_methods, LMPV0);
+    header.SetMPV1(cut_type_and_methods, LMPV1);
+    header.SetErrMPV0(cut_type_and_methods, err_LMPV0);
+    header.SetErrMPV1(cut_type_and_methods, err_LMPV1);
     header.SetH0(cut_type_and_methods, &hdQds0);
     header.SetH1(cut_type_and_methods, &hdQds1);
+    MPV0 = -1; MPV1 = -1;
+    LMPV0 = -1; LMPV1 = -1; err_LMPV0 = -1; err_LMPV1 = -1;
+    LW0 = -1; LW1 = -1; err_LW0 = -1; err_LW1 = -1;
+    GW0 = -1; GW1 = -1; err_GW0 = -1; err_GW1 = -1;
     
     header.ComputeGain(cut_type_and_methods, mpv_cosmics);
     
-    if( nhits_tot < min_number_of_hits ){
-      #if verbose
-      cout << "    Insuficient number of hits (" << nhits_tot << ") for run " << run << ". Skipping this run. \n  next run" << endl;
-      #endif
-      if(runfile_fitted->IsOpen()){
-        runfile_fitted->Close();
-      }
-      delete runfile_fitted;
-      runfile->Close();
-      delete runfile;
-      continue;
-    }
-    else{
-      #if verbose
-      cout << "    Processing " << nhits_tot << " hits for run " << run << endl;
-      #endif
-    }
+    #if verbose
+    cout << "    Processing " << nhits_tot << " hits for run " << run << endl;
+    #endif
     
     for( auto lem : lems ){
     
@@ -194,6 +227,7 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
         if(!get_histo_in_inputfile(hdQds0, runfile, name_to_get, read_fit)){return;}
       }
       
+      hdQds0.SetTitle(string("dQds_LEM_"+to_string(lem)).data());
       if(read_fit){
         f = ReadFit(&hdQds0);
       }
@@ -212,6 +246,7 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
         if(!get_histo_in_inputfile(hdQds1, runfile, name_to_get, read_fit)){return;}
       }
       
+      hdQds1.SetTitle(string("dQds_LEM_"+to_string(lem)).data());
       if(read_fit){
         f = ReadFit(&hdQds1);
       }
@@ -223,25 +258,50 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
       
       if( ((TList*)hdQds0.GetListOfFunctions())->GetSize() > 0){
         func0 = *(TF1*)((TList*)hdQds0.GetListOfFunctions())->At(0);
-        MPV0 = func0.GetMaximumX();
+        if(func0.GetNpar() > 1){
+          MPV0 = func0.GetMaximumX();
+          LMPV0 = func0.GetParameter(1);
+          LW0 = func0.GetParameter(0);
+          GW0 = func0.GetParameter(3);
+          err_LMPV0 = func0.GetParError(1);
+          err_LW0 = func0.GetParError(0);
+          err_GW0 = func0.GetParError(3);
+        }
       }
       else{
         func0 = TF1("empty","");
-        MPV0 = -1;
       }
       if( ((TList*)hdQds1.GetListOfFunctions())->GetSize() > 0){
         func1 = *(TF1*)((TList*)hdQds1.GetListOfFunctions())->At(0);
-        MPV1 = func1.GetMaximumX();
+        if(func1.GetNpar() > 1){
+          MPV1 = func1.GetMaximumX();
+          LMPV1 = func1.GetParameter(1);
+          LW1 = func1.GetParameter(0);
+          GW1 = func1.GetParameter(3);
+          err_LMPV1 = func1.GetParError(1);
+          err_LW1 = func1.GetParError(0);
+          err_GW1 = func1.GetParError(3);
+        }
       }
       else{
         func1 = TF1("empty","");
-        MPV1 = -1;
       }
       histograms.push_back(make_pair(hdQds0,hdQds1) );
       functions.push_back( make_pair(func0,func1) );
       MPVs.push_back( make_pair(MPV0, MPV1) );
-      header.SetMPVLEM(cut_type_and_methods, lem, make_pair(MPV0,MPV1));
+      LMPVs.push_back( make_pair(LMPV0, LMPV1) );
+      LWs.push_back( make_pair(LW0, LW1) );
+      GWs.push_back( make_pair(GW0, GW1) );
+      errLMPVs.push_back( make_pair(err_LMPV0, err_LMPV1) );
+      errLWs.push_back( make_pair(err_LW0, err_LW1) );
+      errGWs.push_back( make_pair(err_GW0, err_GW1) );
+      header.SetMPVLEM(cut_type_and_methods, lem, make_pair(LMPV0,LMPV1));
+      header.SetErrMPVLEM(cut_type_and_methods, lem, make_pair(err_LMPV0,err_LMPV1));
       header.SetHLEM(cut_type_and_methods, lem, make_pair(&hdQds0,&hdQds1));
+      MPV0 = -1; MPV1 = -1; err_MPV0 = -1; err_MPV1 = -1;
+      LMPV0 = -1; LMPV1 = -1; err_LMPV0 = -1; err_LMPV1 = -1;
+      LW0 = -1; LW1 = -1; err_LW0 = -1; err_LW1 = -1;
+      GW0 = -1; GW1 = -1; err_GW0 = -1; err_GW1 = -1;
       
       header.ComputeGain(cut_type_and_methods, mpv_cosmics,lem);
     
@@ -255,29 +315,54 @@ void dodqdx(vector<int> run_list = {783}, string cut_type = "common", string ver
     #endif
     runfile->Close();
     delete runfile;
-    save_run_header(header);
+    if(update_header){
+      save_run_header(header);
+    }
     
     if(!save_plots){return;}
     
     
-    string outpath = dQds_Output + cut_type + "/plots/" + to_string(run) + "/";
+    string outpath = dQds_Output + cut_type + "/plots/";
     check_and_mkdir(outpath);
+    string outfile = outpath + to_string(run) + "_dQds";
     for(int i = 0; i < histograms.size(); i++){
-      string outfile = outpath + string(histograms[i].first.GetName()).erase(string(histograms[i].first.GetName()).find("_view"),6);
-      histograms[i].second.SetLineColor(kRed);
-      functions[i].second.SetLineColor(kRed);
-      histograms[i].second.SetTitle(string("view0 blue MPV "+to_string(MPVs[i].first)+" " + to_string((int)histograms[i].first.GetEntries()) + " hits, view1 "+to_string(MPVs[i].second)+" " + to_string((int)histograms[i].second.GetEntries()) + " hits red;fC/cm").data());
+      TCanvas mycan("","",1000,620);
+      TLegend leg(0.75,0.7,0.95,0.95);
+      histograms[i].second.SetLineColor(kBlue);
+      functions[i].second.SetLineColor(kBlue);
+      string title0 = "#splitline{v0 Langau MPV: " + to_string_with_precision(MPVs[i].first,2) + "}{#splitline{Landau MPV: " + to_string_with_precision(LMPVs[i].first,2) + "+/-" + to_string_with_precision(errLMPVs[i].first,2) + "}{#splitline{LWidth: " + to_string_with_precision(LWs[i].first,2) + "+/-" + to_string_with_precision(errLWs[i].first,2) + "}{GWidth: " + to_string_with_precision(GWs[i].first,2) + "+/-" + to_string_with_precision(errGWs[i].first,2) + "}}}";
+      string title1 = "#splitline{v1 Langau MPV: " + to_string_with_precision(MPVs[i].second,2) + "}{#splitline{Landau MPV: " + to_string_with_precision(LMPVs[i].second,2) + "+/-" + to_string_with_precision(errLMPVs[i].second,2) + "}{#splitline{LWidth: " + to_string_with_precision(LWs[i].second,2) + "+/-" + to_string_with_precision(errLWs[i].second,2) + "}{GWidth: " + to_string_with_precision(GWs[i].second,2) + "+/-" + to_string_with_precision(errGWs[i].second,2) + "}}}";
       double max = histograms[i].second.GetMaximum();
       if(histograms[i].first.GetMaximum() > max){max = histograms[i].first.GetMaximum();}
-      functions[i].first.SetLineColor(kBlue);
+      histograms[i].first.SetLineColor(kRed);
+      functions[i].first.SetLineColor(kRed);
       histograms[i].second.SetMaximum(max*1.1);
       histograms[i].second.Draw();
+      histograms[i].first.Draw("SAME");
+      leg.AddEntry(&histograms[i].first,title0.data());
+      leg.AddEntry(&histograms[i].second,title1.data());
+      leg.Draw();
       if(string(functions[i].second.GetName()) != "empty"){functions[i].second.Draw("SAME");}
       if(string(functions[i].first.GetName()) != "empty"){functions[i].first.Draw("SAME");}
-      histograms[i].first.Draw("SAME");
-      gPad->SaveAs(string(outfile+".png").data());
-      delete gPad;
+      if(i == 0){
+        mycan.Print(string(outfile+".pdf(").data(),"pdf");
+      }
+      else if(i == histograms.size()-1){
+        mycan.Print(string(outfile+".pdf)").data(),"pdf");
+      }
+      else{
+        mycan.Print(string(outfile+".pdf").data(),"pdf");
+      }
     }
+    histograms.clear();
+    functions.clear();
+    MPVs.clear();
+    LMPVs.clear();
+    LWs.clear();
+    GWs.clear();
+    errLMPVs.clear();
+    errLWs.clear();
+    errGWs.clear();
     
     #if verbose
     cout << "    next run" << endl;
